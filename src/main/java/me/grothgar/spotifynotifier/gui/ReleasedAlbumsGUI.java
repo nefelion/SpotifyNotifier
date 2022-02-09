@@ -2,7 +2,6 @@ package me.grothgar.spotifynotifier.gui;
 
 import me.grothgar.spotifynotifier.ReleasedAlbum;
 import me.grothgar.spotifynotifier.TheEngine;
-import me.grothgar.spotifynotifier.Utilities;
 import me.grothgar.spotifynotifier.records.TempAlbumInfo;
 import me.grothgar.spotifynotifier.records.TimeCheckpoint;
 import se.michaelthelin.spotify.model_objects.specification.Album;
@@ -14,8 +13,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -239,7 +236,7 @@ public class ReleasedAlbumsGUI extends StandardGUI implements ListSelectionListe
 
         info = tempInfoMap.get(id);
         artistNameLabel.setText(Arrays.stream(info.album().getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(", ")));
-        nameLabel.setText(info.album().getName());
+        nameLabel.setText(info.album().getName().length() > 65 ? info.album().getName().substring(0, 60) + "..." : info.album().getName());
         typeLabel.setText(info.album().getAlbumType().getType().toUpperCase() + " released " + info.album().getReleaseDate());
         IDArea.setText(info.album().getId());
         coverLabel.setIcon(new ImageIcon(info.cover()));
