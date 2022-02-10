@@ -32,10 +32,12 @@ public class AddGUI extends StandardGUI {
         artistList.setCellRenderer(new ArtistListRenderer());
         artistList.addListSelectionListener(e -> {
             buttonAdd.setEnabled(false);
-            buttonReleases.setEnabled(false);
+            buttonReleases.setEnabled(true);
             if (artistListModel.isEmpty()) return;
+            if (artistList.getSelectedIndex() < 0) return;
 
             if (artistListModel.get(0).startsWith("\t") && artistList.getSelectedIndex() == 0) {
+                buttonReleases.setEnabled(false);
                 artistList.setSelectedIndex(-1);
                 refresh();
             } else if (!isFollowedHashset.contains(results.get(artistList.getSelectedIndex()).getId())) {
