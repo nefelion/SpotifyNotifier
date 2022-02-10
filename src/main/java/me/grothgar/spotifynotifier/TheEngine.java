@@ -185,8 +185,6 @@ public class TheEngine {
 
     private List<AlbumSimplified> getAlbums(String artistID) {
 
-        ProgressGUI gui;
-
         List<AlbumSimplified> allAlbums = new ArrayList<>();
 
         try {
@@ -252,6 +250,18 @@ public class TheEngine {
             System.exit(-1367);
             return null;
         }
+    }
+
+    public List<Artist> searchArtist(String name) {
+
+        List<Artist> artists = new ArrayList<>();
+        try {
+            artists.addAll(List.of(spotifyApi.searchArtists(name).offset(0).limit(50).build().execute().getItems()));
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            Utilities.showMessageDialog(e.getMessage(), "searchArtist ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+
+        return artists;
     }
 
 }

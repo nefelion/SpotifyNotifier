@@ -11,6 +11,7 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,11 +77,10 @@ public class FollowedGUI extends StandardGUI {
             }
         });
 
-        JButton buttonAddNewArtist = new JButton("Add");
+        JButton buttonAddNewArtist = new JButton("Add / Search");
         buttonAddNewArtist.addActionListener(e -> {
-            theEngine.followArtistID(Utilities.showInputDialog("Enter Artist ID to add", "Add Artist ID"));
-            refreshList();
-            refresh();
+            GUIFrame gui = new AddGUI(theEngine);
+            gui.show();
         });
 
         buttonRemoveArtist = new JButton("Remove");
@@ -157,7 +157,6 @@ public class FollowedGUI extends StandardGUI {
 
         Dimension d = container.getPreferredSize();
         d.height = 600;
-        d.width += 50;
         container.setPreferredSize(d);
 
         frame.add(container);
@@ -166,7 +165,10 @@ public class FollowedGUI extends StandardGUI {
 
         // refresh every 1000ms
         int delay = 1000;
-        ActionListener taskPerformer = evt -> refresh();
+        ActionListener taskPerformer = evt -> {
+            refreshList();
+            refresh();
+        };
         new Timer(delay, taskPerformer).start();
 
 
@@ -187,7 +189,8 @@ public class FollowedGUI extends StandardGUI {
         frame.revalidate();
     }
 
-    private void refreshList() {
+    public void refreshList() {
+        if (!listModel.isEmpty() && new HashSet<>(followedArtists.stream().map(FollowedArtist::getID).collect(Collectors.toList())).equals(new HashSet<>(FileManager.getFileData().getFollowedArtists().stream().map(FollowedArtist::getID).collect(Collectors.toList())))) return;
         followedArtists.clear();
         followedArtists.addAll(FileManager.getFileData().getFollowedArtists());
         listModel.clear();
