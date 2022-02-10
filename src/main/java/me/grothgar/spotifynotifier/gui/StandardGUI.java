@@ -37,11 +37,7 @@ public abstract class StandardGUI extends GUIFrame {
     public void show() {
         pushToStack();
         if (ONE_FRAME == null) ONE_FRAME = this.frame;
-        replaceGUIWith(this);
-    }
-
-    private void replaceGUIWith(StandardGUI gui) {
-        replaceGUIWith(new GUIData(gui.container, gui.frame.getTitle(), gui.frame.getSize()));
+        replaceGUIWith(new GUIData(this.container, this.frame.getTitle(), this.frame.getSize(), this.hashCode()));
     }
 
     private void replaceGUIWith(GUIData guiData) {
@@ -55,7 +51,7 @@ public abstract class StandardGUI extends GUIFrame {
 
 
     protected void pushToStack() {
-        GUI_STACK.push(new GUIData(this.container, this.frame.getTitle(), this.frame.getSize()));
+        GUI_STACK.push(new GUIData(this.container, this.frame.getTitle(), this.frame.getSize(), this.hashCode()));
     }
 
 }

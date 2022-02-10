@@ -7,11 +7,13 @@ public class GUIData {
     private final JPanel container;
     private final String title;
     private final Dimension size;
+    private final int hashCode;
 
-    public GUIData(JPanel container, String title, Dimension size) {
+    public GUIData(JPanel container, String title, Dimension size, int hashCode) {
         this.container = container;
         this.title = title;
         this.size = size;
+        this.hashCode = hashCode;
     }
 
     public JPanel getContainer() {
@@ -24,5 +26,9 @@ public class GUIData {
 
     public Dimension getSize() {
         return size;
+    }
+
+    public int getHashCode() {
+        return hashCode;
     }
 }
