@@ -9,13 +9,12 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FollowedGUI extends StandardGUI implements ListSelectionListener {
+public class FollowedGUI extends StandardGUI {
 
 
     private final JLabel nameLabel;
@@ -47,7 +46,17 @@ public class FollowedGUI extends StandardGUI implements ListSelectionListener {
         listModel = new DefaultListModel<>();
         jList = new JList<>(listModel);
         jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jList.addListSelectionListener(this);
+        jList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (followedArtists.isEmpty()) {
+                    enableButtons(false, buttonSpotify, buttonRemoveArtist, buttonReleases);
+                    return;
+                } else enableButtons(true, buttonSpotify, buttonRemoveArtist, buttonReleases);
+                currentArtist = followedArtists.get(Math.max(jList.getSelectedIndex(), 0));
+                refresh();
+            }
+        });
         if (!followedArtists.isEmpty()) currentArtist = followedArtists.get(0);
         IDArea.setEditable(false);
         lastCheckedLabel.setForeground(Color.GRAY);
@@ -98,7 +107,7 @@ public class FollowedGUI extends StandardGUI implements ListSelectionListener {
         buttonAllReleases = new JButton("Show all recent releases");
         buttonAllReleases.setEnabled(false);
         buttonAllReleases.addActionListener(e -> {
-           theEngine.printAllRecentAlbums();
+            theEngine.printAllRecentAlbums();
         });
 
 
@@ -163,16 +172,6 @@ public class FollowedGUI extends StandardGUI implements ListSelectionListener {
 
         updateTitle();
         refreshList();
-        refresh();
-    }
-
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if (followedArtists.isEmpty()) {
-            enableButtons(false, buttonSpotify, buttonRemoveArtist, buttonReleases);
-            return;
-        } else enableButtons(true, buttonSpotify, buttonRemoveArtist, buttonReleases);
-        currentArtist = followedArtists.get(Math.max(jList.getSelectedIndex(), 0));
         refresh();
     }
 

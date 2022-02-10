@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
-public class ReleasedAlbumsGUI extends StandardGUI implements ListSelectionListener {
+public class ReleasedAlbumsGUI extends StandardGUI {
 
     private final TheEngine theEngine;
     private final JLabel artistNameLabel = new JLabel();
@@ -64,7 +64,23 @@ public class ReleasedAlbumsGUI extends StandardGUI implements ListSelectionListe
         albumList = new JList<>(albumListModel);
         albumList.setCellRenderer(new AlbumListRenderer());
         albumList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        albumList.addListSelectionListener(this);
+        albumList.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (albumList.isSelectionEmpty()) return;
+                if (!albumList.getSelectedValue().startsWith("\t")) {
+                    albumList.setSelectedIndex(albumList.getSelectedIndex() + (!e.getValueIsAdjusting() && lastSelectedIndex > albumList.getSelectedIndex() ? -1 : 1));
+                    if (albumList.getSelectedIndex() == 0) albumList.setSelectedIndex(1);
+                }
+                if (filteredReleasedAlbums.isEmpty()) {
+                    enableButtons(false, buttonSpotify, buttonMoreBy);
+                    return;
+                } else enableButtons(true, buttonSpotify, buttonMoreBy);
+
+                lastSelectedIndex = albumList.getSelectedIndex();
+                refreshFrame();
+            }
+        });
         trackList = new JList<>(trackListModel);
         trackList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         trackList.setCellRenderer(new TrackListRenderer());
@@ -184,24 +200,6 @@ public class ReleasedAlbumsGUI extends StandardGUI implements ListSelectionListe
 
         refreshFrame();
     }
-
-
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if (albumList.isSelectionEmpty()) return;
-        if (!albumList.getSelectedValue().startsWith("\t")) {
-            albumList.setSelectedIndex(albumList.getSelectedIndex() + (!e.getValueIsAdjusting() && lastSelectedIndex > albumList.getSelectedIndex() ? -1 : 1));
-            if (albumList.getSelectedIndex() == 0) albumList.setSelectedIndex(1);
-        }
-        if (filteredReleasedAlbums.isEmpty()) {
-            enableButtons(false, buttonSpotify, buttonMoreBy);
-            return;
-        } else enableButtons(true, buttonSpotify, buttonMoreBy);
-
-        lastSelectedIndex = albumList.getSelectedIndex();
-        refreshFrame();
-    }
-
 
     private void refreshFrame() {
         if (albumList.getSelectedIndex() >= 0) loadInfo(albumList.getSelectedIndex());
