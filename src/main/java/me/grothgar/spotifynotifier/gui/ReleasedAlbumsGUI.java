@@ -263,6 +263,8 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         albumListOffset.clear();
 
         final List<TimeCheckpoint> checkpoints = new LinkedList<>(Arrays.asList(
+                new TimeCheckpoint(-2, "Future"),
+                new TimeCheckpoint(-1, "Tomorrow"),
                 new TimeCheckpoint(0, "Today"),
                 new TimeCheckpoint(1, "Yesterday"),
                 new TimeCheckpoint(7, "Last 7 days"),
