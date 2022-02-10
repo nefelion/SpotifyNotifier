@@ -27,7 +27,7 @@ public class TheEngine {
     public void followArtistID(String id) {
         if (id == null || id.trim().isEmpty()) return;
 
-        FileData fileData = FileManager.getFileData();
+        FileData fileData = TempData.getInstance().getFileData();
         List<FollowedArtist> followedArtists = fileData.getFollowedArtists();
 
         HashSet<String> hashSet = FileManager.getAlbumHashSet();
@@ -64,7 +64,7 @@ public class TheEngine {
     public void unfollowArtistID(String id) {
         if (id == null || id.trim().isEmpty()) return;
 
-        FileData fileData = FileManager.getFileData();
+        FileData fileData = TempData.getInstance().getFileData();
         List<FollowedArtist> followedArtists = fileData.getFollowedArtists();
 
         OptionalInt indexOfExistingID = IntStream.range(0, followedArtists.size())
@@ -89,7 +89,7 @@ public class TheEngine {
     }
 
     public void checkForNewReleases(boolean quiet) {
-        FileData fd = FileManager.getFileData();
+        FileData fd = TempData.getInstance().getFileData();
         List<FollowedArtist> followedArtists = fd.getFollowedArtists();
         HashSet<String> hashSet = FileManager.getAlbumHashSet();
 
@@ -129,7 +129,7 @@ public class TheEngine {
 
 
     public void showFollowedList() {
-        List<FollowedArtist> followedArtistSortedList = FileManager.getFileData().getFollowedArtists().stream().sorted(Comparator.comparing(FollowedArtist::getName)).collect(Collectors.toList());
+        List<FollowedArtist> followedArtistSortedList = TempData.getInstance().getFileData().getFollowedArtists().stream().sorted(Comparator.comparing(FollowedArtist::getName)).collect(Collectors.toList());
 
         GUIFrame gui = new FollowedGUI(this, true, followedArtistSortedList);
         gui.show();
@@ -138,7 +138,7 @@ public class TheEngine {
     public void printAllArtistAlbums(String id) {
         if (id == null || id.trim().isEmpty()) return;
 
-        FileData fileData = FileManager.getFileData();
+        FileData fileData = TempData.getInstance().getFileData();
         List<FollowedArtist> followedArtists = fileData.getFollowedArtists();
         FollowedArtist artist;
 
@@ -163,7 +163,7 @@ public class TheEngine {
 
     public void printAllRecentAlbums() {
         List<ReleasedAlbum> releasedAlbums = new ArrayList<>();
-        List<FollowedArtist> followedArtists = FileManager.getFileData().getFollowedArtists();
+        List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists();
         HashSet<String> IDHashset = new HashSet<>();
 
         ProgressGUI progressBar = new ProgressGUI(0, followedArtists.size());

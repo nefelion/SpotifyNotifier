@@ -19,6 +19,17 @@ public class Main {
     private static FileLock lock = null;
 
     public static void main(String[] args) {
+
+        try {
+            FileManager.setPath(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            System.exit(123);
+        }
+
+        // initialize singleton ram
+        TempData.getInstance().setFileData(FileManager.getFileData());
+
         // :)
         TokenGetter tokenGetter = new TokenGetter("d31c4bbf7a6c41e4b1ce6c47656de668", "c1f3be4db5104a54bc2fac060fdbdf14");
 
@@ -32,12 +43,6 @@ public class Main {
                 .build();
 
 
-        try {
-            FileManager.setPath(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            System.exit(123);
-        }
 
         if (!lock()) {
             Utilities.showMessageDialog("Another instance is running!", "Error!", JOptionPane.ERROR_MESSAGE);

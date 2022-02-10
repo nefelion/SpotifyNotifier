@@ -1,9 +1,6 @@
 package me.grothgar.spotifynotifier.gui;
 
-import me.grothgar.spotifynotifier.FileManager;
-import me.grothgar.spotifynotifier.FollowedArtist;
-import me.grothgar.spotifynotifier.TheEngine;
-import me.grothgar.spotifynotifier.Utilities;
+import me.grothgar.spotifynotifier.*;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -182,7 +179,7 @@ public class FollowedGUI extends StandardGUI {
         if (currentArtist != null) {
             nameLabel.setText(currentArtist.getName());
             IDArea.setText(currentArtist.getID());
-            lastCheckedLabel.setText("Last checked: " + Utilities.getTimeAgo(FileManager.getFileData().getLastChecked()));
+            lastCheckedLabel.setText("Last checked: " + Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked()));
         }
 
         frame.repaint();
@@ -190,9 +187,13 @@ public class FollowedGUI extends StandardGUI {
     }
 
     public void refreshList() {
-        if (!listModel.isEmpty() && new HashSet<>(followedArtists.stream().map(FollowedArtist::getID).collect(Collectors.toList())).equals(new HashSet<>(FileManager.getFileData().getFollowedArtists().stream().map(FollowedArtist::getID).collect(Collectors.toList())))) return;
+        if (!listModel.isEmpty() &&
+                new HashSet<>(followedArtists.stream().map(FollowedArtist::getID).collect(Collectors.toList()))
+                .equals(new HashSet<>(TempData.getInstance().getFileData().getFollowedArtists().stream().map(FollowedArtist::getID).collect(Collectors.toList()))))
+            return;
+
         followedArtists.clear();
-        followedArtists.addAll(FileManager.getFileData().getFollowedArtists());
+        followedArtists.addAll(TempData.getInstance().getFileData().getFollowedArtists());
         listModel.clear();
         listModel.addAll(followedArtists.stream().map(FollowedArtist::getName).collect(Collectors.toList()));
         enableButtons(!listModel.isEmpty(), buttonCheck, buttonAllReleases);
