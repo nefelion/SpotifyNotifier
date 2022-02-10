@@ -1,10 +1,12 @@
 package me.grothgar.spotifynotifier.gui;
 
+import me.grothgar.spotifynotifier.TempData;
 import me.grothgar.spotifynotifier.TheEngine;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +19,8 @@ public class AddGUI extends StandardGUI {
     private final JTextField textField;
     private final List<Artist> results;
     private final JButton buttonAdd = new JButton();
+    private final JButton buttonReleases = new JButton();
+    private final HashSet<String> isFollowedHashset = new HashSet<>();
 
     public AddGUI(TheEngine theEngine) {
         super();
@@ -28,13 +32,15 @@ public class AddGUI extends StandardGUI {
         artistList.setCellRenderer(new ArtistListRenderer());
         artistList.addListSelectionListener(e -> {
             buttonAdd.setEnabled(false);
+            buttonReleases.setEnabled(false);
             if (artistListModel.isEmpty()) return;
 
             if (artistListModel.get(0).startsWith("\t") && artistList.getSelectedIndex() == 0) {
                 artistList.setSelectedIndex(-1);
                 refresh();
-            } else {
+            } else if (!isFollowedHashset.contains(results.get(artistList.getSelectedIndex()).getId())) {
                 buttonAdd.setEnabled(true);
+                buttonReleases.setEnabled(true);
             }
         });
 
@@ -51,6 +57,9 @@ public class AddGUI extends StandardGUI {
         buttonAdd.setText("Add");
         buttonAdd.addActionListener(e -> add());
         buttonAdd.setEnabled(false);
+        buttonReleases.setText("Releases");
+        buttonReleases.addActionListener(e -> theEngine.printAllArtistAlbums(results.get(artistList.getSelectedIndex()).getId()));
+        buttonReleases.setEnabled(false);
         textField = new JTextField();
         textField.setPreferredSize(new Dimension(150, 20));
         textField.addActionListener(e -> search());
@@ -63,6 +72,7 @@ public class AddGUI extends StandardGUI {
 
         buttonPanel.add(textField);
         buttonPanel.add(buttonSearch);
+        buttonPanel.add(buttonReleases);
         buttonPanel.add(buttonAdd);
         artistListPanel.add(scrollList);
 
@@ -83,6 +93,13 @@ public class AddGUI extends StandardGUI {
         if (textField.getText().trim().isEmpty()) return;
         results.clear();
         results.addAll(theEngine.searchArtist(textField.getText()));
+        isFollowedHashset.clear();
+        isFollowedHashset.addAll(results
+                .stream()
+                .map(Artist::getId)
+                .filter(id -> TempData.getInstance().getFileData().getFollowedArtists().stream().anyMatch(r -> r.getID().equals(id))).collect(Collectors.toList()));
+
+
         artistListModel.clear();
         if (results.isEmpty()) artistListModel.add(0, "\t'" + textField.getText().trim() + "' not found");
         else artistListModel.addAll(results
@@ -103,7 +120,7 @@ public class AddGUI extends StandardGUI {
         frame.revalidate();
     }
 
-    private static class ArtistListRenderer extends DefaultListCellRenderer {
+    private class ArtistListRenderer extends DefaultListCellRenderer {
 
         JLabel label;
 
@@ -112,9 +129,10 @@ public class AddGUI extends StandardGUI {
 
             if (value.toString().startsWith("\t")) {
                 label.setForeground(Color.gray);
-                int fontStyle = Font.PLAIN;
-                int fontSize = 14;
-                label.setFont((new Font("Dialog", fontStyle, fontSize)));
+                label.setFont((new Font("Dialog", Font.PLAIN, 14)));
+            } else if (isFollowedHashset.contains(results.get(index).getId())) {
+                label.setForeground(new Color(0, 102, 0));
+                label.setFont((new Font("Dialog", Font.PLAIN, 12)));
             }
 
             return label;
