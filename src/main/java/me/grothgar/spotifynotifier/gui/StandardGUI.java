@@ -7,7 +7,7 @@ import java.util.Stack;
 
 public abstract class StandardGUI extends GUIFrame {
 
-    protected static final Stack<GUIData> GUI_STACK = new Stack<>();
+    private static final Stack<GUIData> GUI_STACK = new Stack<>();
     private static JFrame ONE_FRAME;
 
     public StandardGUI() {
@@ -49,9 +49,11 @@ public abstract class StandardGUI extends GUIFrame {
         ONE_FRAME.setVisible(true);
     }
 
-
     protected void pushToStack() {
         GUI_STACK.push(new GUIData(this.container, this.frame.getTitle(), this.frame.getSize(), this.hashCode()));
     }
 
+    protected int getCurrentGUIHashCode() {
+        return GUI_STACK.peek().getHashCode();
+    }
 }

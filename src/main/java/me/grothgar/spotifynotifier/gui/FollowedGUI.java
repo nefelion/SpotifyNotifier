@@ -163,6 +163,7 @@ public class FollowedGUI extends StandardGUI {
         // refresh every 1000ms
         int delay = 1000;
         ActionListener taskPerformer = evt -> {
+            if (getCurrentGUIHashCode() != this.hashCode()) return;
             updateTitle();
             refreshList();
             refresh();
