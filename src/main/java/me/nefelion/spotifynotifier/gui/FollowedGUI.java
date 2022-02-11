@@ -29,7 +29,6 @@ public class FollowedGUI extends StandardGUI {
     private final JButton buttonCheck;
     private final JButton buttonAllReleases;
     private final JLabel lastCheckedLabel;
-    private final JProgressBar progressBar;
     private FollowedArtist currentArtist;
 
     public FollowedGUI(TheEngine theEngine, boolean exitOnClose, List<FollowedArtist> followedArtists) {
@@ -39,8 +38,6 @@ public class FollowedGUI extends StandardGUI {
         nameLabel = new JLabel();
         IDArea = new JTextArea();
         lastCheckedLabel = new JLabel();
-        progressBar = new JProgressBar();
-        progressBar.setVisible(false);
 
 
         // itemy
@@ -136,7 +133,6 @@ public class FollowedGUI extends StandardGUI {
         lastCheckedPanel.add(lastCheckedLabel);
         checkPanel.add(buttonCheck);
         checkPanel.add(buttonAllReleases);
-        progressPanel.add(progressBar);
 
 
         // scroll do listy
