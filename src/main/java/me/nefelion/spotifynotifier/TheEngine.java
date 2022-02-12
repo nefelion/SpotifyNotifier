@@ -131,7 +131,7 @@ public class TheEngine {
     public void showFollowedList() {
         List<FollowedArtist> followedArtistSortedList = TempData.getInstance().getFileData().getFollowedArtists().stream().sorted(Comparator.comparing(FollowedArtist::getName)).collect(Collectors.toList());
 
-        GUIFrame gui = new FollowedGUI(this, true, followedArtistSortedList);
+        GUIFrame gui = new FollowedGUI(JFrame.EXIT_ON_CLOSE, this, followedArtistSortedList);
         gui.show();
     }
 

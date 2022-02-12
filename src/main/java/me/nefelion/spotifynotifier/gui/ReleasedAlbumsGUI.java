@@ -10,8 +10,6 @@ import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -89,7 +87,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
 
     private void fillContainerWithPanels() {
         container.add(getInitialPanelCheckBox());
-        container.add(getAlbumListScrollPane(albumList));
+        container.add(getListScrollPane(albumList));
         container.add(getInitialPanelArtistName());
         container.add(getInitialNameSpotify());
         container.add(getInitialPanelReleaseType());
@@ -161,12 +159,6 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         return checkBoxPanel;
     }
 
-    private JPanel createZeroHeightJPanel() {
-        JPanel checkBoxPanel = new JPanel();
-        checkBoxPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
-        return checkBoxPanel;
-    }
-
     private JCheckBox getInitialCheckBoxFeaturing() {
         final JCheckBox checkBoxFeaturing;
         checkBoxFeaturing = new JCheckBox("Featuring (0)", false);
@@ -200,18 +192,8 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         return scrollTrackList;
     }
 
-    private JScrollPane getAlbumListScrollPane(JList<String> albumList) {
-        JScrollPane scrollList = new JScrollPane(albumList);
-        scrollList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollList.getVerticalScrollBar().setUnitIncrement(16);
-        return scrollList;
-    }
-
     private JButton getInitialButtonMoreBy() {
-        final JButton buttonMoreBy;
-        buttonMoreBy = new JButton("More from...");
-        buttonMoreBy.setEnabled(false);
+        final JButton buttonMoreBy = getDisabledButton("More from...");
         buttonMoreBy.addActionListener(e -> {
             List<String> idList = allArtistsAndPerformers.stream().map(ArtistSimplified::getId).collect(Collectors.toList());
             List<String> nameList = allArtistsAndPerformers.stream().map(ArtistSimplified::getName).collect(Collectors.toList());
@@ -224,9 +206,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     }
 
     private JButton getInitialButtonSpotify() {
-        final JButton buttonSpotify;
-        buttonSpotify = new JButton("Spotify");
-        buttonSpotify.setEnabled(false);
+        final JButton buttonSpotify = getDisabledButton("Spotify");
         buttonSpotify.addActionListener(e -> {
             Runtime rt = Runtime.getRuntime();
             String url = "https://open.spotify.com/album/" + filteredReleasedAlbums.get(getIndexWithoutOffset(albumList.getSelectedIndex())).getId();
@@ -240,11 +220,18 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         return buttonSpotify;
     }
 
+    private JButton getDisabledButton(String text) {
+        final JButton buttonSpotify;
+        buttonSpotify = new JButton(text);
+        buttonSpotify.setEnabled(false);
+        return buttonSpotify;
+    }
+
     private JList<String> getInitialTrackList() {
         final JList<String> trackList;
         trackList = new JList<>(modelTrackList);
-        trackList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         trackList.setCellRenderer(new TrackListRenderer());
+        trackList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         trackList.addListSelectionListener(e -> {
             if (trackList.getSelectedIndex() == 0) trackList.setSelectedIndex(1);
         });
@@ -256,22 +243,19 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         albumList = new JList<>(modelAlbumList);
         albumList.setCellRenderer(new AlbumListRenderer());
         albumList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        albumList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (albumList.isSelectionEmpty()) return;
-                if (!albumList.getSelectedValue().startsWith("\t")) {
-                    albumList.setSelectedIndex(albumList.getSelectedIndex() + (!e.getValueIsAdjusting() && lastSelectedIndex > albumList.getSelectedIndex() ? -1 : 1));
-                    if (albumList.getSelectedIndex() == 0) albumList.setSelectedIndex(1);
-                }
-                if (filteredReleasedAlbums.isEmpty()) {
-                    enableButtons(false, buttonSpotify, buttonMoreBy);
-                    return;
-                } else enableButtons(true, buttonSpotify, buttonMoreBy);
-
-                lastSelectedIndex = albumList.getSelectedIndex();
-                refreshFrame();
+        albumList.addListSelectionListener(e -> {
+            if (albumList.isSelectionEmpty()) return;
+            if (!albumList.getSelectedValue().startsWith("\t")) {
+                albumList.setSelectedIndex(albumList.getSelectedIndex() + (!e.getValueIsAdjusting() && lastSelectedIndex > albumList.getSelectedIndex() ? -1 : 1));
+                if (albumList.getSelectedIndex() == 0) albumList.setSelectedIndex(1);
             }
+            if (filteredReleasedAlbums.isEmpty()) {
+                enableButtons(false, buttonSpotify, buttonMoreBy);
+                return;
+            } else enableButtons(true, buttonSpotify, buttonMoreBy);
+
+            lastSelectedIndex = albumList.getSelectedIndex();
+            refreshFrame();
         });
         return albumList;
     }

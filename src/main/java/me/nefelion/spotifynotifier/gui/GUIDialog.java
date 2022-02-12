@@ -2,8 +2,7 @@ package me.nefelion.spotifynotifier.gui;
 
 import javax.swing.*;
 
-public abstract class GUIDialog {
-    private static final String GUI_PREFIX_NAME = "SN: ";
+public abstract class GUIDialog extends GUI {
     protected final JDialog dialog = new JDialog();
     protected JPanel container = new JPanel();
 
@@ -13,12 +12,12 @@ public abstract class GUIDialog {
         dialog.add(container);
     }
 
+    @Override
     public void setTitle(String title) {
         dialog.setTitle(title);
     }
 
-    public abstract void show();
-
+    @Override
     public void close() {
         dialog.dispose();
     }

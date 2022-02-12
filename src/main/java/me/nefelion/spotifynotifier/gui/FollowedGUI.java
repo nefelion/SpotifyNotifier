@@ -6,61 +6,198 @@ import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.Utilities;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FollowedGUI extends StandardGUI {
 
-
-    private final JLabel nameLabel;
-    private final JTextArea IDArea;
-    private final DefaultListModel<String> listModel;
-    private final JList<String> jList;
+    private final TheEngine theEngine;
+    private final JLabel labelName = new JLabel();
+    private final JTextArea areaID;
+    private final DefaultListModel<String> modelList = new DefaultListModel<>();
+    private final JList<String> artistList;
     private final List<FollowedArtist> followedArtists;
     private final JButton buttonSpotify;
-    private final JButton buttonRemoveArtist;
+    private final JButton buttonAdd;
+    private final JButton buttonRemove;
     private final JButton buttonReleases;
     private final JButton buttonCheck;
     private final JButton buttonAllReleases;
-    private final JLabel lastCheckedLabel;
+    private final JLabel labelLastChecked;
     private FollowedArtist currentArtist;
 
-    public FollowedGUI(TheEngine theEngine, boolean exitOnClose, List<FollowedArtist> followedArtists) {
+    public FollowedGUI(int defaultCloseOperation, TheEngine theEngine, List<FollowedArtist> followedArtists) {
         super();
+        this.theEngine = theEngine;
         this.followedArtists = followedArtists;
-        if (exitOnClose) frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        nameLabel = new JLabel();
-        IDArea = new JTextArea();
-        lastCheckedLabel = new JLabel();
+        artistList = getInitialArtistList();
+        areaID = getInitialAreaID();
+        labelLastChecked = getInitialLabelLastChecked();
+        buttonSpotify = getInitialButtonSpotify();
+        buttonAdd = getInitialButtonAdd();
+        buttonRemove = getInitialButtonRemove();
+        buttonReleases = getInitialButtonReleases();
+        buttonCheck = getInitialButtonCheck();
+        buttonAllReleases = getInitialButtonAllReleases();
+
+        // refresh every 1000ms
+        setTimer();
+
+        buildGUI(defaultCloseOperation);
+
+        refreshList();
+        refresh();
+    }
+
+    private void setTimer() {
+        int delay = 1000;
+        ActionListener taskPerformer = evt -> {
+            if (getCurrentGUIHashCode() != this.hashCode()) return;
+            updateTitle();
+            refreshList();
+            refresh();
+        };
+        new Timer(delay, taskPerformer).start();
+    }
+
+    private void buildGUI(int defaultCloseOperation) {
+        frame.setDefaultCloseOperation(defaultCloseOperation);
+        setContainer();
+        setFrame();
+        updateTitle();
+    }
+
+    private void setFrame() {
+        frame.add(container);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+    }
+
+    private void setContainer() {
+        fillContainerWithPanels();
+        Dimension d = container.getPreferredSize();
+        d.height = 600;
+        container.setPreferredSize(d);
+    }
+
+    private void fillContainerWithPanels() {
+        container.add(getListScrollPane(artistList));
+        container.add(getInitialPanelNameAndSpotify());
+        container.add(getInitialPanelID());
+        container.add(getInitialPanelSelectionButtons());
+        container.add(getInitialPanelLastChecked());
+        container.add(getInitialPanelCheck());
+    }
+
+    private JLabel getInitialLabelLastChecked() {
+        final JLabel labelLastChecked;
+        labelLastChecked = new JLabel();
+        labelLastChecked.setForeground(Color.GRAY);
+        return labelLastChecked;
+    }
+
+    private JTextArea getInitialAreaID() {
+        final JTextArea areaID;
+        areaID = new JTextArea();
+        areaID.setEditable(false);
+        return areaID;
+    }
+
+    private JPanel getInitialPanelCheck() {
+        JPanel panelCheck = createZeroHeightJPanel();
 
 
-        // itemy
-        listModel = new DefaultListModel<>();
-        jList = new JList<>(listModel);
-        jList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (followedArtists.isEmpty()) {
-                    enableButtons(false, buttonSpotify, buttonRemoveArtist, buttonReleases);
-                    return;
-                } else enableButtons(true, buttonSpotify, buttonRemoveArtist, buttonReleases);
-                currentArtist = followedArtists.get(Math.max(jList.getSelectedIndex(), 0));
-                refresh();
-            }
+        panelCheck.add(buttonCheck);
+        panelCheck.add(buttonAllReleases);
+        return panelCheck;
+    }
+
+    private JPanel getInitialPanelLastChecked() {
+        JPanel panelLastChecked = createZeroHeightJPanel();
+        panelLastChecked.add(labelLastChecked);
+        return panelLastChecked;
+    }
+
+    private JPanel getInitialPanelSelectionButtons() {
+        JPanel panelSelectionButtons = createZeroHeightJPanel();
+        panelSelectionButtons.add(buttonAdd);
+        panelSelectionButtons.add(buttonRemove);
+        panelSelectionButtons.add(buttonReleases);
+        return panelSelectionButtons;
+    }
+
+    private JPanel getInitialPanelID() {
+        JPanel IDPanel = createZeroHeightJPanel();
+        IDPanel.add(new JLabel("ID"));
+        IDPanel.add(areaID);
+        return IDPanel;
+    }
+
+    private JPanel getInitialPanelNameAndSpotify() {
+        JPanel nameAndSpotifyPanel = createZeroHeightJPanel();
+        nameAndSpotifyPanel.add(labelName);
+        nameAndSpotifyPanel.add(buttonSpotify);
+        return nameAndSpotifyPanel;
+    }
+
+    private JButton getInitialButtonAllReleases() {
+        final JButton buttonAllReleases;
+        buttonAllReleases = new JButton("Show all recent releases");
+        buttonAllReleases.setEnabled(false);
+        buttonAllReleases.addActionListener(e -> {
+            theEngine.printAllRecentAlbums();
         });
-        if (!followedArtists.isEmpty()) currentArtist = followedArtists.get(0);
-        IDArea.setEditable(false);
-        lastCheckedLabel.setForeground(Color.GRAY);
+        return buttonAllReleases;
+    }
 
+    private JButton getInitialButtonCheck() {
+        final JButton buttonCheck;
+        buttonCheck = new JButton("Check now");
+        buttonCheck.setEnabled(false);
+        buttonCheck.addActionListener(e -> {
+            theEngine.checkForNewReleases(false);
+            refresh();
+        });
+        return buttonCheck;
+    }
 
-        // buttony
+    private JButton getInitialButtonReleases() {
+        final JButton buttonReleases;
+        buttonReleases = new JButton("Show releases");
+        buttonReleases.setEnabled(false);
+        buttonReleases.addActionListener(e -> {
+            theEngine.printAllArtistAlbums(currentArtist.getID());
+        });
+        return buttonReleases;
+    }
+
+    private JButton getInitialButtonRemove() {
+        final JButton buttonRemove;
+        buttonRemove = new JButton("Remove");
+        buttonRemove.setEnabled(false);
+        buttonRemove.addActionListener(e -> {
+            theEngine.unfollowArtistID(currentArtist.getID());
+            refreshList();
+            refresh();
+        });
+        return buttonRemove;
+    }
+
+    private JButton getInitialButtonAdd() {
+        JButton buttonAddNewArtist = new JButton("Add / Search");
+        buttonAddNewArtist.addActionListener(e -> {
+            GUIFrame gui = new AddGUI(theEngine);
+            gui.show();
+        });
+        return buttonAddNewArtist;
+    }
+
+    private JButton getInitialButtonSpotify() {
+        final JButton buttonSpotify;
         buttonSpotify = new JButton("Spotify");
         buttonSpotify.setEnabled(false);
         buttonSpotify.addActionListener(e -> {
@@ -73,114 +210,30 @@ public class FollowedGUI extends StandardGUI {
                 ex.printStackTrace();
             }
         });
+        return buttonSpotify;
+    }
 
-        JButton buttonAddNewArtist = new JButton("Add / Search");
-        buttonAddNewArtist.addActionListener(e -> {
-            GUIFrame gui = new AddGUI(theEngine);
-            gui.show();
-        });
-
-        buttonRemoveArtist = new JButton("Remove");
-        buttonRemoveArtist.setEnabled(false);
-        buttonRemoveArtist.addActionListener(e -> {
-            theEngine.unfollowArtistID(currentArtist.getID());
-            refreshList();
+    private JList<String> getInitialArtistList() {
+        final JList<String> artistList;
+        artistList = new JList<>(modelList);
+        artistList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        artistList.addListSelectionListener(e -> {
+            if (followedArtists.isEmpty()) {
+                enableButtons(false, buttonSpotify, buttonRemove, buttonReleases);
+                return;
+            } else enableButtons(true, buttonSpotify, buttonRemove, buttonReleases);
+            currentArtist = followedArtists.get(Math.max(artistList.getSelectedIndex(), 0));
             refresh();
         });
-
-        buttonReleases = new JButton("Show releases");
-        buttonReleases.setEnabled(false);
-        buttonReleases.addActionListener(e -> {
-            theEngine.printAllArtistAlbums(currentArtist.getID());
-        });
-
-        buttonCheck = new JButton("Check now");
-        buttonCheck.setEnabled(false);
-        buttonCheck.addActionListener(e -> {
-            theEngine.checkForNewReleases(false);
-            refresh();
-        });
-
-        buttonAllReleases = new JButton("Show all recent releases");
-        buttonAllReleases.setEnabled(false);
-        buttonAllReleases.addActionListener(e -> {
-            theEngine.printAllRecentAlbums();
-        });
-
-
-        // kontenery, JPanel
-        JPanel nameAndSpotifyPanel = new JPanel();
-        nameAndSpotifyPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
-        JPanel IDPanel = new JPanel();
-        IDPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
-        JPanel restButtonsPanel = new JPanel();
-        restButtonsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
-        JPanel lastCheckedPanel = new JPanel();
-        lastCheckedPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
-        JPanel checkPanel = new JPanel();
-        checkPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
-        JPanel progressPanel = new JPanel();
-        progressPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
-
-
-        nameAndSpotifyPanel.add(nameLabel);
-        nameAndSpotifyPanel.add(buttonSpotify);
-        IDPanel.add(new JLabel("ID"));
-        IDPanel.add(IDArea);
-        restButtonsPanel.add(buttonAddNewArtist);
-        restButtonsPanel.add(buttonRemoveArtist);
-        restButtonsPanel.add(buttonReleases);
-        lastCheckedPanel.add(lastCheckedLabel);
-        checkPanel.add(buttonCheck);
-        checkPanel.add(buttonAllReleases);
-
-
-        // scroll do listy
-        JScrollPane scrollList = new JScrollPane(jList);
-        scrollList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollList.getVerticalScrollBar().setUnitIncrement(16);
-
-
-        // pakowanie
-        container.add(scrollList);
-        container.add(nameAndSpotifyPanel);
-        container.add(IDPanel);
-        container.add(restButtonsPanel);
-        container.add(lastCheckedPanel);
-        container.add(checkPanel);
-        container.add(progressPanel);
-
-        Dimension d = container.getPreferredSize();
-        d.height = 600;
-        container.setPreferredSize(d);
-
-        frame.add(container);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-
-        // refresh every 1000ms
-        int delay = 1000;
-        ActionListener taskPerformer = evt -> {
-            if (getCurrentGUIHashCode() != this.hashCode()) return;
-            updateTitle();
-            refreshList();
-            refresh();
-        };
-        new Timer(delay, taskPerformer).start();
-
-
-        updateTitle();
-        refreshList();
-        refresh();
+        return artistList;
     }
 
 
     private void refresh() {
         if (currentArtist != null) {
-            nameLabel.setText(currentArtist.getName());
-            IDArea.setText(currentArtist.getID());
-            lastCheckedLabel.setText("Last checked: " + Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked()));
+            labelName.setText(currentArtist.getName());
+            areaID.setText(currentArtist.getID());
+            labelLastChecked.setText("Last checked: " + Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked()));
         }
 
         frame.repaint();
@@ -188,18 +241,21 @@ public class FollowedGUI extends StandardGUI {
     }
 
     public void refreshList() {
-        if (!listModel.isEmpty() &&
-                new HashSet<>(followedArtists.stream().map(FollowedArtist::getID).collect(Collectors.toList()))
-                        .equals(new HashSet<>(TempData.getInstance().getFileData().getFollowedArtists().stream().map(FollowedArtist::getID).collect(Collectors.toList()))))
-            return;
+        if (!modelList.isEmpty() && !followedArtistListModified()) return;
 
         followedArtists.clear();
         followedArtists.addAll(TempData.getInstance().getFileData().getFollowedArtists());
-        listModel.clear();
-        listModel.addAll(followedArtists.stream().map(FollowedArtist::getName).collect(Collectors.toList()));
-        enableButtons(!listModel.isEmpty(), buttonCheck, buttonAllReleases);
+        modelList.clear();
+        modelList.addAll(followedArtists.stream().map(FollowedArtist::getName).collect(Collectors.toList()));
+        enableButtons(!modelList.isEmpty(), buttonCheck, buttonAllReleases);
 
         updateTitle();
+    }
+
+    private boolean followedArtistListModified() {
+        Set<?> set1 = Set.of(followedArtists.stream().map(FollowedArtist::getID).collect(Collectors.toList()));
+        Set<?> set2 = Set.of(TempData.getInstance().getFileData().getFollowedArtists().stream().map(FollowedArtist::getID).collect(Collectors.toList()));
+        return !set1.equals(set2);
     }
 
     private void updateTitle() {
