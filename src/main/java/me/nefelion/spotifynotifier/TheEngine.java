@@ -118,7 +118,7 @@ public class TheEngine {
         progressBar.close();
 
         if (!releasedAlbums.isEmpty()) {
-            GUIFrame gui = new ReleasedAlbumsGUI(true, this, releasedAlbums, "New releases: " + releasedAlbums.size());
+            GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, this, releasedAlbums, "New releases: " + releasedAlbums.size());
             gui.show();
         } else if (!quiet) {
             Utilities.showMessageDialog("No new releases.", "Check releases", JOptionPane.INFORMATION_MESSAGE);
@@ -156,7 +156,7 @@ public class TheEngine {
         List<ReleasedAlbum> releasedAlbums = new ArrayList<>();
         for (AlbumSimplified album : albums) releasedAlbums.add(new ReleasedAlbum(album, artist));
 
-        GUIFrame gui = new ReleasedAlbumsGUI(false, this, releasedAlbums,
+        GUIFrame gui = new ReleasedAlbumsGUI(JFrame.HIDE_ON_CLOSE, this, releasedAlbums,
                 "All releases by " + artist.getName() + " (" + releasedAlbums.size() + ")");
         gui.show();
     }
@@ -179,7 +179,7 @@ public class TheEngine {
 
         progressBar.close();
 
-        GUIFrame gui = new ReleasedAlbumsGUI(true, this, releasedAlbums, "Recent albums (" + releasedAlbums.size() + ")");
+        GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, this, releasedAlbums, "Recent albums (" + releasedAlbums.size() + ")");
         gui.show();
     }
 
