@@ -9,16 +9,18 @@ import java.time.LocalDate;
 public class ReleasedAlbum {
     private final String id;
     private final String albumName;
-    private final String artistName;
+    private final String artistString;
+    private final String followedArtistName;
     private final String artistId;
     private final String albumType;
     private final String releaseDate;
     private final boolean featuring;
 
-    public ReleasedAlbum(String id, String albumName, String artistName, String artistId, String albumType, String releaseDate, boolean featuring) {
+    public ReleasedAlbum(String id, String albumName, String artistString, String followedArtistName, String artistId, String albumType, String releaseDate, boolean featuring) {
         this.id = id;
         this.albumName = albumName;
-        this.artistName = artistName;
+        this.artistString = artistString;
+        this.followedArtistName = followedArtistName;
         this.artistId = artistId;
         this.albumType = albumType;
         this.releaseDate = releaseDate;
@@ -32,7 +34,8 @@ public class ReleasedAlbum {
 
         this.id = album.getId();
         this.albumName = album.getName();
-        this.artistName = finalArtistName;
+        this.artistString = finalArtistName;
+        this.followedArtistName = artist.getName();
         this.artistId = artist.getID();
         this.albumType = album.getAlbumType().toString();
         this.releaseDate = album.getReleaseDate();
@@ -51,8 +54,8 @@ public class ReleasedAlbum {
         return albumName;
     }
 
-    public String getArtistName() {
-        return artistName;
+    public String getArtistString() {
+        return artistString;
     }
 
     public String getAlbumType() {
@@ -71,9 +74,13 @@ public class ReleasedAlbum {
         return featuring;
     }
 
+    public String getFollowedArtistName() {
+        return followedArtistName;
+    }
+
     @Override
     public String toString() {
-        return new String((albumType + "  |  " + releaseDate + "  |       " + artistName + "  —  " + albumName).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        return new String((albumType + "  |  " + releaseDate + "  |       " + artistString + "  —  " + albumName).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
     }
 
     public LocalDate getLocalDate() {

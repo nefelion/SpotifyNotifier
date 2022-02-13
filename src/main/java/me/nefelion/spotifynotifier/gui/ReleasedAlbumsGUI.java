@@ -36,6 +36,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     private final List<ReleasedAlbum> filteredReleasedAlbums;
     private final JButton buttonSpotify;
     private final JButton buttonMoreBy;
+    private final JButton buttonFollow;
     private final JCheckBox checkBoxAlbums;
     private final JCheckBox checkBoxSingles;
     private final JCheckBox checkBoxFeaturing;
@@ -59,6 +60,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         labelArtistName = getInitialLabelArtistName();
         buttonSpotify = getInitialButtonSpotify();
         buttonMoreBy = getInitialButtonMoreBy();
+        buttonFollow = getInitialButtonFollow();
         checkBoxAlbums = getInitialCheckBoxAlbums();
         checkBoxSingles = getInitialCheckBoxSingles();
         checkBoxFeaturing = getInitialCheckBoxFeaturing();
@@ -93,6 +95,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         container.add(getInitialPanelReleaseType());
         container.add(getInitialPanelID());
         container.add(getInitialPanelImage());
+        container.add(getInitialPanelFollow());
     }
 
     private List<ReleasedAlbum> getAlbumsSortedByReleaseDate(List<ReleasedAlbum> albums) {
@@ -114,6 +117,12 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         IDArea = new JTextArea();
         IDArea.setEditable(false);
         return IDArea;
+    }
+
+    private JPanel getInitialPanelFollow() {
+        JPanel panelFollow = createZeroHeightJPanel();
+        panelFollow.add(buttonFollow);
+        return panelFollow;
     }
 
     private JPanel getInitialPanelImage() {
@@ -192,6 +201,29 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         return scrollTrackList;
     }
 
+    private JButton getInitialButtonFollow() {
+        final JButton buttonFollow = getDisabledButton("button-follow");
+        buttonFollow.addActionListener(e -> {
+            String id = getSelectedAlbum().getArtistId();
+            if (theEngine.isFollowed(id)) theEngine.unfollowArtistID(id);
+            else theEngine.followArtistID(id);
+        });
+        setSmallButtonMargins(buttonFollow);
+        return buttonFollow;
+    }
+
+    private void refreshButtonFollow() {
+        buttonFollow.setText(getButtonFollowState());
+    }
+
+    private String getButtonFollowState() {
+        try {
+            return (theEngine.isFollowed(getSelectedAlbum().getArtistId()) ? "Unfollow" : "Follow") + " " + getSelectedAlbum().getFollowedArtistName();
+        } catch (IndexOutOfBoundsException e) {
+            return "-";
+        }
+    }
+
     private JButton getInitialButtonMoreBy() {
         final JButton buttonMoreBy = getDisabledButton("More from...");
         buttonMoreBy.addActionListener(e -> {
@@ -202,6 +234,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
             int index = gui.getPickedIndex();
             if (index != -1) theEngine.printAllArtistAlbums(idList.get(index));
         });
+        setSmallButtonMargins(buttonMoreBy);
         return buttonMoreBy;
     }
 
@@ -209,7 +242,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         final JButton buttonSpotify = getDisabledButton("Spotify");
         buttonSpotify.addActionListener(e -> {
             Runtime rt = Runtime.getRuntime();
-            String url = "https://open.spotify.com/album/" + filteredReleasedAlbums.get(getIndexWithoutOffset(albumList.getSelectedIndex())).getId();
+            String url = "https://open.spotify.com/album/" + getSelectedAlbum().getId();
             try {
                 rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
             } catch (IOException ex) {
@@ -217,7 +250,12 @@ public class ReleasedAlbumsGUI extends StandardGUI {
                 System.exit(-1009);
             }
         });
+        setSmallButtonMargins(buttonSpotify);
         return buttonSpotify;
+    }
+
+    private ReleasedAlbum getSelectedAlbum() {
+        return filteredReleasedAlbums.get(getIndexWithoutOffset(albumList.getSelectedIndex()));
     }
 
     private JButton getDisabledButton(String text) {
@@ -250,11 +288,12 @@ public class ReleasedAlbumsGUI extends StandardGUI {
                 if (albumList.getSelectedIndex() == 0) albumList.setSelectedIndex(1);
             }
             if (filteredReleasedAlbums.isEmpty()) {
-                enableButtons(false, buttonSpotify, buttonMoreBy);
+                enableButtons(false, buttonSpotify, buttonMoreBy, buttonFollow);
                 return;
-            } else enableButtons(true, buttonSpotify, buttonMoreBy);
+            } else enableButtons(true, buttonSpotify, buttonMoreBy, buttonFollow);
 
             lastSelectedIndex = albumList.getSelectedIndex();
+            refreshButtonFollow();
             refreshFrame();
         });
         return albumList;
@@ -311,7 +350,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         recreateAlbumAndOffsetLists();
 
         if (!modelAlbumList.isEmpty()) albumList.setSelectedIndex(1);
-        else enableButtons(false, buttonSpotify, buttonMoreBy);
+        else enableButtons(false, buttonSpotify, buttonMoreBy, buttonFollow);
     }
 
     private void recreateAlbumAndOffsetLists() {
@@ -439,8 +478,8 @@ public class ReleasedAlbumsGUI extends StandardGUI {
             if (index == 0) {
                 label.setFont(new Font("Dialog", Font.BOLD, 14));
                 label.setForeground(Color.gray);
-            } else if (filteredReleasedAlbums.get(getIndexWithoutOffset(albumList.getSelectedIndex())).isFeaturing()) {
-                if (Arrays.stream(info.trackList().get(index - 1).getArtists()).noneMatch(p -> Objects.equals(p.getId(), filteredReleasedAlbums.get(getIndexWithoutOffset(albumList.getSelectedIndex())).getArtistId()))) {
+            } else if (getSelectedAlbum().isFeaturing()) {
+                if (Arrays.stream(info.trackList().get(index - 1).getArtists()).noneMatch(p -> Objects.equals(p.getId(), getSelectedAlbum().getArtistId()))) {
                     label.setFont(new Font("Dialog", Font.PLAIN, 12));
                     label.setForeground(Color.gray);
                 }

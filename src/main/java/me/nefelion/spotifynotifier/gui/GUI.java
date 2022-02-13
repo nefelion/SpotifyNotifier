@@ -24,4 +24,8 @@ public abstract class GUI {
         scrollList.getVerticalScrollBar().setUnitIncrement(16);
         return scrollList;
     }
+
+    protected void setSmallButtonMargins(JButton buttonFollow) {
+        buttonFollow.setMargin(new Insets(1, 1, 1, 1));
+    }
 }
