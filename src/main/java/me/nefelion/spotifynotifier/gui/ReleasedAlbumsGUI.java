@@ -207,6 +207,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
             String id = getSelectedAlbum().getArtistId();
             if (theEngine.isFollowed(id)) theEngine.unfollowArtistID(id);
             else theEngine.followArtistID(id);
+            refreshButtonFollow();
         });
         setSmallButtonMargins(buttonFollow);
         return buttonFollow;
