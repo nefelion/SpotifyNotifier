@@ -95,7 +95,7 @@ public class FollowedGUI extends StandardGUI {
 
     private JLabel getInitialLabelLastChecked() {
         final JLabel labelLastChecked;
-        labelLastChecked = new JLabel();
+        labelLastChecked = new JLabel(getLastCheckedString());
         labelLastChecked.setForeground(Color.GRAY);
         return labelLastChecked;
     }
@@ -228,16 +228,23 @@ public class FollowedGUI extends StandardGUI {
         return artistList;
     }
 
-
     private void refresh() {
         if (currentArtist != null) {
             labelName.setText(currentArtist.getName());
             areaID.setText(currentArtist.getID());
-            labelLastChecked.setText("Last checked: " + Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked()));
+            refreshLabelLastChecked();
         }
 
         frame.repaint();
         frame.revalidate();
+    }
+
+    private void refreshLabelLastChecked() {
+        labelLastChecked.setText(getLastCheckedString());
+    }
+
+    private String getLastCheckedString() {
+        return "Last checked: " + Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked());
     }
 
     public void refreshList() {
