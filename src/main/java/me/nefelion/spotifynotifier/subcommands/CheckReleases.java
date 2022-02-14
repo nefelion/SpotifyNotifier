@@ -5,10 +5,9 @@ import me.nefelion.spotifynotifier.TheEngine;
 
 public class CheckReleases implements ISubCommand {
 
-    private final TheEngine theEngine;
+    private final TheEngine theEngine = TheEngine.getInstance();
 
-    public CheckReleases(TheEngine theEngine) {
-        this.theEngine = theEngine;
+    public CheckReleases() {
     }
 
     @Override

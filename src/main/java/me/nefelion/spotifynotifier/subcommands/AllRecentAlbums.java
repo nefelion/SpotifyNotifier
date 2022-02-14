@@ -5,10 +5,9 @@ import me.nefelion.spotifynotifier.TheEngine;
 
 public class AllRecentAlbums implements ISubCommand {
 
-    private final TheEngine theEngine;
+    private final TheEngine theEngine = TheEngine.getInstance();
 
-    public AllRecentAlbums(TheEngine theEngine) {
-        this.theEngine = theEngine;
+    public AllRecentAlbums() {
     }
 
     @Override

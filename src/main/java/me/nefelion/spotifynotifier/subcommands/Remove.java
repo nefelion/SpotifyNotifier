@@ -6,10 +6,9 @@ import me.nefelion.spotifynotifier.Utilities;
 
 public class Remove implements ISubCommand {
 
-    private final TheEngine theEngine;
+    private final TheEngine theEngine = TheEngine.getInstance();
 
-    public Remove(TheEngine theEngine) {
-        this.theEngine = theEngine;
+    public Remove() {
     }
 
     @Override

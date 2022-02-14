@@ -2,11 +2,9 @@ package me.nefelion.spotifynotifier;
 
 import me.nefelion.spotifynotifier.gui.FollowedGUI;
 import me.nefelion.spotifynotifier.gui.GUIFrame;
-import me.nefelion.spotifynotifier.gui.ProgressGUI;
 import me.nefelion.spotifynotifier.gui.ReleasedAlbumsGUI;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.enums.AlbumGroup;
 import se.michaelthelin.spotify.enums.AlbumType;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.*;
@@ -18,12 +16,22 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TheEngine {
-    private final SpotifyApi spotifyApi;
+    private static TheEngine instance;
+    private SpotifyApi spotifyAPI;
 
-    public TheEngine(SpotifyApi spotifyApi) {
-        this.spotifyApi = spotifyApi;
+    private TheEngine() {
     }
 
+    public static TheEngine getInstance() {
+        if (instance == null) {
+            instance = new TheEngine();
+        }
+        return instance;
+    }
+
+    public void setSpotifyAPI(SpotifyApi spotifyApi) {
+        this.spotifyAPI = spotifyApi;
+    }
 
     public void followArtistID(String id) {
         if (id == null || id.trim().isEmpty()) return;
@@ -44,7 +52,7 @@ public class TheEngine {
 
 
         try {
-            Artist artist = spotifyApi.getArtist(id).build().execute();
+            Artist artist = spotifyAPI.getArtist(id).build().execute();
             FollowedArtist newArtist = new FollowedArtist(artist.getName(), artist.getId());
             for (AlbumSimplified album : getAlbums(id)) hashSet.add(album.getId());
             followedArtists.add(newArtist);
@@ -92,7 +100,7 @@ public class TheEngine {
     public void checkForNewReleases(boolean quiet) {
         FileData fd = TempData.getInstance().getFileData();
 
-        ReleasesProcessor processor = new ReleasesProcessor(this, fd.getFollowedArtists());
+        ReleasesProcessor processor = new ReleasesProcessor(fd.getFollowedArtists());
         processor.processOnlyNewReleases(true);
         processor.setProgressBarVisible(!quiet);
         processor.process();
@@ -104,7 +112,7 @@ public class TheEngine {
         FileManager.saveAlbumHashSet(processor.getIDhashSet());
 
         if (!releasedAlbums.isEmpty()) {
-            GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, this, releasedAlbums, "New releases: " + releasedAlbums.size());
+            GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, releasedAlbums, "New releases: " + releasedAlbums.size());
             gui.show();
         } else if (!quiet) {
             Utilities.showMessageDialog("No new releases.", "Check releases", JOptionPane.INFORMATION_MESSAGE);
@@ -112,11 +120,10 @@ public class TheEngine {
 
     }
 
-
     public void showFollowedList() {
         List<FollowedArtist> followedArtistSortedList = TempData.getInstance().getFileData().getFollowedArtists().stream().sorted(Comparator.comparing(FollowedArtist::getName)).collect(Collectors.toList());
 
-        GUIFrame gui = new FollowedGUI(JFrame.EXIT_ON_CLOSE, this, followedArtistSortedList);
+        GUIFrame gui = new FollowedGUI(JFrame.EXIT_ON_CLOSE, followedArtistSortedList);
         gui.show();
     }
 
@@ -136,28 +143,28 @@ public class TheEngine {
             artist = new FollowedArtist(temp.getName(), temp.getId());
         }
 
-        ReleasesProcessor processor = new ReleasesProcessor(this, artist);
+        ReleasesProcessor processor = new ReleasesProcessor(artist);
         processor.processOnlyNewReleases(false);
         processor.setProgressBarVisible(true);
         processor.process();
 
         List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
 
-        GUIFrame gui = new ReleasedAlbumsGUI(JFrame.HIDE_ON_CLOSE, this, releasedAlbums,
+        GUIFrame gui = new ReleasedAlbumsGUI(JFrame.HIDE_ON_CLOSE, releasedAlbums,
                 "All releases by " + artist.getName() + " (" + releasedAlbums.size() + ")");
         gui.show();
     }
 
     public void printAllRecentAlbums() {
 
-        ReleasesProcessor processor = new ReleasesProcessor(this, TempData.getInstance().getFileData().getFollowedArtists());
+        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
         processor.processOnlyNewReleases(false);
         processor.setProgressBarVisible(true);
         processor.process();
 
         List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
 
-        GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, this, releasedAlbums, "Recent albums (" + releasedAlbums.size() + ")");
+        GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, releasedAlbums, "Recent albums (" + releasedAlbums.size() + ")");
         gui.show();
     }
 
@@ -172,7 +179,7 @@ public class TheEngine {
             int n = 50;
 
             do {
-                paging = spotifyApi.getArtistsAlbums(artistID).offset(offset).limit(n).build().execute();
+                paging = spotifyAPI.getArtistsAlbums(artistID).offset(offset).limit(n).build().execute();
                 allAlbums.addAll(List.of(paging.getItems()));
                 offset += n;
             } while (paging.getNext() != null);
@@ -197,7 +204,7 @@ public class TheEngine {
             int n = 50;
 
             do {
-                paging = spotifyApi.getAlbumsTracks(albumID).offset(offset).limit(n).build().execute();
+                paging = spotifyAPI.getAlbumsTracks(albumID).offset(offset).limit(n).build().execute();
                 allTracks.addAll(List.of(paging.getItems()));
                 offset += n;
             } while (paging.getNext() != null);
@@ -212,7 +219,7 @@ public class TheEngine {
 
     public Album getAlbum(String albumID) {
         try {
-            return spotifyApi.getAlbum(albumID).build().execute();
+            return spotifyAPI.getAlbum(albumID).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("getAlbum: Something went wrong!\n" + e.getMessage());
             System.exit(-1007);
@@ -222,7 +229,7 @@ public class TheEngine {
 
     public Artist getArtist(String albumID) {
         try {
-            return spotifyApi.getArtist(albumID).build().execute();
+            return spotifyAPI.getArtist(albumID).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("getArtist: Something went wrong!\n" + e.getMessage());
             System.exit(-1367);
@@ -234,7 +241,7 @@ public class TheEngine {
 
         List<Artist> artists = new ArrayList<>();
         try {
-            artists.addAll(List.of(spotifyApi.searchArtists(name).offset(0).limit(50).build().execute().getItems()));
+            artists.addAll(List.of(spotifyAPI.searchArtists(name).offset(0).limit(50).build().execute().getItems()));
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             Utilities.showMessageDialog(e.getMessage(), "searchArtist ERROR", JOptionPane.ERROR_MESSAGE);
         }

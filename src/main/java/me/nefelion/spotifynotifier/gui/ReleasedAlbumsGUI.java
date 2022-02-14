@@ -24,7 +24,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ReleasedAlbumsGUI extends StandardGUI {
 
-    private final TheEngine theEngine;
+    private final TheEngine theEngine = TheEngine.getInstance();
     private final JLabel labelArtistName;
     private final JLabel nameLabel = new JLabel();
     private final JLabel typeLabel = new JLabel();
@@ -48,10 +48,9 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     private TempAlbumInfo info;
     private int lastSelectedIndex = 0;
 
-    public ReleasedAlbumsGUI(int defaultCloseOperation, TheEngine theEngine, List<ReleasedAlbum> albums, String title) {
+    public ReleasedAlbumsGUI(int defaultCloseOperation, List<ReleasedAlbum> albums, String title) {
         super();
 
-        this.theEngine = theEngine;
         releasedAlbums = new ArrayList<>(albums);
         filteredReleasedAlbums = getAlbumsSortedByReleaseDate(releasedAlbums);
         albumList = getInitialAlbumList();

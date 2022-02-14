@@ -47,7 +47,10 @@ public class Main {
             Utilities.showMessageDialog("Another instance is running!", "Error!", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        loadSubcommands(new TheEngine(spotifyApi));
+
+        TheEngine.getInstance().setSpotifyAPI(spotifyApi);
+
+        loadSubcommands();
 
 
         if (args.length == 0)
@@ -58,13 +61,13 @@ public class Main {
 
     }
 
-    private static void loadSubcommands(TheEngine theEngine) {
-        subCommands.put("add", new Add(theEngine));
-        subCommands.put("remove", new Remove(theEngine));
-        subCommands.put("check", new CheckReleases(theEngine));
-        subCommands.put("list", new Followed(theEngine));
-        subCommands.put("allby", new AllBy(theEngine));
-        subCommands.put("recent", new AllRecentAlbums(theEngine));
+    private static void loadSubcommands() {
+        subCommands.put("add", new Add());
+        subCommands.put("remove", new Remove());
+        subCommands.put("check", new CheckReleases());
+        subCommands.put("list", new Followed());
+        subCommands.put("allby", new AllBy());
+        subCommands.put("recent", new AllRecentAlbums());
     }
 
     private static boolean lock() {

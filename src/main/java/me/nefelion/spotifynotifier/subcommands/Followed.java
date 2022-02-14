@@ -5,10 +5,9 @@ import me.nefelion.spotifynotifier.TheEngine;
 
 public class Followed implements ISubCommand {
 
-    private final TheEngine theEngine;
+    private final TheEngine theEngine = TheEngine.getInstance();
 
-    public Followed(TheEngine theEngine) {
-        this.theEngine = theEngine;
+    public Followed() {
     }
 
     @Override

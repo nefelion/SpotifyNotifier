@@ -6,10 +6,9 @@ import me.nefelion.spotifynotifier.Utilities;
 
 public class AllBy implements ISubCommand {
 
-    private final TheEngine theEngine;
+    private final TheEngine theEngine = TheEngine.getInstance();
 
-    public AllBy(TheEngine theEngine) {
-        this.theEngine = theEngine;
+    public AllBy() {
     }
 
     @Override

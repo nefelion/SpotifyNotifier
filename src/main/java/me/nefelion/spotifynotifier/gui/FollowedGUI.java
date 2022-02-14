@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class FollowedGUI extends StandardGUI {
 
-    private final TheEngine theEngine;
+    private final TheEngine theEngine = TheEngine.getInstance();
     private final JLabel labelName = new JLabel();
     private final JTextArea areaID;
     private final DefaultListModel<String> modelList = new DefaultListModel<>();
@@ -31,9 +31,8 @@ public class FollowedGUI extends StandardGUI {
     private final JLabel labelID = new JLabel("ID");
     private FollowedArtist currentArtist;
 
-    public FollowedGUI(int defaultCloseOperation, TheEngine theEngine, List<FollowedArtist> followedArtists) {
+    public FollowedGUI(int defaultCloseOperation, List<FollowedArtist> followedArtists) {
         super();
-        this.theEngine = theEngine;
         this.followedArtists = followedArtists;
         artistList = getInitialArtistList();
         areaID = getInitialAreaID();
@@ -193,7 +192,7 @@ public class FollowedGUI extends StandardGUI {
     private JButton getInitialButtonAdd() {
         JButton buttonAddNewArtist = new JButton("Add / Search");
         buttonAddNewArtist.addActionListener(e -> {
-            GUIFrame gui = new AddGUI(theEngine);
+            GUIFrame gui = new AddGUI();
             gui.show();
         });
         return buttonAddNewArtist;

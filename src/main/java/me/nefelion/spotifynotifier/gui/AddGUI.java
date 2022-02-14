@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class AddGUI extends StandardGUI {
 
-    private final TheEngine theEngine;
+    private final TheEngine theEngine = TheEngine.getInstance();
     private final JList<String> artistList;
     private final DefaultListModel<String> artistListModel = new DefaultListModel<>();
     private final JTextField textField;
@@ -22,9 +22,8 @@ public class AddGUI extends StandardGUI {
     private final JButton buttonReleases = new JButton();
     private final HashSet<String> isFollowedHashset = new HashSet<>();
 
-    public AddGUI(TheEngine theEngine) {
+    public AddGUI() {
         super();
-        this.theEngine = theEngine;
         this.results = new LinkedList<>();
         setTitle("Search for artists");
         artistList = new JList<>(artistListModel);

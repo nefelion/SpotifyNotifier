@@ -8,20 +8,18 @@ import java.util.*;
 
 public class ReleasesProcessor {
 
-    private final TheEngine theEngine;
+    private final TheEngine theEngine = TheEngine.getInstance();
     private final List<FollowedArtist> followedArtists;
     private final HashSet<String> IDhashSet = new HashSet<>();
     private final HashMap<String, ReleasedAlbum> featuringHashMap = new HashMap<>();
     private final List<ReleasedAlbum> releasedAlbums = new ArrayList<>();
     private boolean showProgressBar = false;
 
-    public ReleasesProcessor(TheEngine theEngine, List<FollowedArtist> followedArtists) {
-        this.theEngine = theEngine;
+    public ReleasesProcessor(List<FollowedArtist> followedArtists) {
         this.followedArtists = followedArtists;
     }
 
-    public ReleasesProcessor(TheEngine theEngine, FollowedArtist... followedArtists) {
-        this.theEngine = theEngine;
+    public ReleasesProcessor(FollowedArtist... followedArtists) {
         this.followedArtists = new ArrayList<>();
         this.followedArtists.addAll(Arrays.asList(followedArtists));
     }
