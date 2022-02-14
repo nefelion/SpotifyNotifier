@@ -152,6 +152,7 @@ public class FollowedGUI extends StandardGUI {
         buttonAllReleases.addActionListener(e -> {
             theEngine.printAllRecentAlbums();
         });
+        setSmallButtonMargins(buttonAllReleases);
         return buttonAllReleases;
     }
 
@@ -163,6 +164,7 @@ public class FollowedGUI extends StandardGUI {
             theEngine.checkForNewReleases(false);
             refresh();
         });
+        setSmallButtonMargins(buttonCheck);
         return buttonCheck;
     }
 
