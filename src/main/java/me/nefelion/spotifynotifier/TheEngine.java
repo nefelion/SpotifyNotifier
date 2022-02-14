@@ -91,44 +91,17 @@ public class TheEngine {
 
     public void checkForNewReleases(boolean quiet) {
         FileData fd = TempData.getInstance().getFileData();
-        List<FollowedArtist> followedArtists = fd.getFollowedArtists();
-        HashSet<String> hashSet = FileManager.getAlbumHashSet();
-        HashMap<String, ReleasedAlbum> featuringHashMap = new HashMap<>();
 
-        List<ReleasedAlbum> releasedAlbums = new LinkedList<>();
+        ReleasesProcessor processor = new ReleasesProcessor(this, fd.getFollowedArtists());
+        processor.processOnlyNewReleases(true);
+        processor.setProgressBarVisible(!quiet);
+        processor.process();
 
-        ProgressGUI progressBar = new ProgressGUI(0, followedArtists.size());
-        if (!quiet) progressBar.show();
-        int i = 0;
-
-
-        for (FollowedArtist artist : followedArtists.stream().sorted(Comparator.comparing(FollowedArtist::getName)).collect(Collectors.toList())) {
-            progressBar.setTitle(artist.getName());
-
-            for (AlbumSimplified album : getAlbums(artist.getID())) {
-                if (hashSet.contains(album.getId())) continue;
-                if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON))
-                    featuringHashMap.put(album.getId(), new ReleasedAlbum(album, artist));
-                else {
-                    hashSet.add(album.getId());
-                    releasedAlbums.add(new ReleasedAlbum(album, artist));
-                }
-            }
-            progressBar.setValue(++i);
-        }
-
-        for (ReleasedAlbum album : featuringHashMap.values()) {
-            if (hashSet.contains(album.getId())) continue;
-
-            hashSet.add(album.getId());
-            releasedAlbums.add(album);
-        }
-
+        List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
 
         fd.setLastChecked(Utilities.now());
         FileManager.saveFileData(fd);
-        FileManager.saveAlbumHashSet(hashSet);
-        progressBar.close();
+        FileManager.saveAlbumHashSet(processor.getIDhashSet());
 
         if (!releasedAlbums.isEmpty()) {
             GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, this, releasedAlbums, "New releases: " + releasedAlbums.size());
@@ -136,7 +109,6 @@ public class TheEngine {
         } else if (!quiet) {
             Utilities.showMessageDialog("No new releases.", "Check releases", JOptionPane.INFORMATION_MESSAGE);
         }
-
 
     }
 
@@ -164,10 +136,12 @@ public class TheEngine {
             artist = new FollowedArtist(temp.getName(), temp.getId());
         }
 
+        ReleasesProcessor processor = new ReleasesProcessor(this, artist);
+        processor.processOnlyNewReleases(false);
+        processor.setProgressBarVisible(true);
+        processor.process();
 
-        List<AlbumSimplified> albums = getAlbums(id);
-        List<ReleasedAlbum> releasedAlbums = new ArrayList<>();
-        for (AlbumSimplified album : albums) releasedAlbums.add(new ReleasedAlbum(album, artist));
+        List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
 
         GUIFrame gui = new ReleasedAlbumsGUI(JFrame.HIDE_ON_CLOSE, this, releasedAlbums,
                 "All releases by " + artist.getName() + " (" + releasedAlbums.size() + ")");
@@ -175,28 +149,19 @@ public class TheEngine {
     }
 
     public void printAllRecentAlbums() {
-        List<ReleasedAlbum> releasedAlbums = new ArrayList<>();
-        List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists();
-        HashSet<String> IDHashset = new HashSet<>();
 
-        ProgressGUI progressBar = new ProgressGUI(0, followedArtists.size());
-        progressBar.show();
-        int i = 0;
-        for (FollowedArtist artist : followedArtists) {
-            progressBar.setTitle(artist.getName());
-            for (AlbumSimplified album : getAlbums(artist.getID()))
-                if (IDHashset.add(album.getId())) releasedAlbums.add(new ReleasedAlbum(album, artist));
+        ReleasesProcessor processor = new ReleasesProcessor(this, TempData.getInstance().getFileData().getFollowedArtists());
+        processor.processOnlyNewReleases(false);
+        processor.setProgressBarVisible(true);
+        processor.process();
 
-            progressBar.setValue(++i);
-        }
-
-        progressBar.close();
+        List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
 
         GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, this, releasedAlbums, "Recent albums (" + releasedAlbums.size() + ")");
         gui.show();
     }
 
-    private List<AlbumSimplified> getAlbums(String artistID) {
+    public List<AlbumSimplified> getAlbums(String artistID) {
 
         List<AlbumSimplified> allAlbums = new ArrayList<>();
 
@@ -280,5 +245,6 @@ public class TheEngine {
     public boolean isFollowed(String id) {
         return TempData.getInstance().getFileData().getFollowedArtists().stream().anyMatch(p -> p.getID().equals(id));
     }
+
 
 }
