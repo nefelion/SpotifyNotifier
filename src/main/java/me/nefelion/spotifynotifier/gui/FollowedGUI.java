@@ -28,6 +28,7 @@ public class FollowedGUI extends StandardGUI {
     private final JButton buttonCheck;
     private final JButton buttonAllReleases;
     private final JLabel labelLastChecked;
+    private final JLabel labelID = new JLabel("ID");
     private FollowedArtist currentArtist;
 
     public FollowedGUI(int defaultCloseOperation, TheEngine theEngine, List<FollowedArtist> followedArtists) {
@@ -132,7 +133,7 @@ public class FollowedGUI extends StandardGUI {
 
     private JPanel getInitialPanelID() {
         JPanel IDPanel = createZeroHeightJPanel();
-        IDPanel.add(new JLabel("ID"));
+        IDPanel.add(labelID);
         IDPanel.add(areaID);
         return IDPanel;
     }
@@ -229,14 +230,26 @@ public class FollowedGUI extends StandardGUI {
     }
 
     private void refresh() {
-        if (currentArtist != null) {
-            labelName.setText(currentArtist.getName());
-            areaID.setText(currentArtist.getID());
-            refreshLabelLastChecked();
-        }
-
+        refreshLabelName();
+        refreshAreaID();
+        refreshComponentsVisibility();
         frame.repaint();
         frame.revalidate();
+    }
+
+    private void refreshComponentsVisibility() {
+        buttonSpotify.setVisible(currentArtist != null);
+        areaID.setVisible(currentArtist != null);
+        labelName.setVisible(currentArtist != null);
+        labelID.setVisible(currentArtist != null);
+    }
+
+    private void refreshAreaID() {
+        if (currentArtist != null) areaID.setText(currentArtist.getID());
+    }
+
+    private void refreshLabelName() {
+        if (currentArtist != null) labelName.setText(currentArtist.getName());
     }
 
     private void refreshLabelLastChecked() {
