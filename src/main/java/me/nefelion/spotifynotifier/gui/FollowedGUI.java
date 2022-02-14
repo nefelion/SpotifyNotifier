@@ -7,7 +7,10 @@ import me.nefelion.spotifynotifier.Utilities;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -104,6 +107,36 @@ public class FollowedGUI extends StandardGUI {
         final JTextArea areaID;
         areaID = new JTextArea();
         areaID.setEditable(false);
+        areaID.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Toolkit.getDefaultToolkit()
+                        .getSystemClipboard()
+                        .setContents(
+                                new StringSelection(areaID.getText()),
+                                null
+                        );
+                Utilities.showMessageDialog(areaID.getText() + " copied to clipboard.", "Copied ID", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
         return areaID;
     }
 

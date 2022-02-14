@@ -2,6 +2,7 @@ package me.nefelion.spotifynotifier.gui;
 
 import me.nefelion.spotifynotifier.ReleasedAlbum;
 import me.nefelion.spotifynotifier.TheEngine;
+import me.nefelion.spotifynotifier.Utilities;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import me.nefelion.spotifynotifier.records.TimeCheckpoint;
 import se.michaelthelin.spotify.model_objects.specification.Album;
@@ -11,6 +12,9 @@ import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -115,6 +119,36 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         final JTextArea IDArea;
         IDArea = new JTextArea();
         IDArea.setEditable(false);
+        IDArea.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Toolkit.getDefaultToolkit()
+                        .getSystemClipboard()
+                        .setContents(
+                                new StringSelection(IDArea.getText()),
+                                null
+                        );
+                Utilities.showMessageDialog(IDArea.getText() + " copied to clipboard.", "Copied ID", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
         return IDArea;
     }
 
