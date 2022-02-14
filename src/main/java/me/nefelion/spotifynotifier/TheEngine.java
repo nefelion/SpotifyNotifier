@@ -6,6 +6,7 @@ import me.nefelion.spotifynotifier.gui.ProgressGUI;
 import me.nefelion.spotifynotifier.gui.ReleasedAlbumsGUI;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.enums.AlbumGroup;
 import se.michaelthelin.spotify.enums.AlbumType;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.*;
@@ -92,6 +93,7 @@ public class TheEngine {
         FileData fd = TempData.getInstance().getFileData();
         List<FollowedArtist> followedArtists = fd.getFollowedArtists();
         HashSet<String> hashSet = FileManager.getAlbumHashSet();
+        HashMap<String, ReleasedAlbum> featuringHashMap = new HashMap<>();
 
         List<ReleasedAlbum> releasedAlbums = new LinkedList<>();
 
@@ -105,13 +107,24 @@ public class TheEngine {
 
             for (AlbumSimplified album : getAlbums(artist.getID())) {
                 if (hashSet.contains(album.getId())) continue;
-                hashSet.add(album.getId());
-                releasedAlbums.add(new ReleasedAlbum(album, artist));
-                //System.out.println(artist.getName() + "\t-\t" + album.getName() + "\t/\t" + album.getAlbumType().toString() + "\t/\t" + album.getReleaseDate() + "\t/\thttps://open.spotify.com/album/" + album.getId());
+                if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON))
+                    featuringHashMap.put(album.getId(), new ReleasedAlbum(album, artist));
+                else {
+                    hashSet.add(album.getId());
+                    releasedAlbums.add(new ReleasedAlbum(album, artist));
+                }
             }
-
             progressBar.setValue(++i);
         }
+
+        for (ReleasedAlbum album : featuringHashMap.values()) {
+            if (hashSet.contains(album.getId())) continue;
+
+            hashSet.add(album.getId());
+            releasedAlbums.add(album);
+        }
+
+
         fd.setLastChecked(Utilities.now());
         FileManager.saveFileData(fd);
         FileManager.saveAlbumHashSet(hashSet);
