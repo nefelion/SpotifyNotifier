@@ -265,6 +265,7 @@ public class FollowedGUI extends StandardGUI {
 
     private void refresh() {
         refreshLabelName();
+        refreshLabelLastChecked();
         refreshAreaID();
         refreshComponentsVisibility();
         frame.repaint();
