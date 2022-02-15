@@ -48,7 +48,7 @@ public class FollowedGUI extends StandardGUI {
         buttonAllReleases = getInitialButtonAllReleases();
 
         // refresh every 1000ms
-        setTimer();
+        startTimer();
 
         buildGUI(defaultCloseOperation);
 
@@ -56,7 +56,7 @@ public class FollowedGUI extends StandardGUI {
         refresh();
     }
 
-    private void setTimer() {
+    private void startTimer() {
         int delay = 1000;
         ActionListener taskPerformer = evt -> {
             if (getCurrentGUIHashCode() != this.hashCode()) return;

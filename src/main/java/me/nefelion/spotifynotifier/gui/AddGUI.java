@@ -16,84 +16,123 @@ public class AddGUI extends StandardGUI {
     private final TheEngine theEngine = TheEngine.getInstance();
     private final JList<String> artistList;
     private final DefaultListModel<String> artistListModel = new DefaultListModel<>();
-    private final JTextField textField;
-    private final List<Artist> results;
-    private final JButton buttonAdd = new JButton();
+    private final JTextField fieldInput;
+    private final List<Artist> results = new LinkedList<>();
+    private final JButton buttonAdd;
     private final JButton buttonReleases = new JButton();
     private final HashSet<String> isFollowedHashset = new HashSet<>();
 
     public AddGUI() {
         super();
-        this.results = new LinkedList<>();
+        artistList = getInitialArtistList();
+        buttonAdd = getInitialButtonAdd();
+        fieldInput = getInitialFieldInput();
+
+
+        buildGUI();
+    }
+
+    private void buildGUI() {
+        setContainer();
+        setFrame();
         setTitle("Search for artists");
-        artistList = new JList<>(artistListModel);
-        artistList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        artistList.setCellRenderer(new ArtistListRenderer());
-        artistList.addListSelectionListener(e -> {
-            buttonAdd.setEnabled(false);
-            buttonReleases.setEnabled(true);
-            if (artistListModel.isEmpty()) return;
-            if (artistList.getSelectedIndex() < 0) return;
+    }
 
-            if (artistListModel.get(0).startsWith("\t") && artistList.getSelectedIndex() == 0) {
-                buttonReleases.setEnabled(false);
-                artistList.setSelectedIndex(-1);
-                refresh();
-            } else if (!isFollowedHashset.contains(results.get(artistList.getSelectedIndex()).getId())) {
-                buttonAdd.setEnabled(true);
-                buttonReleases.setEnabled(true);
-            }
-        });
+    private void setFrame() {
+        frame.add(container);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+    }
 
+    private void setContainer() {
+        fillContainerWithPanels();
+        Dimension d = container.getPreferredSize();
+        d.height = 600;
+        container.setPreferredSize(d);
+    }
 
+    private void fillContainerWithPanels() {
+        container.add(getInitialUpperPanel());
+        container.add(getInitialArtistListPanel());
+    }
+
+    private JPanel getInitialArtistListPanel() {
+        JPanel artistListPanel = new JPanel();
+        artistListPanel.add(getListScrollPane());
+        artistListPanel.setLayout(new GridLayout(0, 1));
+        return artistListPanel;
+    }
+
+    private JPanel getInitialUpperPanel() {
+        JPanel upperPanel = createZeroHeightJPanel();
+        upperPanel.add(fieldInput);
+        upperPanel.add(getInitialButtonSearch());
+        upperPanel.add(buttonReleases);
+        upperPanel.add(buttonAdd);
+        return upperPanel;
+    }
+
+    private JButton getInitialButtonSearch() {
+        JButton buttonSearch = new JButton("Search");
+        buttonSearch.addActionListener(e -> search());
+        return buttonSearch;
+    }
+
+    private JScrollPane getListScrollPane() {
         JScrollPane scrollList = new JScrollPane(artistList);
         scrollList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollList.getVerticalScrollBar().setUnitIncrement(16);
-        scrollList.setPreferredSize(new Dimension(300, 500));
+        //scrollList.setPreferredSize(new Dimension(300, 500));
 
+        return scrollList;
+    }
 
-        JButton buttonSearch = new JButton("Search");
-        buttonSearch.addActionListener(e -> search());
+    private JTextField getInitialFieldInput() {
+        final JTextField fieldInput;
+        fieldInput = new JTextField();
+        fieldInput.setPreferredSize(new Dimension(150, 20));
+        fieldInput.addActionListener(e -> search());
+        return fieldInput;
+    }
+
+    private JButton getInitialButtonAdd() {
+        final JButton buttonAdd;
+        buttonAdd = new JButton();
         buttonAdd.setText("Add");
         buttonAdd.addActionListener(e -> add());
         buttonAdd.setEnabled(false);
         buttonReleases.setText("Releases");
         buttonReleases.addActionListener(e -> theEngine.printAllArtistAlbums(results.get(artistList.getSelectedIndex()).getId()));
         buttonReleases.setEnabled(false);
-        textField = new JTextField();
-        textField.setPreferredSize(new Dimension(150, 20));
-        textField.addActionListener(e -> search());
+        return buttonAdd;
+    }
 
+    private JList<String> getInitialArtistList() {
+        final JList<String> artistList;
+        artistList = new JList<>(artistListModel);
+        artistList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        artistList.setCellRenderer(new ArtistListRenderer());
+        artistList.addListSelectionListener(e -> {
+            buttonAdd.setEnabled(false);
+            buttonReleases.setEnabled(false);
+            if (artistListModel.isEmpty()) return;
+            if (results.isEmpty()) return;
+            if (artistList.getSelectedIndex() < 0) return;
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 0));
-        JPanel artistListPanel = new JPanel();
+            buttonReleases.setEnabled(true);
 
-
-        buttonPanel.add(textField);
-        buttonPanel.add(buttonSearch);
-        buttonPanel.add(buttonReleases);
-        buttonPanel.add(buttonAdd);
-        artistListPanel.add(scrollList);
-
-
-        container.add(buttonPanel);
-        container.add(artistListPanel);
-
-        Dimension d = container.getPreferredSize();
-        d.height = 600;
-        container.setPreferredSize(d);
-
-        frame.add(container);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
+            if (!isFollowedHashset.contains(results.get(artistList.getSelectedIndex()).getId())) {
+                buttonAdd.setEnabled(true);
+            }
+        });
+        return artistList;
     }
 
     private void search() {
-        if (textField.getText().trim().isEmpty()) return;
+        if (fieldInput.getText().trim().isEmpty()) return;
         results.clear();
-        results.addAll(theEngine.searchArtist(textField.getText()));
+        results.addAll(theEngine.searchArtist(fieldInput.getText()));
         isFollowedHashset.clear();
         isFollowedHashset.addAll(results
                 .stream()
@@ -102,13 +141,13 @@ public class AddGUI extends StandardGUI {
 
 
         artistListModel.clear();
-        if (results.isEmpty()) artistListModel.add(0, "\t'" + textField.getText().trim() + "' not found");
+        if (results.isEmpty()) artistListModel.add(0, "\t'" + fieldInput.getText().trim() + "' not found");
         else artistListModel.addAll(results
                 .stream()
                 .map(m -> m.getName().substring(0, Math.min(25, m.getName().length())) + " (" + m.getPopularity() + ")")
                 .collect(Collectors.toList()));
 
-        textField.setText("");
+        fieldInput.setText("");
         refresh();
     }
 
