@@ -30,8 +30,8 @@ public class ReleasedAlbumsGUI extends StandardGUI {
 
     private final TheEngine theEngine = TheEngine.getInstance();
     private final JLabel labelArtistName;
-    private final JLabel labelName = new JLabel();
-    private final JLabel labelType = new JLabel();
+    private final JLabel labelName;
+    private final JLabel labelTypeDate;
     private final JTextArea textAreaID;
     private final JList<String> albumList;
     private final List<Integer> albumListOffset = new LinkedList<>();
@@ -63,6 +63,8 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         trackList = getInitialTrackList();
         textAreaID = getInitialTextAreaID();
         labelArtistName = getInitialLabelArtistName();
+        labelName = getInitialLabelName();
+        labelTypeDate = getInitialLabelTypeDate();
         buttonSpotify = getInitialButtonSpotify();
         buttonMoreBy = getInitialButtonMoreBy();
         buttonFollow = getInitialButtonFollow();
@@ -118,6 +120,19 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         return labelArtistName;
     }
 
+    private JLabel getInitialLabelName() {
+        final JLabel labelName;
+        labelName = new JLabel();
+        return labelName;
+    }
+
+    private JLabel getInitialLabelTypeDate() {
+        final JLabel labelTypeDate;
+        labelTypeDate = new JLabel();
+        labelTypeDate.setFont(labelTypeDate.getFont().deriveFont(Font.PLAIN));
+        return labelTypeDate;
+    }
+
     private JTextArea getInitialTextAreaID() {
         final JTextArea IDArea;
         IDArea = new JTextArea();
@@ -170,13 +185,15 @@ public class ReleasedAlbumsGUI extends StandardGUI {
 
     private JPanel getInitialPanelReleaseType() {
         JPanel panelReleaseType = createZeroHeightJPanel();
-        panelReleaseType.add(labelType);
+        panelReleaseType.add(labelTypeDate);
         return panelReleaseType;
     }
 
     private JPanel getInitialPanelID() {
         JPanel panelID = createZeroHeightJPanel();
-        panelID.add(new JLabel("ID"));
+        JLabel label = new JLabel("ID");
+        label.setFont(label.getFont().deriveFont(Font.PLAIN));
+        panelID.add(label);
         panelID.add(textAreaID);
         return panelID;
     }
@@ -381,7 +398,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         info = mapTempInfo.get(id);
         labelArtistName.setText(Arrays.stream(info.album().getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(", ")));
         labelName.setText(info.album().getName().length() > 65 ? info.album().getName().substring(0, 60) + "..." : info.album().getName());
-        labelType.setText(info.album().getAlbumType().getType().toUpperCase() + " released " + info.album().getReleaseDate());
+        labelTypeDate.setText(info.album().getAlbumType().getType().toUpperCase() + " released " + info.album().getReleaseDate());
         textAreaID.setText(info.album().getId());
         labelCover.setIcon(new ImageIcon(info.cover()));
         modelTrackList.clear();
