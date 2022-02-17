@@ -30,8 +30,8 @@ public class ReleasedAlbumsGUI extends StandardGUI {
 
     private final TheEngine theEngine = TheEngine.getInstance();
     private final JLabel labelArtistName;
-    private final JLabel nameLabel = new JLabel();
-    private final JLabel typeLabel = new JLabel();
+    private final JLabel labelName = new JLabel();
+    private final JLabel labelType = new JLabel();
     private final JTextArea textAreaID;
     private final JList<String> albumList;
     private final List<Integer> albumListOffset = new LinkedList<>();
@@ -51,10 +51,12 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     private List<ArtistSimplified> allArtistsAndPerformers;
     private TempAlbumInfo info;
     private int lastSelectedIndex = 0;
+    private final String title;
 
     public ReleasedAlbumsGUI(int defaultCloseOperation, List<ReleasedAlbum> albums, String title) {
         super();
 
+        this.title = title;
         releasedAlbums = new ArrayList<>(albums);
         filteredReleasedAlbums = getAlbumsSortedByReleaseDate(releasedAlbums);
         albumList = getInitialAlbumList();
@@ -68,7 +70,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         checkBoxSingles = getInitialCheckBoxSingles();
         checkBoxFeaturing = getInitialCheckBoxFeaturing();
 
-        buildGUI(defaultCloseOperation, title);
+        buildGUI(defaultCloseOperation, this.title + " (" + albums.size() + ")");
         refreshFrame();
     }
 
@@ -91,6 +93,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     }
 
     private void fillContainerWithPanels() {
+        container.add(getInitialPanelGUIName());
         container.add(getInitialPanelCheckBox());
         container.add(getListScrollPane(albumList));
         container.add(getInitialPanelArtistName());
@@ -167,7 +170,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
 
     private JPanel getInitialPanelReleaseType() {
         JPanel panelReleaseType = createZeroHeightJPanel();
-        panelReleaseType.add(typeLabel);
+        panelReleaseType.add(labelType);
         return panelReleaseType;
     }
 
@@ -180,7 +183,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
 
     private JPanel getInitialNameSpotify() {
         JPanel panelNameSpotify = createZeroHeightJPanel();
-        panelNameSpotify.add(nameLabel);
+        panelNameSpotify.add(labelName);
         panelNameSpotify.add(buttonSpotify);
         panelNameSpotify.add(buttonMoreBy);
         return panelNameSpotify;
@@ -198,6 +201,16 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         checkBoxPanel.add(checkBoxSingles);
         checkBoxPanel.add(checkBoxFeaturing);
         setCheckBoxes();
+        return checkBoxPanel;
+    }
+
+    private JPanel getInitialPanelGUIName() {
+        JPanel checkBoxPanel = createZeroHeightJPanel();
+        JLabel label = new JLabel(title);
+        label.setFont(label.getFont().deriveFont(13F));
+        label.setFont(label.getFont().deriveFont(Font.PLAIN));
+        if (backButton != null) checkBoxPanel.add(backButton);
+        checkBoxPanel.add(label);
         return checkBoxPanel;
     }
 
@@ -366,8 +379,8 @@ public class ReleasedAlbumsGUI extends StandardGUI {
 
         info = mapTempInfo.get(id);
         labelArtistName.setText(Arrays.stream(info.album().getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(", ")));
-        nameLabel.setText(info.album().getName().length() > 65 ? info.album().getName().substring(0, 60) + "..." : info.album().getName());
-        typeLabel.setText(info.album().getAlbumType().getType().toUpperCase() + " released " + info.album().getReleaseDate());
+        labelName.setText(info.album().getName().length() > 65 ? info.album().getName().substring(0, 60) + "..." : info.album().getName());
+        labelType.setText(info.album().getAlbumType().getType().toUpperCase() + " released " + info.album().getReleaseDate());
         textAreaID.setText(info.album().getId());
         labelCover.setIcon(new ImageIcon(info.cover()));
         modelTrackList.clear();

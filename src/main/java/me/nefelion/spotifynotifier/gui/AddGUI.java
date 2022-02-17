@@ -65,6 +65,7 @@ public class AddGUI extends StandardGUI {
 
     private JPanel getInitialUpperPanel() {
         JPanel upperPanel = createZeroHeightJPanel();
+        if (backButton != null) upperPanel.add(backButton);
         upperPanel.add(fieldInput);
         upperPanel.add(getInitialButtonSearch());
         upperPanel.add(buttonReleases);
