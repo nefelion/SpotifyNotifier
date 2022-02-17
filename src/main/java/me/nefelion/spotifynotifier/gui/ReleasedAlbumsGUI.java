@@ -207,8 +207,6 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     private JPanel getInitialPanelGUIName() {
         JPanel checkBoxPanel = createZeroHeightJPanel();
         JLabel label = new JLabel(title);
-        label.setFont(label.getFont().deriveFont(13F));
-        label.setFont(label.getFont().deriveFont(Font.PLAIN));
         if (backButton != null) checkBoxPanel.add(backButton);
         checkBoxPanel.add(label);
         return checkBoxPanel;
@@ -219,6 +217,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         checkBoxFeaturing = new JCheckBox("Featuring (0)", false);
         checkBoxFeaturing.setEnabled(false);
         checkBoxFeaturing.addItemListener(e -> refreshAlbumList());
+        checkBoxFeaturing.setFont(checkBoxFeaturing.getFont().deriveFont(Font.PLAIN));
         return checkBoxFeaturing;
     }
 
@@ -227,6 +226,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         checkBoxSingles = new JCheckBox("Singles (0)", false);
         checkBoxSingles.setEnabled(false);
         checkBoxSingles.addItemListener(e -> refreshAlbumList());
+        checkBoxSingles.setFont(checkBoxSingles.getFont().deriveFont(Font.PLAIN));
         return checkBoxSingles;
     }
 
@@ -235,6 +235,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         albumsCheckBox = new JCheckBox("Albums (0)", false);
         albumsCheckBox.setEnabled(false);
         albumsCheckBox.addItemListener(e -> refreshAlbumList());
+        albumsCheckBox.setFont(albumsCheckBox.getFont().deriveFont(Font.PLAIN));
         return albumsCheckBox;
     }
 
