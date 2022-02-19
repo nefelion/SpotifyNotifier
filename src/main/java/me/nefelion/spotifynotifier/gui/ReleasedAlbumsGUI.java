@@ -6,6 +6,7 @@ import me.nefelion.spotifynotifier.Utilities;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import me.nefelion.spotifynotifier.records.TimeCheckpoint;
 import se.michaelthelin.spotify.model_objects.specification.Album;
+import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
@@ -41,6 +42,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     private final JButton buttonSpotify;
     private final JButton buttonMoreBy;
     private final JButton buttonFollow;
+    private final JButton buttonRelated;
     private final JCheckBox checkBoxAlbums;
     private final JCheckBox checkBoxSingles;
     private final JCheckBox checkBoxFeaturing;
@@ -48,10 +50,10 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     private final JLabel labelCover = new JLabel();
     private final JList<String> trackList;
     private final DefaultListModel<String> modelTrackList = new DefaultListModel<>();
+    private final String title;
     private List<ArtistSimplified> allArtistsAndPerformers;
     private TempAlbumInfo info;
     private int lastSelectedIndex = 0;
-    private final String title;
 
     public ReleasedAlbumsGUI(int defaultCloseOperation, List<ReleasedAlbum> albums, String title) {
         super();
@@ -68,6 +70,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         buttonSpotify = getInitialButtonSpotify();
         buttonMoreBy = getInitialButtonMoreBy();
         buttonFollow = getInitialButtonFollow();
+        buttonRelated = getInitialButtonRelated();
         checkBoxAlbums = getInitialCheckBoxAlbums();
         checkBoxSingles = getInitialCheckBoxSingles();
         checkBoxFeaturing = getInitialCheckBoxFeaturing();
@@ -103,7 +106,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         container.add(getInitialPanelReleaseType());
         container.add(getInitialPanelID());
         container.add(getInitialPanelImage());
-        container.add(getInitialPanelFollow());
+        container.add(getInitialPanelBottom());
     }
 
     private List<ReleasedAlbum> getAlbumsSortedByReleaseDate(List<ReleasedAlbum> albums) {
@@ -170,9 +173,10 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         return IDArea;
     }
 
-    private JPanel getInitialPanelFollow() {
+    private JPanel getInitialPanelBottom() {
         JPanel panelFollow = createZeroHeightJPanel();
         panelFollow.add(buttonFollow);
+        panelFollow.add(buttonRelated);
         return panelFollow;
     }
 
@@ -294,13 +298,27 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         buttonMoreBy.addActionListener(e -> {
             List<String> idList = allArtistsAndPerformers.stream().map(ArtistSimplified::getId).collect(Collectors.toList());
             List<String> nameList = allArtistsAndPerformers.stream().map(ArtistSimplified::getName).collect(Collectors.toList());
-            PickArtistGUI gui = new PickArtistGUI(nameList);
+            PickOneGUI gui = new PickOneGUI(nameList);
             gui.show();
             int index = gui.getPickedIndex();
             if (index != -1) theEngine.printAllArtistAlbums(idList.get(index));
         });
         setSmallButtonMargins(buttonMoreBy);
         return buttonMoreBy;
+    }
+
+    private JButton getInitialButtonRelated() {
+        final JButton buttonRelated = getDisabledButton("Related artists");
+        buttonRelated.addActionListener(e -> {
+            Artist[] relatedArtists = theEngine.getRelatedArtists(getSelectedAlbum().getArtistId());
+            List<String> nameList = Arrays.stream(relatedArtists).map(Artist::getName).collect(Collectors.toList());
+            PickOneGUI gui = new PickOneGUI(nameList);
+            gui.show();
+            int index = gui.getPickedIndex();
+            if (index != -1) theEngine.printAllArtistAlbums(relatedArtists[index].getId());
+        });
+        setSmallButtonMargins(buttonRelated);
+        return buttonRelated;
     }
 
     private JButton getInitialButtonSpotify() {
@@ -353,9 +371,9 @@ public class ReleasedAlbumsGUI extends StandardGUI {
                 if (albumList.getSelectedIndex() == 0) albumList.setSelectedIndex(1);
             }
             if (filteredReleasedAlbums.isEmpty()) {
-                enableButtons(false, buttonSpotify, buttonMoreBy, buttonFollow);
+                enableButtons(false, buttonSpotify, buttonMoreBy, buttonFollow, buttonRelated);
                 return;
-            } else enableButtons(true, buttonSpotify, buttonMoreBy, buttonFollow);
+            } else enableButtons(true, buttonSpotify, buttonMoreBy, buttonFollow, buttonRelated);
 
             lastSelectedIndex = albumList.getSelectedIndex();
             refreshButtonFollow();
@@ -415,7 +433,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         recreateAlbumAndOffsetLists();
 
         if (!modelAlbumList.isEmpty()) albumList.setSelectedIndex(1);
-        else enableButtons(false, buttonSpotify, buttonMoreBy, buttonFollow);
+        else enableButtons(false, buttonSpotify, buttonMoreBy, buttonFollow, buttonRelated);
     }
 
     private void recreateAlbumAndOffsetLists() {

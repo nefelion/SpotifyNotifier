@@ -237,6 +237,16 @@ public class TheEngine {
         }
     }
 
+    public Artist[] getRelatedArtists(String id) {
+        try {
+            return spotifyAPI.getArtistsRelatedArtists(id).build().execute();
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            System.out.println("getSimilarArtists: Something went wrong!\n" + e.getMessage());
+            System.exit(-17327);
+            return null;
+        }
+    }
+
     public List<Artist> searchArtist(String name) {
 
         List<Artist> artists = new ArrayList<>();

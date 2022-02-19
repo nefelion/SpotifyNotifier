@@ -1,15 +1,14 @@
 package me.nefelion.spotifynotifier.gui;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Stack;
 
 
 public abstract class StandardGUI extends GUIFrame {
 
-    protected JButton backButton;
     private static final Stack<GUIData> GUI_STACK = new Stack<>();
     private static JFrame ONE_FRAME;
+    protected JButton backButton;
 
     public StandardGUI() {
         super();
