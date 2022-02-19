@@ -216,6 +216,7 @@ public class FollowedGUI extends StandardGUI {
         buttonRemove.setEnabled(false);
         buttonRemove.addActionListener(e -> {
             theEngine.unfollowArtistID(currentArtist.getID());
+            currentArtist = null;
             refreshList();
             refresh();
         });
