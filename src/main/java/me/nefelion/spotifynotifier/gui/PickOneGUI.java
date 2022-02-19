@@ -6,13 +6,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
-public class PickArtistGUI extends PopupGUI {
+public class PickOneGUI extends PopupGUI {
 
     private final List<String> artistList;
     private int selectedIndex = -1;
     private int hoveredJListIndex = -1;
 
-    public PickArtistGUI(List<String> artistList) {
+    public PickOneGUI(List<String> artistList) {
         this.artistList = artistList;
         createGUI();
     }
@@ -21,7 +21,7 @@ public class PickArtistGUI extends PopupGUI {
         container.add(getTrackListScrollPane(getInitialList(artistList)));
         dialog.add(container);
         dialog.pack();
-        setTitle("Select an artist");
+        setTitle("Select one");
     }
 
     private JList<String> getInitialList(List<String> artistList) {
