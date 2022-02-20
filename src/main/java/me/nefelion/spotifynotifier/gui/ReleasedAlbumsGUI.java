@@ -33,6 +33,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     private final JLabel labelArtistName;
     private final JLabel labelName;
     private final JLabel labelTypeDate;
+    private final JLabel labelBottomInfo;
     private final JTextArea textAreaID;
     private final JList<String> albumList;
     private final List<Integer> albumListOffset = new LinkedList<>();
@@ -67,6 +68,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         labelArtistName = getInitialLabelArtistName();
         labelName = getInitialLabelName();
         labelTypeDate = getInitialLabelTypeDate();
+        labelBottomInfo = getInitialLabelBottomInfo();
         buttonSpotify = getInitialButtonSpotify();
         buttonMoreBy = getInitialButtonMoreBy();
         buttonFollow = getInitialButtonFollow();
@@ -136,6 +138,13 @@ public class ReleasedAlbumsGUI extends StandardGUI {
         return labelTypeDate;
     }
 
+    private JLabel getInitialLabelBottomInfo() {
+        final JLabel labelBottomInfo;
+        labelBottomInfo = new JLabel();
+        labelBottomInfo.setFont(labelBottomInfo.getFont().deriveFont(Font.PLAIN));
+        return labelBottomInfo;
+    }
+
     private JTextArea getInitialTextAreaID() {
         final JTextArea IDArea;
         IDArea = new JTextArea();
@@ -175,6 +184,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
 
     private JPanel getInitialPanelBottom() {
         JPanel panelFollow = createZeroHeightJPanel();
+        panelFollow.add(labelBottomInfo);
         panelFollow.add(buttonFollow);
         panelFollow.add(buttonRelated);
         return panelFollow;
