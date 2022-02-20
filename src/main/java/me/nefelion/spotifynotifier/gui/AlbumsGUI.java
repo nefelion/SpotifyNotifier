@@ -27,7 +27,7 @@ import java.util.stream.IntStream;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
-public class ReleasedAlbumsGUI extends StandardGUI {
+public class AlbumsGUI extends StandardGUI {
 
     private final TheEngine theEngine = TheEngine.getInstance();
     private final JLabel labelArtistName;
@@ -56,7 +56,7 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     private TempAlbumInfo info;
     private int lastSelectedIndex = 0;
 
-    public ReleasedAlbumsGUI(int defaultCloseOperation, List<ReleasedAlbum> albums, String title) {
+    public AlbumsGUI(int defaultCloseOperation, List<ReleasedAlbum> albums, String title) {
         super();
 
         this.title = title;

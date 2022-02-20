@@ -2,7 +2,7 @@ package me.nefelion.spotifynotifier;
 
 import me.nefelion.spotifynotifier.gui.FollowedGUI;
 import me.nefelion.spotifynotifier.gui.GUIFrame;
-import me.nefelion.spotifynotifier.gui.ReleasedAlbumsGUI;
+import me.nefelion.spotifynotifier.gui.AlbumsGUI;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.enums.AlbumType;
@@ -112,7 +112,7 @@ public class TheEngine {
         FileManager.saveAlbumHashSet(processor.getIDhashSet());
 
         if (!releasedAlbums.isEmpty()) {
-            GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, releasedAlbums, "New releases");
+            GUIFrame gui = new AlbumsGUI(JFrame.EXIT_ON_CLOSE, releasedAlbums, "New releases");
             gui.show();
         } else if (!quiet) {
             Utilities.showMessageDialog("No new releases.", "Check releases", JOptionPane.INFORMATION_MESSAGE);
@@ -150,7 +150,7 @@ public class TheEngine {
 
         List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
 
-        GUIFrame gui = new ReleasedAlbumsGUI(JFrame.HIDE_ON_CLOSE, releasedAlbums,
+        GUIFrame gui = new AlbumsGUI(JFrame.HIDE_ON_CLOSE, releasedAlbums,
                 "All releases by " + artist.getName());
         gui.show();
     }
@@ -164,7 +164,7 @@ public class TheEngine {
 
         List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
 
-        GUIFrame gui = new ReleasedAlbumsGUI(JFrame.EXIT_ON_CLOSE, releasedAlbums, "Recent albums");
+        GUIFrame gui = new AlbumsGUI(JFrame.EXIT_ON_CLOSE, releasedAlbums, "Recent albums");
         gui.show();
     }
 
