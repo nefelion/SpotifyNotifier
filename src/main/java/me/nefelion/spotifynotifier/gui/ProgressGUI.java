@@ -5,13 +5,15 @@ import java.awt.*;
 
 public class ProgressGUI extends GUIFrame {
 
-    JProgressBar progressBar;
+    private final JProgressBar progressBar;
+    private int value;
 
     public ProgressGUI(int min, int max) {
         super();
         setTitle("ProgressBar");
 
         progressBar = new JProgressBar(min, max);
+        value = min;
         frame.add(progressBar);
         frame.setPreferredSize(new Dimension(300, 80));
         frame.pack();
@@ -20,6 +22,10 @@ public class ProgressGUI extends GUIFrame {
     public void setValue(int value) {
         progressBar.setValue(value);
         progressBar.setStringPainted(true);
+    }
+
+    public void increment() {
+        setValue(++value);
     }
 
     @Override

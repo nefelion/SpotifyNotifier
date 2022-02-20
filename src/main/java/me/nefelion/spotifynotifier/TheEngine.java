@@ -1,8 +1,6 @@
 package me.nefelion.spotifynotifier;
 
-import me.nefelion.spotifynotifier.gui.FollowedGUI;
-import me.nefelion.spotifynotifier.gui.GUIFrame;
-import me.nefelion.spotifynotifier.gui.AlbumsGUI;
+import me.nefelion.spotifynotifier.gui.*;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.enums.AlbumType;
@@ -263,5 +261,33 @@ public class TheEngine {
         return TempData.getInstance().getFileData().getFollowedArtists().stream().anyMatch(p -> p.getID().equals(id));
     }
 
+    public void showRelatedAlbums() {
+        HashSet<String> uniqueArtistsID = new HashSet<>();
+        ArrayList<FollowedArtist> relatedArtists = new ArrayList<>();
+        List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists();
+
+        ProgressGUI progressGUI = new ProgressGUI(0, followedArtists.size());
+        progressGUI.setTitle("Loading related artists...");
+        progressGUI.show();
+        for (FollowedArtist followedArtist : followedArtists) {
+            for (Artist artist : getRelatedArtists(followedArtist.getID())) {
+                String id = artist.getId();
+                if (isFollowed(id)) continue;
+                if (!uniqueArtistsID.add(id)) continue;
+                relatedArtists.add(new FollowedArtist(artist.getName(), id));
+            }
+            progressGUI.increment();
+        }
+        progressGUI.close();
+
+        ReleasesProcessor processor = new ReleasesProcessor(relatedArtists);
+        processor.setProgressBarVisible(true);
+        processor.processOnlyNewReleases(false);
+        processor.process();
+
+        List<ReleasedAlbum> albums = new ArrayList<>(processor.getAlbums());
+        GUI gui = new AlbumsGUI(JFrame.EXIT_ON_CLOSE, albums, "Related releases");
+        gui.show();
+    }
 
 }

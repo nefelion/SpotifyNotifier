@@ -68,6 +68,7 @@ public class Main {
         subCommands.put("list", new Followed());
         subCommands.put("allby", new AllBy());
         subCommands.put("recent", new AllRecentAlbums());
+        subCommands.put("explore", new Explore());
     }
 
     private static boolean lock() {

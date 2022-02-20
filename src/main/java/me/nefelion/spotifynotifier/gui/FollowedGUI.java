@@ -29,6 +29,7 @@ public class FollowedGUI extends StandardGUI {
     private final JButton buttonRemove;
     private final JButton buttonReleases;
     private final JButton buttonCheck;
+    private final JButton buttonExplore;
     private final JButton buttonAllReleases;
     private final JLabel labelLastChecked;
     private final JLabel labelID = new JLabel("ID");
@@ -45,6 +46,7 @@ public class FollowedGUI extends StandardGUI {
         buttonRemove = getInitialButtonRemove();
         buttonReleases = getInitialButtonReleases();
         buttonCheck = getInitialButtonCheck();
+        buttonExplore = getInitialButtonExplore();
         buttonAllReleases = getInitialButtonAllReleases();
 
         // refresh every 1000ms
@@ -146,6 +148,7 @@ public class FollowedGUI extends StandardGUI {
 
         panelCheck.add(buttonCheck);
         panelCheck.add(buttonAllReleases);
+        panelCheck.add(buttonExplore);
         return panelCheck;
     }
 
@@ -198,6 +201,18 @@ public class FollowedGUI extends StandardGUI {
         });
         setSmallButtonMargins(buttonCheck);
         return buttonCheck;
+    }
+
+    private JButton getInitialButtonExplore() {
+        final JButton buttonExplore;
+        buttonExplore = new JButton("Explore");
+        buttonExplore.setEnabled(false);
+        buttonExplore.addActionListener(e -> {
+            theEngine.showRelatedAlbums();
+            refresh();
+        });
+        setSmallButtonMargins(buttonExplore);
+        return buttonExplore;
     }
 
     private JButton getInitialButtonReleases() {
@@ -303,7 +318,7 @@ public class FollowedGUI extends StandardGUI {
         followedArtists.addAll(TempData.getInstance().getFileData().getFollowedArtists());
         modelList.clear();
         modelList.addAll(followedArtists.stream().map(FollowedArtist::getName).collect(Collectors.toList()));
-        enableButtons(!modelList.isEmpty(), buttonCheck, buttonAllReleases);
+        enableButtons(!modelList.isEmpty(), buttonCheck, buttonAllReleases, buttonExplore);
 
         updateTitle();
     }
