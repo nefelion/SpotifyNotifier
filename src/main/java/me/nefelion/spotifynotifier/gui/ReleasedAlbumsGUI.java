@@ -320,12 +320,13 @@ public class ReleasedAlbumsGUI extends StandardGUI {
     private JButton getInitialButtonRelated() {
         final JButton buttonRelated = getDisabledButton("Related artists");
         buttonRelated.addActionListener(e -> {
-            Artist[] relatedArtists = theEngine.getRelatedArtists(getSelectedAlbum().getArtistId());
-            List<String> nameList = Arrays.stream(relatedArtists).map(Artist::getName).collect(Collectors.toList());
+            List<Artist> relatedArtists = Arrays.stream(theEngine.getRelatedArtists(getSelectedAlbum().getArtistId()))
+                    .filter(p -> !theEngine.isFollowed(p.getId())).collect(Collectors.toList());
+            List<String> nameList = relatedArtists.stream().map(Artist::getName).collect(Collectors.toList());
             PickOneGUI gui = new PickOneGUI(nameList);
             gui.show();
             int index = gui.getPickedIndex();
-            if (index != -1) theEngine.printAllArtistAlbums(relatedArtists[index].getId());
+            if (index != -1) theEngine.printAllArtistAlbums(relatedArtists.get(index).getId());
         });
         setSmallButtonMargins(buttonRelated);
         return buttonRelated;
