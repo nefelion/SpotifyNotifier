@@ -9,27 +9,27 @@ import java.util.*;
 public class ReleasesProcessor {
 
     private final TheEngine theEngine = TheEngine.getInstance();
-    private final List<FollowedArtist> followedArtists;
+    private final List<FollowedArtist> artists;
     private final HashSet<String> IDhashSet = new HashSet<>();
     private final HashMap<String, ReleasedAlbum> featuringHashMap = new HashMap<>();
-    private final List<ReleasedAlbum> releasedAlbums = new ArrayList<>();
+    private final List<ReleasedAlbum> albums = new ArrayList<>();
     private boolean showProgressBar = false;
 
-    public ReleasesProcessor(List<FollowedArtist> followedArtists) {
-        this.followedArtists = followedArtists;
+    public ReleasesProcessor(List<FollowedArtist> artists) {
+        this.artists = artists;
     }
 
-    public ReleasesProcessor(FollowedArtist... followedArtists) {
-        this.followedArtists = new ArrayList<>();
-        this.followedArtists.addAll(Arrays.asList(followedArtists));
+    public ReleasesProcessor(FollowedArtist... artists) {
+        this.artists = new ArrayList<>();
+        this.artists.addAll(Arrays.asList(artists));
     }
 
     public void process() {
-        ProgressGUI progressBar = new ProgressGUI(0, followedArtists.size());
+        ProgressGUI progressBar = new ProgressGUI(0, artists.size());
         if (showProgressBar) progressBar.show();
         int i = 0;
 
-        for (FollowedArtist artist : followedArtists) {
+        for (FollowedArtist artist : artists) {
             progressBar.setTitle(artist.getName());
             for (AlbumSimplified album : theEngine.getAlbums(artist.getID())) {
                 if (IDhashSet.contains(album.getId())) continue;
@@ -37,7 +37,7 @@ public class ReleasesProcessor {
                     featuringHashMap.put(album.getId(), new ReleasedAlbum(album, artist));
                 else {
                     IDhashSet.add(album.getId());
-                    releasedAlbums.add(new ReleasedAlbum(album, artist));
+                    albums.add(new ReleasedAlbum(album, artist));
                 }
             }
             progressBar.setValue(++i);
@@ -62,15 +62,15 @@ public class ReleasesProcessor {
         }
     }
 
-    public List<ReleasedAlbum> getReleasedAlbums() {
-        return releasedAlbums;
+    public List<ReleasedAlbum> getAlbums() {
+        return albums;
     }
 
     private void loadUniqueFeaturing() {
         for (ReleasedAlbum album : featuringHashMap.values()) {
             if (IDhashSet.contains(album.getId())) continue;
             IDhashSet.add(album.getId());
-            releasedAlbums.add(album);
+            albums.add(album);
         }
     }
 

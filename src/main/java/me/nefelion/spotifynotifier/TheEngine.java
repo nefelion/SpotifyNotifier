@@ -105,7 +105,7 @@ public class TheEngine {
         processor.setProgressBarVisible(!quiet);
         processor.process();
 
-        List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
+        List<ReleasedAlbum> releasedAlbums = processor.getAlbums();
 
         fd.setLastChecked(Utilities.now());
         FileManager.saveFileData(fd);
@@ -148,7 +148,7 @@ public class TheEngine {
         processor.setProgressBarVisible(true);
         processor.process();
 
-        List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
+        List<ReleasedAlbum> releasedAlbums = processor.getAlbums();
 
         GUIFrame gui = new AlbumsGUI(JFrame.HIDE_ON_CLOSE, releasedAlbums,
                 "All releases by " + artist.getName());
@@ -162,7 +162,7 @@ public class TheEngine {
         processor.setProgressBarVisible(true);
         processor.process();
 
-        List<ReleasedAlbum> releasedAlbums = processor.getReleasedAlbums();
+        List<ReleasedAlbum> releasedAlbums = processor.getAlbums();
 
         GUIFrame gui = new AlbumsGUI(JFrame.EXIT_ON_CLOSE, releasedAlbums, "Recent albums");
         gui.show();
