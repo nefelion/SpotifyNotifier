@@ -280,6 +280,7 @@ public class TheEngine {
         }
         progressGUI.close();
 
+        relatedArtists.sort(Comparator.comparing(FollowedArtist::getName));
         ReleasesProcessor processor = new ReleasesProcessor(relatedArtists);
         processor.setProgressBarVisible(true);
         processor.processOnlyNewReleases(false);
