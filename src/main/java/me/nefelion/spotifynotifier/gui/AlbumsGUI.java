@@ -44,6 +44,7 @@ public class AlbumsGUI extends StandardGUI {
     private final JButton buttonMoreBy;
     private final JButton buttonFollow;
     private final JButton buttonRelated;
+    private final JButton buttonRandom;
     private final JCheckBox checkBoxAlbums;
     private final JCheckBox checkBoxSingles;
     private final JCheckBox checkBoxFeaturing;
@@ -73,6 +74,7 @@ public class AlbumsGUI extends StandardGUI {
         buttonMoreBy = getInitialButtonMoreBy();
         buttonFollow = getInitialButtonFollow();
         buttonRelated = getInitialButtonRelated();
+        buttonRandom = getInitialButtonRandom();
         checkBoxAlbums = getInitialCheckBoxAlbums();
         checkBoxSingles = getInitialCheckBoxSingles();
         checkBoxFeaturing = getInitialCheckBoxFeaturing();
@@ -232,6 +234,7 @@ public class AlbumsGUI extends StandardGUI {
         checkBoxPanel.add(checkBoxSingles);
         checkBoxPanel.add(checkBoxFeaturing);
         setCheckBoxes();
+        checkBoxPanel.add(buttonRandom);
         return checkBoxPanel;
     }
 
@@ -330,6 +333,23 @@ public class AlbumsGUI extends StandardGUI {
         });
         setSmallButtonMargins(buttonRelated);
         return buttonRelated;
+    }
+
+    private JButton getInitialButtonRandom() {
+        final JButton buttonRandom = getDisabledButton("Random");
+        buttonRandom.addActionListener(e -> {
+            if (filteredReleasedAlbums.size() < 2) return;
+
+            int randIndex = new Random().nextInt(modelAlbumList.size());
+            while (albumList.getSelectedIndex() == randIndex || albumListOffset.contains(randIndex + 1))
+                randIndex = new Random().nextInt(modelAlbumList.size());
+
+            albumList.ensureIndexIsVisible(randIndex);
+            albumList.setSelectedIndex(randIndex);
+        });
+        setSmallButtonMargins(buttonRandom);
+        buttonRandom.setEnabled(true);
+        return buttonRandom;
     }
 
     private JButton getInitialButtonSpotify() {
