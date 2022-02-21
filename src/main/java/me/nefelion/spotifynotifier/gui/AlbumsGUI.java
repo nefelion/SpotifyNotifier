@@ -396,6 +396,7 @@ public class AlbumsGUI extends StandardGUI {
         albumList.setCellRenderer(new AlbumListRenderer());
         albumList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         albumList.addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) return;
             if (albumList.isSelectionEmpty()) return;
             if (!albumList.getSelectedValue().startsWith("\t")) {
                 albumList.setSelectedIndex(albumList.getSelectedIndex() + (!e.getValueIsAdjusting() && lastSelectedIndex > albumList.getSelectedIndex() ? -1 : 1));
