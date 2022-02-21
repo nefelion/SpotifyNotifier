@@ -233,7 +233,7 @@ public class AlbumsGUI extends StandardGUI {
         checkBoxPanel.add(checkBoxAlbums);
         checkBoxPanel.add(checkBoxSingles);
         checkBoxPanel.add(checkBoxFeaturing);
-        setCheckBoxes();
+        refreshAlbumList();
         checkBoxPanel.add(buttonRandom);
         return checkBoxPanel;
     }
@@ -247,30 +247,30 @@ public class AlbumsGUI extends StandardGUI {
     }
 
     private JCheckBox getInitialCheckBoxFeaturing() {
-        final JCheckBox checkBoxFeaturing;
-        checkBoxFeaturing = new JCheckBox("Featuring (0)", false);
-        checkBoxFeaturing.setEnabled(false);
-        checkBoxFeaturing.addItemListener(e -> refreshAlbumList());
-        checkBoxFeaturing.setFont(checkBoxFeaturing.getFont().deriveFont(Font.PLAIN));
-        return checkBoxFeaturing;
+        long numberOfFeaturing = releasedAlbums.stream().filter(ReleasedAlbum::isFeaturing).count();
+
+        return getSetCheckBox(numberOfFeaturing, "Featuring");
     }
 
     private JCheckBox getInitialCheckBoxSingles() {
-        final JCheckBox checkBoxSingles;
-        checkBoxSingles = new JCheckBox("Singles (0)", false);
-        checkBoxSingles.setEnabled(false);
-        checkBoxSingles.addItemListener(e -> refreshAlbumList());
-        checkBoxSingles.setFont(checkBoxSingles.getFont().deriveFont(Font.PLAIN));
-        return checkBoxSingles;
+        long numberOfSingles = releasedAlbums.stream().filter(p -> p.getAlbumType().equalsIgnoreCase("SINGLE") && !p.isFeaturing()).count();
+
+        return getSetCheckBox(numberOfSingles, "Singles");
     }
 
     private JCheckBox getInitialCheckBoxAlbums() {
-        final JCheckBox albumsCheckBox;
-        albumsCheckBox = new JCheckBox("Albums (0)", false);
-        albumsCheckBox.setEnabled(false);
-        albumsCheckBox.addItemListener(e -> refreshAlbumList());
-        albumsCheckBox.setFont(albumsCheckBox.getFont().deriveFont(Font.PLAIN));
-        return albumsCheckBox;
+        long numberOfAlbums = releasedAlbums.stream().filter(p -> p.getAlbumType().equalsIgnoreCase("ALBUM") && !p.isFeaturing()).count();
+
+        return getSetCheckBox(numberOfAlbums, "Albums");
+    }
+
+    private JCheckBox getSetCheckBox(long number, String s) {
+        JCheckBox checkBoxFeaturing;
+        checkBoxFeaturing = new JCheckBox(s + " (" + number + ")", number != 0);
+        checkBoxFeaturing.setEnabled(number != 0);
+        checkBoxFeaturing.addItemListener(e -> refreshAlbumList());
+        checkBoxFeaturing.setFont(checkBoxFeaturing.getFont().deriveFont(Font.PLAIN));
+        return checkBoxFeaturing;
     }
 
     private JScrollPane getTrackListScrollPane() {
@@ -407,6 +407,7 @@ public class AlbumsGUI extends StandardGUI {
             } else enableButtons(true, buttonSpotify, buttonMoreBy, buttonFollow, buttonRelated);
 
             lastSelectedIndex = albumList.getSelectedIndex();
+            loadInfo(albumList.getSelectedIndex());
             refreshButtonFollow();
             refreshFrame();
         });
@@ -414,7 +415,6 @@ public class AlbumsGUI extends StandardGUI {
     }
 
     private void refreshFrame() {
-        if (albumList.getSelectedIndex() >= 0) loadInfo(albumList.getSelectedIndex());
 
         frame.repaint();
         frame.revalidate();
@@ -516,28 +516,6 @@ public class AlbumsGUI extends StandardGUI {
         filteredReleasedAlbums.sort((a, b) -> b.getLocalDate().compareTo(a.getLocalDate()));
     }
 
-    private void setCheckBoxes() {
-        long numberOfAlbums = releasedAlbums.stream().filter(p -> p.getAlbumType().equalsIgnoreCase("ALBUM") && !p.isFeaturing()).count();
-        long numberOfSingles = releasedAlbums.stream().filter(p -> p.getAlbumType().equalsIgnoreCase("SINGLE") && !p.isFeaturing()).count();
-        long numberOfFeaturing = releasedAlbums.stream().filter(ReleasedAlbum::isFeaturing).count();
-
-        if (numberOfAlbums > 0) {
-            checkBoxAlbums.setText("Albums (" + numberOfAlbums + ")");
-            checkBoxAlbums.setSelected(true);
-            checkBoxAlbums.setEnabled(true);
-            checkBoxAlbums.repaint();
-        }
-        if (numberOfSingles > 0) {
-            checkBoxSingles.setText("Singles (" + numberOfSingles + ")");
-            checkBoxSingles.setSelected(true);
-            checkBoxSingles.setEnabled(true);
-        }
-        if (numberOfFeaturing > 0) {
-            checkBoxFeaturing.setText("Featuring (" + numberOfFeaturing + ")");
-            checkBoxFeaturing.setSelected(true);
-            checkBoxFeaturing.setEnabled(true);
-        }
-    }
 
     private int getIndexWithoutOffset(int n) {
         OptionalInt offset = IntStream.range(0, albumListOffset.size())
