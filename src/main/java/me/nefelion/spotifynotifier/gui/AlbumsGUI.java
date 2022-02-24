@@ -6,10 +6,7 @@ import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.Utilities;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import me.nefelion.spotifynotifier.records.TimeCheckpoint;
-import se.michaelthelin.spotify.model_objects.specification.Album;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
+import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -35,6 +32,7 @@ public class AlbumsGUI extends StandardGUI {
     private final JLabel labelName;
     private final JLabel labelTypeDate;
     private final JLabel labelBottomInfo;
+    private final JLabel labelCurrentPlaying;
     private final JTextArea textAreaID;
     private final JList<String> albumList;
     private final List<Integer> albumListOffset = new LinkedList<>();
@@ -46,6 +44,7 @@ public class AlbumsGUI extends StandardGUI {
     private final JButton buttonFollow;
     private final JButton buttonRelated;
     private final JButton buttonRandom;
+    private final JButton buttonStopCurrentPlaying;
     private final JCheckBox checkBoxAlbums;
     private final JCheckBox checkBoxSingles;
     private final JCheckBox checkBoxFeaturing;
@@ -72,11 +71,13 @@ public class AlbumsGUI extends StandardGUI {
         labelName = getInitialLabelName();
         labelTypeDate = getInitialLabelTypeDate();
         labelBottomInfo = getInitialLabelBottomInfo();
+        labelCurrentPlaying = getInitialLabelCurrentPlaying();
         buttonSpotify = getInitialButtonSpotify();
         buttonMoreBy = getInitialButtonMoreBy();
         buttonFollow = getInitialButtonFollow();
         buttonRelated = getInitialButtonRelated();
         buttonRandom = getInitialButtonRandom();
+        buttonStopCurrentPlaying = getInitialButtonStopCurrentPlaying();
         checkBoxAlbums = getInitialCheckBoxAlbums();
         checkBoxSingles = getInitialCheckBoxSingles();
         checkBoxFeaturing = getInitialCheckBoxFeaturing();
@@ -111,6 +112,7 @@ public class AlbumsGUI extends StandardGUI {
         container.add(getInitialNameSpotify());
         container.add(getInitialPanelReleaseType());
         container.add(getInitialPanelID());
+        container.add(getInitialPanelPlayback());
         container.add(getInitialPanelImage());
         container.add(getInitialPanelBottom());
     }
@@ -147,6 +149,14 @@ public class AlbumsGUI extends StandardGUI {
         labelBottomInfo = new JLabel();
         labelBottomInfo.setFont(labelBottomInfo.getFont().deriveFont(Font.PLAIN));
         return labelBottomInfo;
+    }
+
+    private JLabel getInitialLabelCurrentPlaying() {
+        final JLabel labelCurrentPlaying;
+        labelCurrentPlaying = new JLabel("eee");
+        labelCurrentPlaying.setFont(labelCurrentPlaying.getFont().deriveFont(Font.PLAIN));
+        labelCurrentPlaying.setVisible(false);
+        return labelCurrentPlaying;
     }
 
     private JTextArea getInitialTextAreaID() {
@@ -214,6 +224,13 @@ public class AlbumsGUI extends StandardGUI {
         panelID.add(label);
         panelID.add(textAreaID);
         return panelID;
+    }
+
+    private JPanel getInitialPanelPlayback() {
+        JPanel panelPlayback = createZeroHeightJPanel();
+        panelPlayback.add(labelCurrentPlaying);
+        panelPlayback.add(buttonStopCurrentPlaying);
+        return panelPlayback;
     }
 
     private JPanel getInitialNameSpotify() {
@@ -352,6 +369,15 @@ public class AlbumsGUI extends StandardGUI {
         setSmallButtonMargins(buttonRandom);
         buttonRandom.setEnabled(true);
         return buttonRandom;
+    }
+
+    private JButton getInitialButtonStopCurrentPlaying() {
+        final JButton buttonStopCurrentPlaying = getDisabledButton("Stop");
+        buttonStopCurrentPlaying.addActionListener(e -> stopPlayback());
+        setSmallButtonMargins(buttonStopCurrentPlaying);
+        buttonStopCurrentPlaying.setVisible(false);
+        buttonStopCurrentPlaying.setEnabled(true);
+        return buttonStopCurrentPlaying;
     }
 
     private JButton getInitialButtonSpotify() {
@@ -530,15 +556,22 @@ public class AlbumsGUI extends StandardGUI {
     private void playSelected() {
         if (trackList.getSelectedIndex() < 1) return;
         stopPlayback();
-        String url = info.trackList().get(trackList.getSelectedIndex() - 1).getPreviewUrl();
+        TrackSimplified selectedTrack = info.trackList().get(trackList.getSelectedIndex() - 1);
+        String url = selectedTrack.getPreviewUrl();
         if (url == null) return;
         currentPlayer = new Player(url);
         currentPlayer.lockToStandardGUI(this.hashCode());
         currentPlayer.play();
+
+        buttonStopCurrentPlaying.setVisible(true);
+        labelCurrentPlaying.setText(selectedTrack.getName());
+        labelCurrentPlaying.setVisible(true);
     }
 
     private void stopPlayback() {
-        if (currentPlayer!=null) currentPlayer.stop();
+        if (currentPlayer != null) currentPlayer.stop();
+        buttonStopCurrentPlaying.setVisible(false);
+        labelCurrentPlaying.setVisible(false);
     }
 
     private List<ArtistSimplified> getArtistsAndPerformers(List<TrackSimplified> tracklist) {
