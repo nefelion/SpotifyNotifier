@@ -414,6 +414,7 @@ public class AlbumsGUI extends StandardGUI {
         trackList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         trackList.addListSelectionListener(e -> {
             if (trackList.getSelectedIndex() == 0) trackList.setSelectedIndex(1);
+            if (e.getValueIsAdjusting()) return;
             playSelected();
         });
         return trackList;
