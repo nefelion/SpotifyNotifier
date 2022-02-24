@@ -275,6 +275,7 @@ public class FollowedGUI extends StandardGUI {
             } else enableButtons(true, buttonSpotify, buttonRemove, buttonReleases);
             currentArtist = followedArtists.get(Math.max(artistList.getSelectedIndex(), 0));
             refresh();
+            artistList.ensureIndexIsVisible(artistList.getSelectedIndex());
         });
         return artistList;
     }
