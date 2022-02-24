@@ -27,7 +27,6 @@ public class ReleasesProcessor {
     public void process() {
         ProgressGUI progressBar = new ProgressGUI(0, artists.size());
         if (showProgressBar) progressBar.show();
-        int i = 0;
 
         for (FollowedArtist artist : artists) {
             progressBar.setTitle(artist.getName());
@@ -40,7 +39,7 @@ public class ReleasesProcessor {
                     albums.add(new ReleasedAlbum(album, artist));
                 }
             }
-            progressBar.setValue(++i);
+            progressBar.increment();
         }
         loadUniqueFeaturing();
 
