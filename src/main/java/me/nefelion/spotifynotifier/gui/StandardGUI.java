@@ -50,7 +50,7 @@ public abstract class StandardGUI extends GUIFrame {
         GUI_STACK.push(new GUIData(this.container, this.frame.getTitle(), this.frame.getSize(), this.hashCode()));
     }
 
-    protected int getCurrentGUIHashCode() {
+    public static int getCurrentGUIHashCode() {
         return GUI_STACK.peek().getHashCode();
     }
 }

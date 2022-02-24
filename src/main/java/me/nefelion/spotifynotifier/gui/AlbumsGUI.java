@@ -1,5 +1,6 @@
 package me.nefelion.spotifynotifier.gui;
 
+import me.nefelion.spotifynotifier.Player;
 import me.nefelion.spotifynotifier.ReleasedAlbum;
 import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.Utilities;
@@ -56,6 +57,7 @@ public class AlbumsGUI extends StandardGUI {
     private List<ArtistSimplified> allArtistsAndPerformers;
     private TempAlbumInfo info;
     private int lastSelectedIndex = 0;
+    private Player currentPlayer;
 
     public AlbumsGUI(int defaultCloseOperation, List<ReleasedAlbum> albums, String title) {
         super();
@@ -386,6 +388,7 @@ public class AlbumsGUI extends StandardGUI {
         trackList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         trackList.addListSelectionListener(e -> {
             if (trackList.getSelectedIndex() == 0) trackList.setSelectedIndex(1);
+            playSelected();
         });
         return trackList;
     }
@@ -517,12 +520,25 @@ public class AlbumsGUI extends StandardGUI {
         filteredReleasedAlbums.sort((a, b) -> b.getLocalDate().compareTo(a.getLocalDate()));
     }
 
-
     private int getIndexWithoutOffset(int n) {
         OptionalInt offset = IntStream.range(0, albumListOffset.size())
                 .filter(i -> albumListOffset.get(i) <= n).reduce((first, second) -> second);
 
         return n - (offset.isPresent() ? offset.getAsInt() + 1 : 0);
+    }
+
+    private void playSelected() {
+        if (trackList.getSelectedIndex() < 1) return;
+        stopPlayback();
+        String url = info.trackList().get(trackList.getSelectedIndex() - 1).getPreviewUrl();
+        if (url == null) return;
+        currentPlayer = new Player(url);
+        currentPlayer.lockToStandardGUI(this.hashCode());
+        currentPlayer.play();
+    }
+
+    private void stopPlayback() {
+        if (currentPlayer!=null) currentPlayer.stop();
     }
 
     private List<ArtistSimplified> getArtistsAndPerformers(List<TrackSimplified> tracklist) {
