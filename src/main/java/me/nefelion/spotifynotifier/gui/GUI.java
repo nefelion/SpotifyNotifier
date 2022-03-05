@@ -17,8 +17,8 @@ public abstract class GUI {
         return checkBoxPanel;
     }
 
-    protected JScrollPane getListScrollPane(JList<String> albumList) {
-        JScrollPane scrollList = new JScrollPane(albumList);
+    protected JScrollPane getScrollPane(Component component) {
+        JScrollPane scrollList = new JScrollPane(component);
         scrollList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollList.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollList.getVerticalScrollBar().setUnitIncrement(16);

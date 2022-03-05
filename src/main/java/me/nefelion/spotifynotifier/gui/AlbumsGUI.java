@@ -108,7 +108,7 @@ public class AlbumsGUI extends StandardGUI {
     private void fillContainerWithPanels() {
         container.add(getInitialPanelGUIName());
         container.add(getInitialPanelCheckBox());
-        container.add(getListScrollPane(albumList));
+        container.add(getScrollPane(albumList));
         container.add(getInitialPanelArtistName());
         container.add(getInitialNameSpotify());
         container.add(getInitialPanelReleaseType());

@@ -90,7 +90,7 @@ public class FollowedGUI extends StandardGUI {
     }
 
     private void fillContainerWithPanels() {
-        container.add(getListScrollPane(artistList));
+        container.add(getScrollPane(artistList));
         container.add(getInitialPanelNameAndSpotify());
         container.add(getInitialPanelID());
         container.add(getInitialPanelSelectionButtons());
