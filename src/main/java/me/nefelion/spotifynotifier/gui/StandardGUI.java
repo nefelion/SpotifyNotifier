@@ -30,6 +30,10 @@ public abstract class StandardGUI extends GUIFrame {
 
     }
 
+    public static int getCurrentGUIHashCode() {
+        return GUI_STACK.peek().getHashCode();
+    }
+
     @Override
     public void show() {
         pushToStack();
@@ -48,9 +52,5 @@ public abstract class StandardGUI extends GUIFrame {
 
     protected void pushToStack() {
         GUI_STACK.push(new GUIData(this.container, this.frame.getTitle(), this.frame.getSize(), this.hashCode()));
-    }
-
-    public static int getCurrentGUIHashCode() {
-        return GUI_STACK.peek().getHashCode();
     }
 }

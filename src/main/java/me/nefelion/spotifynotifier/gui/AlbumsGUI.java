@@ -6,7 +6,10 @@ import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.Utilities;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import me.nefelion.spotifynotifier.records.TimeCheckpoint;
-import se.michaelthelin.spotify.model_objects.specification.*;
+import se.michaelthelin.spotify.model_objects.specification.Album;
+import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
+import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
