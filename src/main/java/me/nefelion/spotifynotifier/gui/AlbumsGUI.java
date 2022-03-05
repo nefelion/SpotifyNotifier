@@ -91,6 +91,7 @@ public class AlbumsGUI extends StandardGUI {
         setContainer();
         setFrame();
         setTitle(title);
+        refreshAlbumList();
     }
 
     private void setFrame() {
@@ -101,7 +102,6 @@ public class AlbumsGUI extends StandardGUI {
 
     private void setContainer() {
         fillContainerWithPanels();
-        refreshAlbumList();
         container.setPreferredSize(new Dimension(610, 750));
     }
 
