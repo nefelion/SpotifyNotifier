@@ -101,6 +101,7 @@ public class AlbumsGUI extends StandardGUI {
 
     private void setContainer() {
         fillContainerWithPanels();
+        refreshAlbumList();
         container.setPreferredSize(new Dimension(610, 750));
     }
 
@@ -252,7 +253,6 @@ public class AlbumsGUI extends StandardGUI {
         checkBoxPanel.add(checkBoxAlbums);
         checkBoxPanel.add(checkBoxSingles);
         checkBoxPanel.add(checkBoxFeaturing);
-        refreshAlbumList();
         checkBoxPanel.add(buttonRandom);
         return checkBoxPanel;
     }
