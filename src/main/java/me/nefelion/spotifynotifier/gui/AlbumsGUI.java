@@ -157,7 +157,7 @@ public class AlbumsGUI extends StandardGUI {
 
     private JLabel getInitialLabelCurrentPlaying() {
         final JLabel labelCurrentPlaying;
-        labelCurrentPlaying = new JLabel("eee");
+        labelCurrentPlaying = new JLabel("current-playing-track");
         labelCurrentPlaying.setFont(labelCurrentPlaying.getFont().deriveFont(Font.PLAIN));
         labelCurrentPlaying.setVisible(false);
         return labelCurrentPlaying;
@@ -568,7 +568,9 @@ public class AlbumsGUI extends StandardGUI {
         currentPlayer.play();
 
         buttonStopCurrentPlaying.setVisible(true);
-        labelCurrentPlaying.setText(selectedTrack.getName());
+        labelCurrentPlaying.setText(Arrays.stream(selectedTrack.getArtists())
+                .map(ArtistSimplified::getName)
+                .collect(Collectors.joining(", ")) + "  —  " + selectedTrack.getName());
         labelCurrentPlaying.setVisible(true);
     }
 
