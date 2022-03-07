@@ -61,7 +61,7 @@ public class AlbumsGUI extends StandardGUI {
     private int lastSelectedIndex = 0;
     private Player currentPlayer;
 
-    public AlbumsGUI(int defaultCloseOperation, List<ReleasedAlbum> albums, String title) {
+    public AlbumsGUI(List<ReleasedAlbum> albums, String title) {
         super();
 
         this.title = title;
@@ -85,12 +85,15 @@ public class AlbumsGUI extends StandardGUI {
         checkBoxSingles = getInitialCheckBoxSingles();
         checkBoxFeaturing = getInitialCheckBoxFeaturing();
 
-        buildGUI(defaultCloseOperation, this.title + " (" + albums.size() + ")");
+        buildGUI(this.title + " (" + albums.size() + ")");
         refreshFrame();
     }
 
-    private void buildGUI(int defaultCloseOperation, String title) {
-        frame.setDefaultCloseOperation(defaultCloseOperation);
+    public AlbumsGUI(ReleasedAlbum album, String title) {
+        this(List.of(album), title);
+    }
+
+    private void buildGUI(String title) {
         setContainer();
         setFrame();
         setTitle(title);
@@ -160,6 +163,34 @@ public class AlbumsGUI extends StandardGUI {
         labelCurrentPlaying = new JLabel("current-playing-track");
         labelCurrentPlaying.setFont(labelCurrentPlaying.getFont().deriveFont(Font.PLAIN));
         labelCurrentPlaying.setVisible(false);
+        labelCurrentPlaying.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        labelCurrentPlaying.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                AlbumsGUI gui = new AlbumsGUI(getSelectedAlbum(), getSelectedAlbum().getAlbumName());
+                gui.show();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
         return labelCurrentPlaying;
     }
 

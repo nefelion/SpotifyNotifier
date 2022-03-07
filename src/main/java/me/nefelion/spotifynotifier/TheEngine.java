@@ -110,7 +110,7 @@ public class TheEngine {
         FileManager.saveAlbumHashSet(processor.getIDhashSet());
 
         if (!releasedAlbums.isEmpty()) {
-            GUIFrame gui = new AlbumsGUI(JFrame.EXIT_ON_CLOSE, releasedAlbums, "New releases");
+            GUIFrame gui = new AlbumsGUI(releasedAlbums, "New releases");
             gui.show();
         } else if (!quiet) {
             Utilities.showMessageDialog("No new releases.", "Check releases", JOptionPane.INFORMATION_MESSAGE);
@@ -148,7 +148,7 @@ public class TheEngine {
 
         List<ReleasedAlbum> releasedAlbums = processor.getAlbums();
 
-        GUIFrame gui = new AlbumsGUI(JFrame.HIDE_ON_CLOSE, releasedAlbums,
+        GUIFrame gui = new AlbumsGUI(releasedAlbums,
                 "All releases by " + artist.getName());
         gui.show();
     }
@@ -162,7 +162,7 @@ public class TheEngine {
 
         List<ReleasedAlbum> releasedAlbums = processor.getAlbums();
 
-        GUIFrame gui = new AlbumsGUI(JFrame.EXIT_ON_CLOSE, releasedAlbums, "Recent albums");
+        GUIFrame gui = new AlbumsGUI(releasedAlbums, "Recent albums");
         gui.show();
     }
 
@@ -287,7 +287,7 @@ public class TheEngine {
         processor.process();
 
         List<ReleasedAlbum> albums = new ArrayList<>(processor.getAlbums());
-        GUI gui = new AlbumsGUI(JFrame.EXIT_ON_CLOSE, albums, "Related releases");
+        GUI gui = new AlbumsGUI(albums, "Related releases");
         gui.show();
     }
 
