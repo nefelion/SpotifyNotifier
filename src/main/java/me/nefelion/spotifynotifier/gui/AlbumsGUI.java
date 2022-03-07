@@ -4,6 +4,7 @@ import me.nefelion.spotifynotifier.Player;
 import me.nefelion.spotifynotifier.ReleasedAlbum;
 import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.Utilities;
+import me.nefelion.spotifynotifier.records.CurrentPlaying;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import me.nefelion.spotifynotifier.records.TimeCheckpoint;
 import se.michaelthelin.spotify.model_objects.specification.Album;
@@ -59,7 +60,7 @@ public class AlbumsGUI extends StandardGUI {
     private List<ArtistSimplified> allArtistsAndPerformers;
     private TempAlbumInfo info;
     private int lastSelectedIndex = 0;
-    private Player currentPlayer;
+    private CurrentPlaying currentPlaying;
 
     public AlbumsGUI(List<ReleasedAlbum> albums, String title) {
         super();
@@ -167,7 +168,8 @@ public class AlbumsGUI extends StandardGUI {
         labelCurrentPlaying.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                AlbumsGUI gui = new AlbumsGUI(getSelectedAlbum(), getSelectedAlbum().getAlbumName());
+                ReleasedAlbum album = currentPlaying.releasedAlbum();
+                AlbumsGUI gui = new AlbumsGUI(album, album.getArtistString() + " - " + album.getAlbumName());
                 gui.show();
             }
 
@@ -594,9 +596,10 @@ public class AlbumsGUI extends StandardGUI {
         TrackSimplified selectedTrack = info.trackList().get(trackList.getSelectedIndex() - 1);
         String url = selectedTrack.getPreviewUrl();
         if (url == null) return;
-        currentPlayer = new Player(url);
-        currentPlayer.lockToStandardGUI(this.hashCode());
-        currentPlayer.play();
+        Player player = new Player(url);
+        player.lockToStandardGUI(this.hashCode());
+        player.play();
+        currentPlaying = new CurrentPlaying(getSelectedAlbum(), selectedTrack, player);
 
         buttonStopCurrentPlaying.setVisible(true);
         labelCurrentPlaying.setText(Arrays.stream(selectedTrack.getArtists())
@@ -606,7 +609,7 @@ public class AlbumsGUI extends StandardGUI {
     }
 
     private void stopPlayback() {
-        if (currentPlayer != null) currentPlayer.stop();
+        if (currentPlaying != null) currentPlaying.player().stop();
         buttonStopCurrentPlaying.setVisible(false);
         labelCurrentPlaying.setVisible(false);
     }

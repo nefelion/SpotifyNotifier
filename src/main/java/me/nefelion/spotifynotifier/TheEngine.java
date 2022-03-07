@@ -148,8 +148,7 @@ public class TheEngine {
 
         List<ReleasedAlbum> releasedAlbums = processor.getAlbums();
 
-        GUIFrame gui = new AlbumsGUI(releasedAlbums,
-                "All releases by " + artist.getName());
+        GUIFrame gui = new AlbumsGUI(releasedAlbums, "All releases by " + artist.getName());
         gui.show();
     }
 
