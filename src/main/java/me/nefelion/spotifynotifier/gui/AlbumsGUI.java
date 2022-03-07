@@ -602,9 +602,7 @@ public class AlbumsGUI extends StandardGUI {
         currentPlaying = new CurrentPlaying(getSelectedAlbum(), selectedTrack, player);
 
         buttonStopCurrentPlaying.setVisible(true);
-        labelCurrentPlaying.setText(Arrays.stream(selectedTrack.getArtists())
-                .map(ArtistSimplified::getName)
-                .collect(Collectors.joining(", ")) + "  —  " + selectedTrack.getName());
+        labelCurrentPlaying.setText(getSelectedAlbum().getArtistString() + "  —  " + selectedTrack.getName());
         labelCurrentPlaying.setVisible(true);
     }
 
