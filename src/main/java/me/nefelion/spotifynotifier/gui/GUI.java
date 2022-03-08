@@ -5,6 +5,10 @@ import java.awt.*;
 
 public abstract class GUI {
 
+    public GUI() {
+        ToolTipManager.sharedInstance().setInitialDelay(0);
+    }
+
     public abstract void show();
 
     public abstract void close();
