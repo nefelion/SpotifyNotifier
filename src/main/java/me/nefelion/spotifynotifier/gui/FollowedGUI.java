@@ -24,7 +24,6 @@ public class FollowedGUI extends StandardGUI {
     private final DefaultListModel<String> modelList = new DefaultListModel<>();
     private final JList<String> artistList;
     private final List<FollowedArtist> followedArtists;
-    private final JButton buttonSpotify;
     private final JButton buttonAdd;
     private final JButton buttonRemove;
     private final JButton buttonReleases;
@@ -42,7 +41,6 @@ public class FollowedGUI extends StandardGUI {
         areaID = getInitialAreaID();
         labelName = getInitialLabelName();
         labelLastChecked = getInitialLabelLastChecked();
-        buttonSpotify = getInitialButtonSpotify();
         buttonAdd = getInitialButtonAdd();
         buttonRemove = getInitialButtonRemove();
         buttonReleases = getInitialButtonReleases();
@@ -311,9 +309,9 @@ public class FollowedGUI extends StandardGUI {
         artistList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         artistList.addListSelectionListener(e -> {
             if (followedArtists.isEmpty()) {
-                enableButtons(false, buttonSpotify, buttonRemove, buttonReleases);
+                enableButtons(false, buttonRemove, buttonReleases);
                 return;
-            } else enableButtons(true, buttonSpotify, buttonRemove, buttonReleases);
+            } else enableButtons(true, buttonRemove, buttonReleases);
             currentArtist = followedArtists.get(Math.max(artistList.getSelectedIndex(), 0));
             refresh();
             artistList.ensureIndexIsVisible(artistList.getSelectedIndex());
@@ -331,7 +329,7 @@ public class FollowedGUI extends StandardGUI {
     }
 
     private void refreshComponentsVisibility() {
-        buttonSpotify.setVisible(currentArtist != null);
+        buttonReleases.setVisible(currentArtist != null);
         areaID.setVisible(currentArtist != null);
         labelName.setVisible(currentArtist != null);
         labelID.setVisible(currentArtist != null);
