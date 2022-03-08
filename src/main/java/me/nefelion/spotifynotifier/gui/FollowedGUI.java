@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class FollowedGUI extends StandardGUI {
 
     private final TheEngine theEngine = TheEngine.getInstance();
-    private final JLabel labelName = new JLabel();
+    private final JLabel labelName;
     private final JTextArea areaID;
     private final DefaultListModel<String> modelList = new DefaultListModel<>();
     private final JList<String> artistList;
@@ -40,6 +40,7 @@ public class FollowedGUI extends StandardGUI {
         this.followedArtists = followedArtists;
         artistList = getInitialArtistList();
         areaID = getInitialAreaID();
+        labelName = getInitialLabelName();
         labelLastChecked = getInitialLabelLastChecked();
         buttonSpotify = getInitialButtonSpotify();
         buttonAdd = getInitialButtonAdd();
@@ -91,7 +92,7 @@ public class FollowedGUI extends StandardGUI {
 
     private void fillContainerWithPanels() {
         container.add(getScrollPane(artistList));
-        container.add(getInitialPanelNameAndSpotify());
+        container.add(getInitialPanelNameAndReleases());
         container.add(getInitialPanelID());
         container.add(getInitialPanelSelectionButtons());
         container.add(getInitialPanelLastChecked());
@@ -103,6 +104,47 @@ public class FollowedGUI extends StandardGUI {
         labelLastChecked = new JLabel(getLastCheckedString());
         labelLastChecked.setForeground(Color.GRAY);
         return labelLastChecked;
+    }
+
+    private JLabel getInitialLabelName() {
+        final JLabel label;
+        label = new JLabel();
+        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        label.setToolTipText("Show on Spotify");
+        label.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Runtime rt = Runtime.getRuntime();
+                String url = "https://open.spotify.com/artist/" + currentArtist.getID();
+                try {
+                    rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+                } catch (IOException ex) {
+                    System.exit(-1008);
+                    ex.printStackTrace();
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+        return label;
     }
 
     private JTextArea getInitialAreaID() {
@@ -162,7 +204,6 @@ public class FollowedGUI extends StandardGUI {
         JPanel panelSelectionButtons = createZeroHeightJPanel();
         panelSelectionButtons.add(buttonAdd);
         panelSelectionButtons.add(buttonRemove);
-        panelSelectionButtons.add(buttonReleases);
         return panelSelectionButtons;
     }
 
@@ -173,11 +214,11 @@ public class FollowedGUI extends StandardGUI {
         return IDPanel;
     }
 
-    private JPanel getInitialPanelNameAndSpotify() {
-        JPanel nameAndSpotifyPanel = createZeroHeightJPanel();
-        nameAndSpotifyPanel.add(labelName);
-        nameAndSpotifyPanel.add(buttonSpotify);
-        return nameAndSpotifyPanel;
+    private JPanel getInitialPanelNameAndReleases() {
+        JPanel panel = createZeroHeightJPanel();
+        panel.add(labelName);
+        panel.add(buttonReleases);
+        return panel;
     }
 
     private JButton getInitialButtonAllReleases() {
@@ -227,7 +268,7 @@ public class FollowedGUI extends StandardGUI {
 
     private JButton getInitialButtonRemove() {
         final JButton buttonRemove;
-        buttonRemove = new JButton("Remove");
+        buttonRemove = new JButton("Remove selected");
         buttonRemove.setEnabled(false);
         buttonRemove.addActionListener(e -> {
             theEngine.unfollowArtistID(currentArtist.getID());
