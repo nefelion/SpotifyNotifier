@@ -270,6 +270,10 @@ public class FollowedGUI extends StandardGUI {
         buttonRemove = new JButton("Remove selected");
         buttonRemove.setEnabled(false);
         buttonRemove.addActionListener(e -> {
+            if (currentArtist == null) {
+                enableButtons(false, buttonRemove);
+                return;
+            }
             theEngine.unfollowArtistID(currentArtist.getID());
             currentArtist = null;
             refreshList();
