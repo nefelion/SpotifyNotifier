@@ -142,6 +142,43 @@ public class AlbumsGUI extends StandardGUI {
     private JLabel getInitialLabelName() {
         final JLabel labelName;
         labelName = new JLabel();
+        labelName.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        labelName.setToolTipText("Copy link");
+        labelName.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                String copiedStuff = getSelectedAlbum().getLink();
+                Toolkit.getDefaultToolkit()
+                        .getSystemClipboard()
+                        .setContents(
+                                new StringSelection(copiedStuff),
+                                null
+                        );
+                Utilities.showMessageDialog("Link to '" + getSelectedAlbum().getAlbumName()
+                        + "' has been copied to clipboard.", "Done", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+        });
+
         return labelName;
     }
 
