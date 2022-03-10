@@ -62,7 +62,10 @@ public class TheEngine {
             System.out.println("followArtistID: Something went wrong!\n" + e.getMessage());
             Utilities.showMessageDialog(e.getMessage(), "Something went wrong!", JOptionPane.ERROR_MESSAGE);
         } catch (IOException | ParseException e) {
-            e.printStackTrace();
+            if (Utilities.tryAgainMSGBOX("followArtistID: Something went wrong!\n" + e.getMessage())) {
+                followArtistID(id);
+                return;
+            }
             System.exit(-1005);
         }
 
@@ -198,7 +201,8 @@ public class TheEngine {
             } while (paging.getNext() != null);
 
         } catch (Exception e) {
-            System.out.println("getAlbums: Something went wrong!\n" + e.getMessage());
+            if (Utilities.tryAgainMSGBOX("getAlbums: Something went wrong!\n" + e.getMessage()))
+                return getAlbums(artistID);
             System.exit(-1006);
         }
 
@@ -223,7 +227,8 @@ public class TheEngine {
             } while (paging.getNext() != null);
 
         } catch (Exception e) {
-            System.out.println("getTracks: Something went wrong!\n" + e.getMessage());
+            if (Utilities.tryAgainMSGBOX("getTracks: Something went wrong!\n" + e.getMessage()))
+                return getTracks(albumID);
             System.exit(-1016);
         }
 
@@ -234,7 +239,8 @@ public class TheEngine {
         try {
             return spotifyAPI.getAlbum(albumID).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("getAlbum: Something went wrong!\n" + e.getMessage());
+            if (Utilities.tryAgainMSGBOX("getAlbum: Something went wrong!\n" + e.getMessage()))
+                return getAlbum(albumID);
             System.exit(-1007);
             return null;
         }
@@ -244,7 +250,8 @@ public class TheEngine {
         try {
             return spotifyAPI.getArtist(albumID).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("getArtist: Something went wrong!\n" + e.getMessage());
+            if (Utilities.tryAgainMSGBOX("getArtist: Something went wrong!\n" + e.getMessage()))
+                return getArtist(albumID);
             System.exit(-1367);
             return null;
         }
@@ -254,7 +261,8 @@ public class TheEngine {
         try {
             return spotifyAPI.getArtistsRelatedArtists(id).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("getSimilarArtists: Something went wrong!\n" + e.getMessage());
+            if (Utilities.tryAgainMSGBOX("getSimilarArtists: Something went wrong!\n" + e.getMessage()))
+                return getRelatedArtists(id);
             System.exit(-17327);
             return null;
         }
