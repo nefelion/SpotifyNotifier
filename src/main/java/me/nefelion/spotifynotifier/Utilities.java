@@ -31,6 +31,7 @@ public class Utilities {
     public static void showMessageDialog(String message, String title, int type) {
         JFrame frame = new JFrame();
         frame.setAlwaysOnTop(true);
+        new Timer(30000, (evt) -> frame.dispose()).start();
         JOptionPane.showMessageDialog(frame, message, "SpotifyNotifier: " + title, type);
         frame.dispose();
     }
