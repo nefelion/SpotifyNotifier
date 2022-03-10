@@ -97,5 +97,18 @@ public class Utilities {
         return "< minute ago";
     }
 
+    public static boolean tryAgainMSGBOX(String errMsg) {
+        String[] choices = {"Try again", "Exit"};
+        return JOptionPane.showOptionDialog(
+                null,
+                errMsg,
+                errMsg,
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.ERROR_MESSAGE,
+                null,
+                choices,
+                "Try again"
+        ) == 0;
+    }
 
 }
