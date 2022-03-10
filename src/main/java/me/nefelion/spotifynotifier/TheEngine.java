@@ -87,7 +87,23 @@ public class TheEngine {
         if (followedArtists.remove(artistToBeRemoved)) {
             FileManager.saveFileData(fileData);
             System.out.println("Removed: " + artistToBeRemoved.getName() + ".");
-            Utilities.showMessageDialog("Removed: " + artistToBeRemoved.getName() + ".", "Done!", JOptionPane.INFORMATION_MESSAGE);
+
+            String message = "Removed: " + artistToBeRemoved.getName() + ".";
+
+            String[] choices = {"OK", "Undo"};
+            int response = JOptionPane.showOptionDialog(
+                    null,
+                    message,
+                    "Done!",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
+                    null,
+                    choices,
+                    "OK"
+            );
+
+            if (response == 1) followArtistID(artistToBeRemoved.getID());
+
         } else {
             System.err.println("Error while removing " + artistToBeRemoved.getID());
             Utilities.showMessageDialog("Error while removing " + artistToBeRemoved.getID(), "Something went wrong!", JOptionPane.ERROR_MESSAGE);
