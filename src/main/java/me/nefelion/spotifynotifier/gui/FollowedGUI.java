@@ -250,6 +250,7 @@ public class FollowedGUI extends StandardGUI {
             theEngine.showRelatedAlbums();
             refresh();
         });
+        buttonExplore.setToolTipText("Show all albums from artists similar to those you follow. It will take a while.");
         setSmallButtonMargins(buttonExplore);
         return buttonExplore;
     }
