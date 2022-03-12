@@ -31,7 +31,7 @@ public class Main {
         TempData.getInstance().setFileData(FileManager.getFileData());
 
         // :)
-        TokenGetter tokenGetter = new TokenGetter("d31c4bbf7a6c41e4b1ce6c47656de668", "c1f3be4db5104a54bc2fac060fdbdf14");
+        TokenGetter tokenGetter = new TokenGetter("44d4e6f2c0ec49ccba1af136cfc57389", "dab320e0e78a464aa773cf3983732049");
 
         String token = tokenGetter.getToken();
         if (token == null) {
