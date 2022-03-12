@@ -20,7 +20,7 @@ public class TheEngine {
     private TheEngine() {
     }
 
-    public static TheEngine getInstance() {
+    public synchronized static TheEngine getInstance() {
         if (instance == null) {
             instance = new TheEngine();
         }
@@ -31,7 +31,7 @@ public class TheEngine {
         this.spotifyAPI = spotifyApi;
     }
 
-    public void followArtistID(String id) {
+    public synchronized void followArtistID(String id) {
         if (id == null || id.trim().isEmpty()) return;
 
         FileData fileData = TempData.getInstance().getFileData();
@@ -184,7 +184,7 @@ public class TheEngine {
         gui.show();
     }
 
-    public List<AlbumSimplified> getAlbums(String artistID) {
+    public synchronized List<AlbumSimplified> getAlbums(String artistID) {
 
         List<AlbumSimplified> allAlbums = new ArrayList<>();
 
@@ -210,8 +210,7 @@ public class TheEngine {
         return allAlbums;
     }
 
-    public List<TrackSimplified> getTracks(String albumID) {
-
+    public synchronized List<TrackSimplified> getTracks(String albumID) {
         List<TrackSimplified> allTracks = new ArrayList<>();
 
         try {
@@ -231,11 +230,10 @@ public class TheEngine {
                 return getTracks(albumID);
             System.exit(-1016);
         }
-
         return allTracks;
     }
 
-    public Album getAlbum(String albumID) {
+    public synchronized Album getAlbum(String albumID) {
         try {
             return spotifyAPI.getAlbum(albumID).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
@@ -246,7 +244,7 @@ public class TheEngine {
         }
     }
 
-    public Artist getArtist(String albumID) {
+    public synchronized Artist getArtist(String albumID) {
         try {
             return spotifyAPI.getArtist(albumID).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
@@ -257,7 +255,7 @@ public class TheEngine {
         }
     }
 
-    public Artist[] getRelatedArtists(String id) {
+    public synchronized Artist[] getRelatedArtists(String id) {
         try {
             return spotifyAPI.getArtistsRelatedArtists(id).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
@@ -268,7 +266,7 @@ public class TheEngine {
         }
     }
 
-    public List<Artist> searchArtist(String name) {
+    public synchronized List<Artist> searchArtist(String name) {
 
         List<Artist> artists = new ArrayList<>();
         try {

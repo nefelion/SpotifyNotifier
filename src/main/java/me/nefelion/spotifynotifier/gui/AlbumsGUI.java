@@ -544,7 +544,7 @@ public class AlbumsGUI extends StandardGUI {
                 System.exit(-1010);
             }
 
-            mapTempInfo.put(id, new TempAlbumInfo(album, cover, trackList));
+            //mapTempInfo.put(id, new TempAlbumInfo(album, cover, trackList));
         }
 
 
@@ -553,7 +553,7 @@ public class AlbumsGUI extends StandardGUI {
         labelName.setText(info.album().getName().length() > 65 ? info.album().getName().substring(0, 60) + "..." : info.album().getName());
         labelTypeDate.setText(info.album().getAlbumType().getType().toUpperCase() + " released " + info.album().getReleaseDate());
         textAreaID.setText(info.album().getId());
-        labelCover.setIcon(new ImageIcon(info.cover()));
+        //labelCover.setIcon(new ImageIcon(info.cover()));
         modelTrackList.clear();
         int totalTracks = info.album().getTracks().getTotal();
         modelTrackList.add(0, totalTracks + " " + (totalTracks == 1 ? "track" : "tracks"));

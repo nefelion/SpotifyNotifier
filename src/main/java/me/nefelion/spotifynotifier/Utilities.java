@@ -6,7 +6,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 
@@ -112,4 +115,7 @@ public class Utilities {
         ) == 0;
     }
 
+    public static Predicate<String> haveWordsThatStartWith(final String startsWith) {
+        return s -> Arrays.stream(s.split(" ")).anyMatch(p -> p.toLowerCase().startsWith(startsWith.toLowerCase()));
+    }
 }
