@@ -43,12 +43,12 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox prefWidth="640.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.nefelion.spotifynotifier.TESTING_JAVAFX.controllers.ControllerList">
+<VBox fx:id="GMainVBOX" prefHeight="700.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.nefelion.spotifynotifier.gui.controllers.ControllerFollowed">
     <children>
         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="500.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
             <children>
-                <Separator layoutX="308.0" layoutY="48.0" orientation="VERTICAL" prefHeight="439.0" prefWidth="25.0" />
-                <ListView fx:id="GListFollowed" layoutX="20.0" layoutY="88.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="400.0" prefWidth="275.0">
+                <Separator layoutX="308.0" layoutY="63.0" orientation="VERTICAL" prefHeight="590.0" prefWidth="25.0" />
+                <ListView fx:id="GListFollowed" layoutX="20.0" layoutY="103.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="550.0" prefWidth="275.0">
                     <contextMenu>
                         <ContextMenu>
                             <items>
@@ -57,7 +57,7 @@
                         </ContextMenu>
                     </contextMenu>
                 </ListView>
-                <ListView fx:id="GListSpotify" layoutX="345.0" layoutY="88.0" prefHeight="400.0" prefWidth="275.0">
+                <ListView fx:id="GListSpotify" layoutX="345.0" layoutY="103.0" prefHeight="550.0" prefWidth="275.0">
                     <contextMenu>
                         <ContextMenu>
                             <items>
@@ -66,19 +66,19 @@
                         </ContextMenu>
                     </contextMenu>
                 </ListView>
-                <Text layoutX="20.0" layoutY="28.0" opacity="0.8" strokeType="OUTSIDE" strokeWidth="0.0" text="Followed artists" textAlignment="CENTER" wrappingWidth="275.0">
+                <Text layoutX="20.0" layoutY="43.0" opacity="0.8" strokeType="OUTSIDE" strokeWidth="0.0" text="Followed artists" textAlignment="CENTER" wrappingWidth="275.0">
                     <font>
                         <Font size="14.0" />
                     </font>
                 </Text>
-                <TextField fx:id="GTextFieldSearchFollowed" layoutX="20.0" layoutY="48.0" onKeyTyped="#onKeyTypedSearchFollowed" prefHeight="25.0" prefWidth="275.0" promptText="Search followed artists" />
-                <Text layoutX="345.0" layoutY="28.0" opacity="0.8" strokeType="OUTSIDE" strokeWidth="0.0" text="Add new artist" textAlignment="CENTER" wrappingWidth="275.0">
+                <TextField fx:id="GTextFieldSearchFollowed" layoutX="20.0" layoutY="63.0" onKeyTyped="#onKeyTypedSearchFollowed" prefHeight="25.0" prefWidth="275.0" promptText="Search followed artists" />
+                <Text layoutX="345.0" layoutY="43.0" opacity="0.8" strokeType="OUTSIDE" strokeWidth="0.0" text="Add new artist" textAlignment="CENTER" wrappingWidth="275.0">
                     <font>
                         <Font size="14.0" />
                     </font>
                 </Text>
-                <TextField fx:id="GTextFieldSearchSpotify" layoutX="345.0" layoutY="48.0" onAction="#onActionTextFieldSearchSpotify" prefHeight="25.0" prefWidth="215.0" promptText="Search artists in Spotify" />
-                <Button layoutX="568.0" layoutY="48.0" mnemonicParsing="false" onAction="#onActionTextFieldSearchSpotify" text="Search" />
+                <TextField fx:id="GTextFieldSearchSpotify" layoutX="345.0" layoutY="63.0" onAction="#onActionTextFieldSearchSpotify" prefHeight="25.0" prefWidth="215.0" promptText="Search artists in Spotify" />
+                <Button layoutX="568.0" layoutY="63.0" mnemonicParsing="false" onAction="#onActionTextFieldSearchSpotify" text="Search" />
             </children>
         </AnchorPane>
     </children>

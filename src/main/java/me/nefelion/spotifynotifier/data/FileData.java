@@ -1,4 +1,6 @@
-package me.nefelion.spotifynotifier;
+package me.nefelion.spotifynotifier.data;
+
+import me.nefelion.spotifynotifier.FollowedArtist;
 
 import java.util.LinkedList;
 import java.util.List;

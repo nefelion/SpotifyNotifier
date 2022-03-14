@@ -6,6 +6,8 @@ import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
+import static java.time.temporal.ChronoUnit.DAYS;
+
 public class ReleasedAlbum {
     private final String id;
     private final String albumName;
@@ -89,6 +91,10 @@ public class ReleasedAlbum {
         else if (releaseDate.length() == 7) dateToBeParsed += "-01";
 
         return LocalDate.parse(dateToBeParsed);
+    }
+
+    public int getDaysAgo() {
+        return (int) DAYS.between(getLocalDate(), LocalDate.now());
     }
 
 }

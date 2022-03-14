@@ -1,4 +1,4 @@
-package me.nefelion.spotifynotifier.TESTING_JAVAFX.controllers;
+package me.nefelion.spotifynotifier.gui.controllers;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -9,9 +9,10 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import me.nefelion.spotifynotifier.FollowedArtist;
-import me.nefelion.spotifynotifier.TempData;
+import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.TheEngine;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
@@ -20,23 +21,32 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class ControllerList {
+public class ControllerFollowed {
     private static final String DEFAULT_CONTROL_INNER_BACKGROUND = "derive(-fx-base,80%)";
     private static final String HIGHLIGHTED_CONTROL_INNER_BACKGROUND = "derive(palegreen, 50%)";
 
     private final Label placeholderLabelGListFollowed, placeholderLabelGListSpotify;
     private double maxGListSpotifyPopularity = Double.MAX_VALUE;
+
+    @FXML
+    private VBox GMainVBOX;
     @FXML
     private ListView<String> GListFollowed;
+
+
     @FXML
     private ListView<Artist> GListSpotify;
     @FXML
     private TextField GTextFieldSearchFollowed, GTextFieldSearchSpotify;
 
 
-    public ControllerList() {
+    public ControllerFollowed() {
         placeholderLabelGListFollowed = initializePlaceholderLabelGListFollowedArtists();
         placeholderLabelGListSpotify = initializePlaceholderLabelGListSearchSpotifyArtists();
+    }
+
+    public VBox getGMainVBOX() {
+        return GMainVBOX;
     }
 
 

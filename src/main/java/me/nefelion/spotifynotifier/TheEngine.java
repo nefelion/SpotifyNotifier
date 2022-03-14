@@ -1,6 +1,8 @@
 package me.nefelion.spotifynotifier;
 
-import me.nefelion.spotifynotifier.gui.*;
+import me.nefelion.spotifynotifier.data.FileData;
+import me.nefelion.spotifynotifier.data.FileManager;
+import me.nefelion.spotifynotifier.data.TempData;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.enums.AlbumType;
@@ -118,19 +120,15 @@ public class TheEngine {
         FileData fd = TempData.getInstance().getFileData();
 
         ReleasesProcessor processor = new ReleasesProcessor(fd.getFollowedArtists());
-        processor.processOnlyNewReleases(true);
-        processor.setProgressBarVisible(!quiet);
         processor.process();
 
-        List<ReleasedAlbum> releasedAlbums = processor.getAlbums();
+        List<ReleasedAlbum> releasedAlbums = processor.getAllAlbums();
 
         fd.setLastChecked(Utilities.now());
         FileManager.saveFileData(fd);
-        FileManager.saveAlbumHashSet(processor.getIDhashSet());
 
         if (!releasedAlbums.isEmpty()) {
-            GUIFrame gui = new AlbumsGUI(releasedAlbums, "New releases");
-            gui.show();
+
         } else if (!quiet) {
             Utilities.showMessageDialog("No new releases.", "Check releases", JOptionPane.INFORMATION_MESSAGE);
         }
@@ -140,8 +138,7 @@ public class TheEngine {
     public void showFollowedList() {
         List<FollowedArtist> followedArtistSortedList = TempData.getInstance().getFileData().getFollowedArtists().stream().sorted(Comparator.comparing(FollowedArtist::getName)).collect(Collectors.toList());
 
-        GUIFrame gui = new FollowedGUI(JFrame.EXIT_ON_CLOSE, followedArtistSortedList);
-        gui.show();
+
     }
 
     public void printAllArtistAlbums(String id) {
@@ -161,27 +158,21 @@ public class TheEngine {
         }
 
         ReleasesProcessor processor = new ReleasesProcessor(artist);
-        processor.processOnlyNewReleases(false);
-        processor.setProgressBarVisible(true);
         processor.process();
 
-        List<ReleasedAlbum> releasedAlbums = processor.getAlbums();
+        List<ReleasedAlbum> releasedAlbums = processor.getAllAlbums();
 
-        GUIFrame gui = new AlbumsGUI(releasedAlbums, "All releases by " + artist.getName());
-        gui.show();
+
     }
 
     public void printAllRecentAlbums() {
 
         ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
-        processor.processOnlyNewReleases(false);
-        processor.setProgressBarVisible(true);
         processor.process();
 
-        List<ReleasedAlbum> releasedAlbums = processor.getAlbums();
+        List<ReleasedAlbum> releasedAlbums = processor.getAllAlbums();
 
-        GUIFrame gui = new AlbumsGUI(releasedAlbums, "Recent albums");
-        gui.show();
+
     }
 
     public synchronized List<AlbumSimplified> getAlbums(String artistID) {
@@ -287,9 +278,7 @@ public class TheEngine {
         ArrayList<FollowedArtist> relatedArtists = new ArrayList<>();
         List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists();
 
-        ProgressGUI progressGUI = new ProgressGUI(0, followedArtists.size());
-        progressGUI.setTitle("Loading related artists...");
-        progressGUI.show();
+
         for (FollowedArtist followedArtist : followedArtists) {
             for (Artist artist : getRelatedArtists(followedArtist.getID())) {
                 String id = artist.getId();
@@ -297,19 +286,16 @@ public class TheEngine {
                 if (!uniqueArtistsID.add(id)) continue;
                 relatedArtists.add(new FollowedArtist(artist.getName(), id));
             }
-            progressGUI.increment();
+
         }
-        progressGUI.close();
+
 
         relatedArtists.sort(Comparator.comparing(FollowedArtist::getName));
         ReleasesProcessor processor = new ReleasesProcessor(relatedArtists);
-        processor.setProgressBarVisible(true);
-        processor.processOnlyNewReleases(false);
         processor.process();
 
-        List<ReleasedAlbum> albums = new ArrayList<>(processor.getAlbums());
-        GUI gui = new AlbumsGUI(albums, "Related releases");
-        gui.show();
+        List<ReleasedAlbum> albums = new ArrayList<>(processor.getAllAlbums());
+
     }
 
 }

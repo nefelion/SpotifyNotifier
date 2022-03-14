@@ -1,7 +1,8 @@
 package me.nefelion.spotifynotifier;
 
-import me.nefelion.spotifynotifier.TESTING_JAVAFX.Starter;
-import me.nefelion.spotifynotifier.TESTING_JAVAFX.Test;
+import me.nefelion.spotifynotifier.data.FileManager;
+import me.nefelion.spotifynotifier.data.TempData;
+import me.nefelion.spotifynotifier.gui.Starter;
 import me.nefelion.spotifynotifier.subcommands.*;
 import se.michaelthelin.spotify.SpotifyApi;
 

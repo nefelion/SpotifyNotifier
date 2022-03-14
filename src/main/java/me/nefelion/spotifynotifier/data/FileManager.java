@@ -1,6 +1,7 @@
-package me.nefelion.spotifynotifier;
+package me.nefelion.spotifynotifier.data;
 
 import com.google.gson.Gson;
+import me.nefelion.spotifynotifier.FollowedArtist;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

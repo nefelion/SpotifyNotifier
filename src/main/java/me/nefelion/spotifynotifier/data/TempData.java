@@ -1,8 +1,9 @@
-package me.nefelion.spotifynotifier;
+package me.nefelion.spotifynotifier.data;
 
 public final class TempData {
     private static TempData instance;
     private FileData fileData;
+    private double volumeSliderValue = 33;
 
     private TempData() {
         fileData = new FileData();
@@ -21,6 +22,18 @@ public final class TempData {
 
     public void setFileData(FileData fileData) {
         this.fileData = fileData;
+    }
+
+    public static void setInstance(TempData instance) {
+        TempData.instance = instance;
+    }
+
+    public double getVolumeSliderValue() {
+        return volumeSliderValue;
+    }
+
+    public void setVolumeSliderValue(double volumeSliderValue) {
+        this.volumeSliderValue = volumeSliderValue;
     }
 
 }

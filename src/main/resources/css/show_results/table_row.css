@@ -1,0 +1,17 @@
+.table-row-cell .text {
+    -fx-fill: black;
+}
+
+.featuring.table-row-cell .text {
+    -fx-fill: gray;
+    -fx-font-style: italic;
+}
+
+.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected .text,
+.featuring.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected .text {
+    -fx-fill: white;
+}
+
+.new.table-row-cell {
+    -fx-background-color: green;
+}
