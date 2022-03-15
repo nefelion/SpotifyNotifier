@@ -49,7 +49,7 @@ public class ControllerAlbums {
     @FXML
     private VBox GMainVBOX;
     @FXML
-    private Accordion GAccordionAlbums;
+    private Accordion GAccordionAlbums, GAccordionTracklist;
     @FXML
     private TitledPane GTitledPaneNewReleases, GTitledPaneAllReleases, GTitledPaneTracklist, GTitledPaneInfo;
     @FXML
@@ -242,6 +242,7 @@ public class ControllerAlbums {
         GTitledPaneNewReleases.setDisable(false);
 
         GAccordionAlbums.setExpandedPane(GTitledPaneNewReleases);
+        GAccordionTracklist.setExpandedPane(GTitledPaneTracklist);
         GTableNewReleases.getSelectionModel().select(0);
 
     }
@@ -265,6 +266,7 @@ public class ControllerAlbums {
         GTitledPaneAllReleases.setDisable(false);
         if (newAlbums == null || newAlbums.isEmpty()) {
             GAccordionAlbums.setExpandedPane(GTitledPaneAllReleases);
+            GAccordionTracklist.setExpandedPane(GTitledPaneTracklist);
             GTableAllReleases.getSelectionModel().select(0);
         }
     }
