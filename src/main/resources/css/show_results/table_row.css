@@ -11,7 +11,3 @@
 .featuring.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected .text {
     -fx-fill: white;
 }
-
-.new.table-row-cell {
-    -fx-background-color: green;
-}
