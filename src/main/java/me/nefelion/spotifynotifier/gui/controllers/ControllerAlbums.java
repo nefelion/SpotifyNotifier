@@ -228,6 +228,7 @@ public class ControllerAlbums {
 
 
     public void setNewAlbums(List<ReleasedAlbum> newAlbums) {
+        if (newAlbums == null) return;
         if (newAlbums.isEmpty()) {
             GTitledPaneNewReleases.getStylesheets().clear();
             return;
