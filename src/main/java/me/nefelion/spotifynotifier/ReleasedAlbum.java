@@ -9,34 +9,20 @@ import java.time.LocalDate;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ReleasedAlbum {
+    private final AlbumSimplified album;
     private final String id;
     private final String albumName;
-    private final String artistString;
     private final String followedArtistName;
     private final String artistId;
     private final String albumType;
     private final String releaseDate;
     private final boolean featuring;
 
-    public ReleasedAlbum(String id, String albumName, String artistString, String followedArtistName, String artistId, String albumType, String releaseDate, boolean featuring) {
-        this.id = id;
-        this.albumName = albumName;
-        this.artistString = artistString;
-        this.followedArtistName = followedArtistName;
-        this.artistId = artistId;
-        this.albumType = albumType;
-        this.releaseDate = releaseDate;
-        this.featuring = featuring;
-    }
 
     public ReleasedAlbum(AlbumSimplified album, FollowedArtist artist) {
-        String finalArtistName = (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON) ?
-                album.getArtists()[0].getName() + (album.getArtists().length == 1 ? " " : " ... ") + "(feat. " + artist.getName() + ")"
-                : artist.getName() + (album.getArtists().length == 1 ? "" : " ..."));
-
+        this.album = album;
         this.id = album.getId();
         this.albumName = album.getName();
-        this.artistString = finalArtistName;
         this.followedArtistName = artist.getName();
         this.artistId = artist.getID();
         this.albumType = album.getAlbumType().toString();
@@ -57,7 +43,9 @@ public class ReleasedAlbum {
     }
 
     public String getArtistString() {
-        return artistString;
+        return (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON) ?
+                album.getArtists()[0].getName() + (album.getArtists().length == 1 ? " " : " ... ") + "(feat. " + followedArtistName + ")"
+                : followedArtistName + (album.getArtists().length == 1 ? "" : " ..."));
     }
 
     public String getAlbumType() {
@@ -82,7 +70,7 @@ public class ReleasedAlbum {
 
     @Override
     public String toString() {
-        return new String((albumType + "  |  " + releaseDate + "  |       " + artistString + "  —  " + albumName).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        return new String((albumType + "  |  " + releaseDate + "  |       " + getArtistString() + "  —  " + albumName).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
     }
 
     public LocalDate getLocalDate() {
@@ -97,4 +85,7 @@ public class ReleasedAlbum {
         return (int) DAYS.between(getLocalDate(), LocalDate.now());
     }
 
+    public AlbumSimplified getAlbum() {
+        return album;
+    }
 }
