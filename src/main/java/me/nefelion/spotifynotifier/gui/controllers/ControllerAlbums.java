@@ -437,6 +437,7 @@ public class ControllerAlbums {
 
             final ContextMenu contextMenu = new ContextMenu();
             final MenuItem showReleasesMenuItem = new MenuItem("Show releases");
+            final MenuItem followUnfollowMenuItem = new MenuItem("Follow/Unfollow");
             showReleasesMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
                 showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
@@ -445,6 +446,7 @@ public class ControllerAlbums {
             //TODO
             showReleasesMenuItem.setDisable(true);
             contextMenu.getItems().add(showReleasesMenuItem);
+            contextMenu.getItems().add(followUnfollowMenuItem);
 
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
             row.contextMenuProperty().bind(
@@ -454,22 +456,30 @@ public class ControllerAlbums {
             );
 
             tableView.getSelectionModel().getSelectedIndices().addListener((ListChangeListener<Integer>) change -> {
-                if (row.getItem() == null) {
+                ReleasedAlbum album = row.getItem();
+                if (album == null) {
                     showReleasesMenuItem.setDisable(true);
-                } else if (row.getItem().isFeaturing() || row.getItem().getAlbum().getArtists().length > 1) {
+                    followUnfollowMenuItem.setDisable(true);
+                    return;
+                }
+                if (album.isFeaturing() || album.getAlbum().getArtists().length > 1) {
                     showReleasesMenuItem.setDisable(false);
                     showReleasesMenuItem.setText("Show releases by...");
-                    showReleasesMenuItem.setOnAction((ev) -> {
-                        showPickArtistDialog(row.getItem().getAlbum().getArtists());
-                    });
+                    showReleasesMenuItem.setOnAction((ev) -> showPickArtistDialog(row.getItem().getAlbum().getArtists()));
                 } else {
                     showReleasesMenuItem.setText("Show releases by " + row.getItem().getFollowedArtistName());
                     showReleasesMenuItem.setDisable(oneArtist);
-                    showReleasesMenuItem.setOnAction((ev) -> {
-                        ReleasedAlbum album = row.getItem();
-                        showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
-                    });
+                    showReleasesMenuItem.setOnAction((ev) -> showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId())));
                 }
+
+                boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
+                followUnfollowMenuItem.setDisable(false);
+                followUnfollowMenuItem.setText(isArtistFollowed ? "Unfollow " : "Follow ");
+                followUnfollowMenuItem.setText(followUnfollowMenuItem.getText() + row.getItem().getFollowedArtistName());
+                followUnfollowMenuItem.setOnAction((ev) -> {
+                    if (isArtistFollowed) TheEngine.getInstance().unfollowArtistID(album.getArtistId());
+                    else TheEngine.getInstance().followArtistID(album.getArtistId());
+                });
             });
 
             return row;
