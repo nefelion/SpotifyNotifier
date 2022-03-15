@@ -3,10 +3,12 @@ package me.nefelion.spotifynotifier.gui.controllers;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -15,6 +17,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import me.nefelion.spotifynotifier.FollowedArtist;
 import me.nefelion.spotifynotifier.ReleasedAlbum;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
@@ -23,12 +28,14 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.AppShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import se.michaelthelin.spotify.model_objects.specification.Album;
+import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class ControllerAlbums {
@@ -41,6 +48,7 @@ public class ControllerAlbums {
     private List<ReleasedAlbum> newAlbums, allAlbums, filteredNewAlbums, filteredAllAlbums;
     private ReleasedAlbum currentSelectedAlbum;
     private TrackSimplified currentSelectedTrack;
+    private boolean oneArtist;
 
     public void setControllerOutline(ControllerOutline controllerOutline) {
         this.controllerOutline = controllerOutline;
@@ -260,6 +268,7 @@ public class ControllerAlbums {
         allAlbums.sort(Comparator.comparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
         this.allAlbums = allAlbums;
         this.filteredAllAlbums = new ArrayList<>(allAlbums);
+        this.oneArtist = allAlbums.stream().filter(p -> !p.getArtistId().equals(allAlbums.get(0).getArtistId())).findAny().isEmpty();
 
         refreshReleases("All releases", filteredAllAlbums, GTitledPaneAllReleases, GTableAllReleases);
 
@@ -430,8 +439,11 @@ public class ControllerAlbums {
             final MenuItem showReleasesMenuItem = new MenuItem("Show releases");
             showReleasesMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
-                showReleases(album);
+                showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
             });
+
+            //TODO
+            showReleasesMenuItem.setDisable(true);
             contextMenu.getItems().add(showReleasesMenuItem);
 
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
@@ -441,14 +453,65 @@ public class ControllerAlbums {
                             .otherwise(contextMenu)
             );
 
+            tableView.getSelectionModel().getSelectedIndices().addListener((ListChangeListener<Integer>) change -> {
+                if (row.getItem() == null) {
+                    showReleasesMenuItem.setDisable(true);
+                } else if (row.getItem().isFeaturing() || row.getItem().getAlbum().getArtists().length > 1) {
+                    showReleasesMenuItem.setDisable(false);
+                    showReleasesMenuItem.setText("Show releases by...");
+                    showReleasesMenuItem.setOnAction((ev) -> {
+                        showPickArtistDialog(row.getItem().getAlbum().getArtists());
+                    });
+                } else {
+                    showReleasesMenuItem.setText("Show releases by " + row.getItem().getFollowedArtistName());
+                    showReleasesMenuItem.setDisable(oneArtist);
+                    showReleasesMenuItem.setOnAction((ev) -> {
+                        ReleasedAlbum album = row.getItem();
+                        showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
+                    });
+                }
+            });
+
             return row;
         });
 
     }
 
-    private void showReleases(ReleasedAlbum album) {
+    private void showPickArtistDialog(ArtistSimplified... artists) {
+        Stage stage = new Stage(StageStyle.UTILITY);
+        stage.setTitle("Pick an artist");
+        stage.initModality(Modality.APPLICATION_MODAL);
+        ListView<FollowedArtist> list = new ListView<>();
+        List<FollowedArtist> followedArtists = Arrays.stream(artists).map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList());
+        followedArtists.removeIf(p -> oneArtist && p.getID().equals(allAlbums.get(0).getArtistId()));
+        list.setItems(FXCollections.observableArrayList(followedArtists));
+        list.setCellFactory((param) -> new ListCell<>() {
+            @Override
+            protected void updateItem(FollowedArtist item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setText(null);
+                    return;
+                }
+                setText(item.getName());
+            }
+        });
+        list.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection == null) return;
+            showReleases(newSelection);
+            stage.close();
+        });
+        list.setPrefHeight(followedArtists.size() * 24 + 2);
+        list.setMaxHeight(500);
+
+        Scene scene = new Scene(list);
+        stage.setScene(scene);
+        stage.showAndWait();
+    }
+
+    private void showReleases(FollowedArtist artist) {
         stopCurrent();
-        ReleasesProcessor processor = new ReleasesProcessor(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
+        ReleasesProcessor processor = new ReleasesProcessor(artist);
         disableAllElements(true);
         showProgressBar(true);
 
