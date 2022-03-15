@@ -12,6 +12,11 @@ public class ControllerOutline {
     @FXML
     private AnchorPane GFollowedAnchorPane, GAlbumAnchorPane, GSettingsAnchorPane;
 
+    @FXML
+    private void initialize() {
+        GTabPane.getTabs().get(2).setDisable(true);
+    }
+
     public enum TAB {
         FOLLOWED,
         ALBUMS,
