@@ -228,7 +228,7 @@ public class ControllerAlbums {
 
 
     public void setNewAlbums(List<ReleasedAlbum> newAlbums) {
-        if (newAlbums == null || newAlbums.isEmpty()) {
+        if (newAlbums.isEmpty()) {
             GTitledPaneNewReleases.getStylesheets().clear();
             return;
         }
@@ -247,7 +247,13 @@ public class ControllerAlbums {
     }
 
     public void setAllAlbums(List<ReleasedAlbum> allAlbums) {
-        if (allAlbums == null || allAlbums.isEmpty()) return;
+        initializeCheckboxesFor(allAlbums);
+
+        if (allAlbums.isEmpty()) {
+            GTitledPaneTracklist.setDisable(true);
+            GTitledPaneInfo.setDisable(true);
+            return;
+        }
 
         allAlbums.sort(Comparator.comparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
         this.allAlbums = allAlbums;
@@ -255,7 +261,6 @@ public class ControllerAlbums {
 
         refreshReleases("All releases", filteredAllAlbums, GTitledPaneAllReleases, GTableAllReleases);
 
-        initializeCheckboxesFor(allAlbums);
 
         GTitledPaneAllReleases.setDisable(false);
         if (newAlbums == null || newAlbums.isEmpty()) {
