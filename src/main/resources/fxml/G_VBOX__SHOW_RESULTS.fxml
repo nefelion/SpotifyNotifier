@@ -61,10 +61,10 @@
                            <children>
                               <TableView fx:id="GTableNewReleases" prefHeight="257.0" prefWidth="618.0">
                                  <columns>
-                                    <TableColumn fx:id="GNewReleases_Type" editable="false" prefWidth="55.0" resizable="false" sortable="false" style="-fx-highlight-fill: red;" text="Type" />
                                     <TableColumn fx:id="GNewReleases_Date" editable="false" prefWidth="70.0" resizable="false" sortable="false" text="Date" />
-                                    <TableColumn fx:id="GNewReleases_Artist" editable="false" prefWidth="230.0" resizable="false" sortable="false" text="Artist" />
+                                    <TableColumn fx:id="GNewReleases_Type" editable="false" prefWidth="55.0" resizable="false" sortable="false" style="-fx-highlight-fill: red;" text="Type" />
                                     <TableColumn fx:id="GNewReleases_Release" editable="false" maxWidth="1.7976931348623157E308" prefWidth="247.0" resizable="false" sortable="false" text="Release" />
+                                    <TableColumn fx:id="GNewReleases_Artist" editable="false" prefWidth="230.0" resizable="false" sortable="false" text="Artist" />
                                  </columns>
                                  <stylesheets>
                                     <URL value="@../css/show_results/tableview.css" />
@@ -81,10 +81,10 @@
                            <children>
                               <TableView fx:id="GTableAllReleases" prefHeight="254.0" prefWidth="618.0">
                                  <columns>
-                                    <TableColumn fx:id="GAllReleases_Type" editable="false" prefWidth="55.0" resizable="false" sortable="false" text="Type" />
                                     <TableColumn fx:id="GAllReleases_Date" editable="false" prefWidth="70.0" resizable="false" sortable="false" text="Date" />
-                                    <TableColumn fx:id="GAllReleases_Artist" editable="false" prefWidth="230.0" resizable="false" sortable="false" text="Artist" />
+                                    <TableColumn fx:id="GAllReleases_Type" editable="false" prefWidth="55.0" resizable="false" sortable="false" text="Type" />
                                     <TableColumn fx:id="GAllReleases_Release" editable="false" maxWidth="1.7976931348623157E308" prefWidth="247.0" resizable="false" sortable="false" text="Release" />
+                                    <TableColumn fx:id="GAllReleases_Artist" editable="false" prefWidth="230.0" resizable="false" sortable="false" text="Artist" />
                                  </columns>
                                  <stylesheets>
                                     <URL value="@../css/show_results/tableview.css" />

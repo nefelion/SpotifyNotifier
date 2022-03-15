@@ -240,10 +240,10 @@ public class ControllerAlbums {
         refreshReleases("New releases", filteredNewAlbums, GTitledPaneNewReleases, GTableNewReleases);
 
         GTitledPaneNewReleases.setDisable(false);
-        Platform.runLater(() -> {
-            GTitledPaneNewReleases.setExpanded(true);
-            GTableNewReleases.getSelectionModel().select(0);
-        });
+
+        GAccordionAlbums.setExpandedPane(GTitledPaneNewReleases);
+        GTableNewReleases.getSelectionModel().select(0);
+
     }
 
     public void setAllAlbums(List<ReleasedAlbum> allAlbums) {
@@ -259,10 +259,8 @@ public class ControllerAlbums {
 
         GTitledPaneAllReleases.setDisable(false);
         if (newAlbums == null || newAlbums.isEmpty()) {
-            Platform.runLater(() -> {
-                GTitledPaneAllReleases.setExpanded(true);
-                GTableAllReleases.getSelectionModel().select(0);
-            });
+            GAccordionAlbums.setExpandedPane(GTitledPaneAllReleases);
+            GTableAllReleases.getSelectionModel().select(0);
         }
     }
 
