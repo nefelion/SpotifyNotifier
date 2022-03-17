@@ -102,7 +102,7 @@ public class ControllerAlbums {
         initializeGButtonBack();
         initializeGButtonRandom();
 
-
+        GTitledPaneInfo.setDisable(true);
     }
 
     @FXML
