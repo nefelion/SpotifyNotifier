@@ -318,7 +318,7 @@ public class ControllerAlbums {
                 GListTracklist.setPlaceholder(new Label("Loading..."));
 
                 GListTracklist.setItems(null);
-                Thread taskThread = new Thread(this::downloadInfoForSelectedAlbum);
+                Thread taskThread = new Thread(() -> downloadInfoForAlbum(getSelectedAlbum()));
                 taskThread.start();
             } else loadInfo();
 
@@ -336,9 +336,9 @@ public class ControllerAlbums {
         GListTracklist.setItems(FXCollections.observableArrayList(info.trackList()));
     }
 
-    private void downloadInfoForSelectedAlbum() {
+    private synchronized void downloadInfoForAlbum(ReleasedAlbum releasedAlbum) {
         GMainVBOX.setCursor(Cursor.WAIT);
-        String id = getSelectedAlbum().getId();
+        String id = releasedAlbum.getId();
         Album album = TheEngine.getInstance().getAlbum(id);
         List<TrackSimplified> trackList = TheEngine.getInstance().getTracks(album.getId());
         try {
@@ -443,7 +443,8 @@ public class ControllerAlbums {
                 showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
             });
 
-            //TODO
+            //TODO pierwsze menu jest zjebane
+            //TODO po kliknięciu się nie aktualizuje (follow/unfollow)
             showReleasesMenuItem.setDisable(true);
             contextMenu.getItems().add(showReleasesMenuItem);
             contextMenu.getItems().add(followUnfollowMenuItem);
@@ -462,15 +463,11 @@ public class ControllerAlbums {
                     followUnfollowMenuItem.setDisable(true);
                     return;
                 }
-                if (album.isFeaturing() || album.getAlbum().getArtists().length > 1) {
-                    showReleasesMenuItem.setDisable(false);
-                    showReleasesMenuItem.setText("Show releases by...");
-                    showReleasesMenuItem.setOnAction((ev) -> showPickArtistDialog(row.getItem().getAlbum().getArtists()));
-                } else {
-                    showReleasesMenuItem.setText("Show releases by " + row.getItem().getFollowedArtistName());
-                    showReleasesMenuItem.setDisable(oneArtist);
-                    showReleasesMenuItem.setOnAction((ev) -> showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId())));
-                }
+
+                showReleasesMenuItem.setDisable(false);
+                showReleasesMenuItem.setText("Show releases by...");
+                showReleasesMenuItem.setOnAction((ev) -> showPickArtistDialog(album));
+
 
                 boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
                 followUnfollowMenuItem.setDisable(false);
@@ -487,17 +484,43 @@ public class ControllerAlbums {
 
     }
 
-    private void showPickArtistDialog(ArtistSimplified... artists) {
+    private void showPickArtistDialog(ReleasedAlbum album) {
         Stage stage = new Stage(StageStyle.UTILITY);
         stage.setTitle("Pick an artist");
         stage.initModality(Modality.APPLICATION_MODAL);
-        ListView<FollowedArtist> list = new ListView<>();
-        List<FollowedArtist> followedArtists = Arrays.stream(artists).map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList());
-        followedArtists.removeIf(p -> oneArtist && p.getID().equals(allAlbums.get(0).getArtistId()));
-        list.setItems(FXCollections.observableArrayList(followedArtists));
+        ListView<ArtistSimplified> list = initializeListOfArtistsToPick(stage);
+
+
+        Task<Boolean> task = new Task<>() {
+            @Override
+            public Boolean call() {
+                if (!infoHashMap.containsKey(album.getId())) downloadInfoForAlbum(album);
+                return true;
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            List<ArtistSimplified> artistsAndPerformers = getArtistsAndPerformers(infoHashMap.get(album.getId()).trackList());
+
+            artistsAndPerformers.removeIf(p -> oneArtist && p.getId().equals(allAlbums.get(0).getArtistId()));
+            list.setItems(FXCollections.observableArrayList(artistsAndPerformers));
+
+            list.setPrefHeight(artistsAndPerformers.size() * 24 + 2);
+
+            Scene scene = new Scene(list);
+            stage.setScene(scene);
+            stage.showAndWait();
+        });
+        new Thread(task).start();
+
+
+    }
+
+    private ListView<ArtistSimplified> initializeListOfArtistsToPick(Stage stage) {
+        ListView<ArtistSimplified> list = new ListView<>();
         list.setCellFactory((param) -> new ListCell<>() {
             @Override
-            protected void updateItem(FollowedArtist item, boolean empty) {
+            protected void updateItem(ArtistSimplified item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item == null || empty) {
                     setText(null);
@@ -511,12 +534,12 @@ public class ControllerAlbums {
             showReleases(newSelection);
             stage.close();
         });
-        list.setPrefHeight(followedArtists.size() * 24 + 2);
         list.setMaxHeight(500);
+        return list;
+    }
 
-        Scene scene = new Scene(list);
-        stage.setScene(scene);
-        stage.showAndWait();
+    private void showReleases(ArtistSimplified artistSimplified) {
+        showReleases(new FollowedArtist(artistSimplified.getName(), artistSimplified.getId()));
     }
 
     private void showReleases(FollowedArtist artist) {
@@ -557,5 +580,16 @@ public class ControllerAlbums {
 
     public VBox getGMainVBOX() {
         return GMainVBOX;
+    }
+
+    private List<ArtistSimplified> getArtistsAndPerformers(List<TrackSimplified> tracklist) {
+        List<ArtistSimplified> artistsAndPerformers = new LinkedList<>();
+        HashSet<String> nameSet = new HashSet<>();
+        for (TrackSimplified track : tracklist)
+            for (ArtistSimplified artist : track.getArtists())
+                if (nameSet.add(artist.getId()))
+                    artistsAndPerformers.add(artist);
+
+        return artistsAndPerformers.stream().sorted(Comparator.comparing(ArtistSimplified::getName)).collect(Collectors.toList());
     }
 }
