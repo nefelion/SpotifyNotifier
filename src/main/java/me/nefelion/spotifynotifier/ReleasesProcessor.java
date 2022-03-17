@@ -51,8 +51,8 @@ public class ReleasesProcessor {
             for (AlbumSimplified album : theEngine.getAlbums(artist.getID())) {
                 if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON))
                     featuringHashMap.put(album.getId(), new ReleasedAlbum(album, artist));
-                else if (!loadedIDhashSet.contains(album.getId())) {
-                    if (!savedIDhashSet.contains(album.getId())) {
+                else if (!loadedIDhashSet.contains(album.getId()) ) {
+                    if (!savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(artist.getID())) {
                         savedIDhashSet.add(album.getId());
                         newAlbums.add(new ReleasedAlbum(album, artist));
                     }
@@ -74,7 +74,7 @@ public class ReleasesProcessor {
         for (ReleasedAlbum album : featuringHashMap.values()) {
             if (loadedIDhashSet.contains(album.getId())) continue;
 
-            if (!savedIDhashSet.contains(album.getId())) {
+            if (!savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(album.getArtistId())) {
                 savedIDhashSet.add(album.getId());
                 newAlbums.add(album);
             }
