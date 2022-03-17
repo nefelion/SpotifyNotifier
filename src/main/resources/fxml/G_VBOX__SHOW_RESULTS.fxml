@@ -38,8 +38,8 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 <?import java.net.URL?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="GMainVBOX" prefHeight="700.0" prefWidth="640.0"
-      xmlns="http://javafx.com/javafx/17" fx:controller="me.nefelion.spotifynotifier.gui.controllers.ControllerAlbums">
+<VBox fx:id="GMainVBOX" prefHeight="700.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.nefelion.spotifynotifier.gui.controllers.ControllerAlbums">
     <children>
         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="500.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
             <children>
@@ -150,11 +150,13 @@
                 </HBox>
                 <ProgressBar fx:id="GProgressBar" layoutX="14.0" layoutY="341.0" prefHeight="34.0" prefWidth="300.0"
                              progress="0.0"/>
-                <Button fx:id="GButtonBack" layoutX="12.0" layoutY="2.0" mnemonicParsing="false"
+                <Button fx:id="GButtonBack" layoutX="14.0" layoutY="2.0" mnemonicParsing="false"
                         onAction="#onActionGButtonBack" prefHeight="0.0" prefWidth="41.0"
                         stylesheets="@../css/show_results/back_button.css" text="&lt;"/>
                 <Text fx:id="GTextLoadingArtist" layoutX="14.0" layoutY="363.0" strokeType="OUTSIDE" strokeWidth="0.0"
                       text="loading-artist" textAlignment="CENTER" wrappingWidth="300.0"/>
+                <Button fx:id="GButtonRandom" layoutX="602.0" layoutY="2.0" mnemonicParsing="false" prefHeight="0.0"
+                        prefWidth="87.0" stylesheets="@../css/show_results/back_button.css" text="R"/>
             </children>
         </AnchorPane>
     </children>

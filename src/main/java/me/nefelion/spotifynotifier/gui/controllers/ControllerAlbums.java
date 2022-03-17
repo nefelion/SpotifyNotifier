@@ -20,6 +20,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import me.nefelion.spotifynotifier.FollowedArtist;
 import me.nefelion.spotifynotifier.ReleasedAlbum;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
@@ -47,6 +48,7 @@ public class ControllerAlbums {
     private ReleasedAlbum currentSelectedAlbum;
     private TrackSimplified currentSelectedTrack;
     private boolean oneArtist;
+
     @FXML
     private VBox GMainVBOX;
     @FXML
@@ -65,7 +67,7 @@ public class ControllerAlbums {
     @FXML
     private Text GTextCurrentPlaying, GTextVolume, GTextLoadingArtist;
     @FXML
-    private Button GButtonStopPlaying, GButtonBack;
+    private Button GButtonStopPlaying, GButtonBack, GButtonRandom;
     @FXML
     private Slider GSliderVolume;
     @FXML
@@ -98,6 +100,7 @@ public class ControllerAlbums {
 
         initializeGProgressBar();
         initializeGButtonBack();
+        initializeGButtonRandom();
 
 
     }
@@ -144,6 +147,28 @@ public class ControllerAlbums {
         gTitledPaneReleases.setText(albumType + " (" + filteredAlbums.size() + ")");
     }
 
+    private void initializeGButtonRandom() {
+        Tooltip tooltip = new Tooltip("Random release");
+        tooltip.setShowDelay(Duration.seconds(0));
+        GButtonRandom.setTooltip(tooltip);
+
+        GButtonRandom.setOnAction(e -> {
+            if (filteredAllAlbums.size() < 2) return;
+            TableView<ReleasedAlbum> GTable;
+
+            if (GTitledPaneNewReleases.isExpanded()) GTable = GTableNewReleases;
+            else if (GTitledPaneAllReleases.isExpanded()) GTable = GTableAllReleases;
+            else return;
+
+            int size = GTable.getItems().size();
+            int randIndex = new Random().nextInt(size);
+            while (GTable.getSelectionModel().getSelectedIndex() == randIndex)
+                randIndex = new Random().nextInt(size);
+
+            GTable.getSelectionModel().select(randIndex);
+            GTable.scrollTo(randIndex);
+        });
+    }
 
     private void initializeGButtonBack() {
         if (vboxStack.isEmpty()) GButtonBack.setVisible(false);
