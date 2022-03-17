@@ -1,9 +1,9 @@
 package me.nefelion.spotifynotifier.gui.controllers;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 
 
 public class ControllerAlbums {
-    //TODO
     private static final Stack<VBox> vboxStack = new Stack<>();
     private final HashMap<String, TempAlbumInfo> infoHashMap = new HashMap<>();
     private ControllerOutline controllerOutline;
@@ -250,7 +249,7 @@ public class ControllerAlbums {
 
         GAccordionAlbums.setExpandedPane(GTitledPaneNewReleases);
         GAccordionTracklist.setExpandedPane(GTitledPaneTracklist);
-        GTableNewReleases.getSelectionModel().select(0);
+        Platform.runLater(() -> GTableNewReleases.getSelectionModel().select(0));
 
     }
 
@@ -275,7 +274,7 @@ public class ControllerAlbums {
         if (newAlbums == null || newAlbums.isEmpty()) {
             GAccordionAlbums.setExpandedPane(GTitledPaneAllReleases);
             GAccordionTracklist.setExpandedPane(GTitledPaneTracklist);
-            GTableAllReleases.getSelectionModel().select(0);
+            Platform.runLater(() -> GTableAllReleases.getSelectionModel().select(0));
         }
     }
 
@@ -300,8 +299,6 @@ public class ControllerAlbums {
     private void addAlbumSelectionListenerFor(TableView<ReleasedAlbum> gTable) {
         gTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (getSelectedAlbum() == null) return;
-            if (getSelectedAlbum().equals(currentSelectedAlbum)) return;
-            currentSelectedAlbum = getSelectedAlbum();
             String id = getSelectedAlbum().getId();
 
             if (newSelection != null) {
@@ -310,6 +307,9 @@ public class ControllerAlbums {
                 else if (gTable.equals(GTableAllReleases))
                     GTableNewReleases.getSelectionModel().clearSelection();
             }
+
+            if (getSelectedAlbum().equals(currentSelectedAlbum)) return;
+            currentSelectedAlbum = getSelectedAlbum();
 
             if (!infoHashMap.containsKey(id)) {
                 GCoverImageView.setImage(null);
@@ -434,15 +434,13 @@ public class ControllerAlbums {
             };
 
             final ContextMenu contextMenu = new ContextMenu();
-            final MenuItem showReleasesMenuItem = new MenuItem("Show releases");
-            final MenuItem followUnfollowMenuItem = new MenuItem("Follow/Unfollow");
+            final MenuItem showReleasesMenuItem = new MenuItem("Show releases by...");
+            final MenuItem followUnfollowMenuItem = new MenuItem();
             showReleasesMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
                 showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
             });
 
-            //TODO pierwsze menu jest zjebane
-            //TODO po kliknięciu się nie aktualizuje (follow/unfollow)
             showReleasesMenuItem.setDisable(true);
             contextMenu.getItems().add(showReleasesMenuItem);
             contextMenu.getItems().add(followUnfollowMenuItem);
@@ -454,41 +452,41 @@ public class ControllerAlbums {
                             .otherwise(contextMenu)
             );
 
-            tableView.getSelectionModel().getSelectedIndices().addListener((ListChangeListener<Integer>) change -> {
-                ReleasedAlbum album = row.getItem();
-                if (album == null) {
-                    showReleasesMenuItem.setDisable(true);
-                    followUnfollowMenuItem.setDisable(true);
-                    return;
-                }
 
-                showReleasesMenuItem.setDisable(false);
-                showReleasesMenuItem.setText("Show releases by...");
-                showReleasesMenuItem.setOnAction((ev) -> showPickArtistDialog(album));
-
-
-                boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
-                followUnfollowMenuItem.setDisable(false);
-                followUnfollowMenuItem.setText(isArtistFollowed ? "Unfollow " : "Follow ");
-                followUnfollowMenuItem.setText(followUnfollowMenuItem.getText() + row.getItem().getFollowedArtistName());
-                followUnfollowMenuItem.setOnAction((ev) -> {
-                    if (isArtistFollowed) TheEngine.getInstance().unfollowArtistID(album.getArtistId());
-                    else TheEngine.getInstance().followArtistID(album.getArtistId());
-                });
+            tableView.getSelectionModel().getSelectedIndices().addListener((InvalidationListener) (event) -> {
+                getContextMenuLambdaBody(row, showReleasesMenuItem, followUnfollowMenuItem);
             });
+            contextMenu.setOnHiding((event) -> {
+                getContextMenuLambdaBody(row, showReleasesMenuItem, followUnfollowMenuItem);
+            });
+
 
             return row;
         });
 
     }
 
+    private void getContextMenuLambdaBody(TableRow<ReleasedAlbum> row, MenuItem showReleasesMenuItem, MenuItem followUnfollowMenuItem) {
+        ReleasedAlbum album = row.getItem();
+        if (album == null) {
+            showReleasesMenuItem.setDisable(true);
+            followUnfollowMenuItem.setDisable(true);
+            return;
+        }
+
+        showReleasesMenuItem.setDisable(false);
+        showReleasesMenuItem.setOnAction((ev) -> showPickArtistDialog(album));
+
+        boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
+        followUnfollowMenuItem.setDisable(false);
+        followUnfollowMenuItem.setText((isArtistFollowed ? "Unfollow " : "Follow ") + album.getFollowedArtistName());
+        followUnfollowMenuItem.setOnAction((ev) -> {
+            if (isArtistFollowed) TheEngine.getInstance().unfollowArtistID(album.getArtistId());
+            else TheEngine.getInstance().followArtistID(album.getArtistId());
+        });
+    }
+
     private void showPickArtistDialog(ReleasedAlbum album) {
-        Stage stage = new Stage(StageStyle.UTILITY);
-        stage.setTitle("Pick an artist");
-        stage.initModality(Modality.APPLICATION_MODAL);
-        ListView<ArtistSimplified> list = initializeListOfArtistsToPick(stage);
-
-
         Task<Boolean> task = new Task<>() {
             @Override
             public Boolean call() {
@@ -499,12 +497,14 @@ public class ControllerAlbums {
 
         task.setOnSucceeded(e -> {
             List<ArtistSimplified> artistsAndPerformers = getArtistsAndPerformers(infoHashMap.get(album.getId()).trackList());
-
             artistsAndPerformers.removeIf(p -> oneArtist && p.getId().equals(allAlbums.get(0).getArtistId()));
+
+            Stage stage = new Stage(StageStyle.UTILITY);
+            stage.setTitle("Pick an artist");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            ListView<ArtistSimplified> list = initializeListOfArtistsToPick(stage);
             list.setItems(FXCollections.observableArrayList(artistsAndPerformers));
-
             list.setPrefHeight(artistsAndPerformers.size() * 24 + 2);
-
             Scene scene = new Scene(list);
             stage.setScene(scene);
             stage.showAndWait();
@@ -516,6 +516,9 @@ public class ControllerAlbums {
 
     private ListView<ArtistSimplified> initializeListOfArtistsToPick(Stage stage) {
         ListView<ArtistSimplified> list = new ListView<>();
+
+        list.setPlaceholder(new Label("Nothing to be found here"));
+
         list.setCellFactory((param) -> new ListCell<>() {
             @Override
             protected void updateItem(ArtistSimplified item, boolean empty) {
@@ -527,6 +530,7 @@ public class ControllerAlbums {
                 setText(item.getName());
             }
         });
+
         list.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection == null) return;
             showReleases(newSelection);
