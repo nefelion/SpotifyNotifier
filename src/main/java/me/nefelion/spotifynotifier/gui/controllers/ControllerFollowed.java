@@ -2,6 +2,7 @@ package me.nefelion.spotifynotifier.gui.controllers;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -16,6 +17,7 @@ import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.data.TempData;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,7 @@ public class ControllerFollowed {
     private static final String HIGHLIGHTED_CONTROL_INNER_BACKGROUND = "derive(palegreen, 50%)";
 
     private final Label placeholderLabelGListFollowed, placeholderLabelGListSpotify;
+    private String lastSearch = "";
     private double maxGListSpotifyPopularity = Double.MAX_VALUE;
 
     @FXML
@@ -120,13 +123,20 @@ public class ControllerFollowed {
 
     private void searchSpotify() {
         String search = GTextFieldSearchSpotify.getText().trim();
-        if (search.isEmpty()) return;
+        if (search.isEmpty() || search.equals(lastSearch)) return;
+        lastSearch = search;
 
-        Thread taskThread = new Thread(() -> {
-            //todo, to nie ma sensu, robisz run later po wątku
-            Platform.runLater(() -> updateGListSearchSpotifyArtistsWith(TheEngine.getInstance().searchArtist(search)));
-        });
-        taskThread.start();
+        List<Artist> artistList = new ArrayList<>();
+        Task<Boolean> task = new Task<>() {
+            @Override
+            public Boolean call() {
+                artistList.addAll(TheEngine.getInstance().searchArtist(search));
+                return true;
+            }
+        };
+
+        task.setOnSucceeded(e -> updateGListSearchSpotifyArtistsWith(artistList));
+        new Thread(task).start();
     }
 
     private void refreshGListFollowedArtists() {
@@ -144,11 +154,12 @@ public class ControllerFollowed {
 
     private void updateGListSearchSpotifyArtistsWith(List<Artist> list) {
         String search = GTextFieldSearchSpotify.getText().trim();
-        GListSpotify.setItems(FXCollections.observableArrayList(list));
+        Platform.runLater(() -> {
+            placeholderLabelGListSpotify.setText("Can't find '" + search + "' on Spotify");
+            GListSpotify.setItems(FXCollections.observableArrayList(list));
+        });
         Optional<Integer> optional = GListSpotify.getItems().stream().max(Comparator.comparingInt(Artist::getPopularity)).map(Artist::getPopularity);
         optional.ifPresent(integer -> maxGListSpotifyPopularity = (double) integer);
-
-        placeholderLabelGListSpotify.setText("Can't find '" + search + "' on Spotify");
     }
 
 }
