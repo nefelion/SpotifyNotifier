@@ -12,8 +12,8 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import me.nefelion.spotifynotifier.FollowedArtist;
-import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.TheEngine;
+import me.nefelion.spotifynotifier.data.TempData;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
 import java.util.Comparator;

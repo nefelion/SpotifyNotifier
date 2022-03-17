@@ -41,19 +41,13 @@ import java.util.stream.Collectors;
 public class ControllerAlbums {
     //TODO
     private static final Stack<VBox> vboxStack = new Stack<>();
-
+    private final HashMap<String, TempAlbumInfo> infoHashMap = new HashMap<>();
     private ControllerOutline controllerOutline;
     private MediaPlayer player;
-    private final HashMap<String, TempAlbumInfo> infoHashMap = new HashMap<>();
     private List<ReleasedAlbum> newAlbums, allAlbums, filteredNewAlbums, filteredAllAlbums;
     private ReleasedAlbum currentSelectedAlbum;
     private TrackSimplified currentSelectedTrack;
     private boolean oneArtist;
-
-    public void setControllerOutline(ControllerOutline controllerOutline) {
-        this.controllerOutline = controllerOutline;
-    }
-
     @FXML
     private VBox GMainVBOX;
     @FXML
@@ -79,6 +73,10 @@ public class ControllerAlbums {
     private CheckBox GCheckboxAlbums, GCheckboxSingles, GCheckboxFeaturing;
     @FXML
     private ProgressBar GProgressBar;
+
+    public void setControllerOutline(ControllerOutline controllerOutline) {
+        this.controllerOutline = controllerOutline;
+    }
 
     @FXML
     private void initialize() {

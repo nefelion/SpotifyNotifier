@@ -32,109 +32,130 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<?import java.net.URL?>
-<?import javafx.scene.control.Accordion?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ProgressBar?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-
-<VBox fx:id="GMainVBOX" prefHeight="700.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.nefelion.spotifynotifier.gui.controllers.ControllerAlbums">
+<?import java.net.URL?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="GMainVBOX" prefHeight="700.0" prefWidth="640.0"
+      xmlns="http://javafx.com/javafx/17" fx:controller="me.nefelion.spotifynotifier.gui.controllers.ControllerAlbums">
     <children>
         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="500.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
-         <children>
-            <Accordion fx:id="GAccordionAlbums" layoutX="12.0" layoutY="27.0" prefHeight="306.0" prefWidth="618.0">
-              <panes>
-                <TitledPane fx:id="GTitledPaneNewReleases" animated="false" expanded="false" prefWidth="653.0" stylesheets="@../css/show_results/new_titled_pane.css" text="New releases">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="255.0" prefWidth="891.0">
-                           <children>
-                              <TableView fx:id="GTableNewReleases" prefHeight="257.0" prefWidth="618.0">
-                                 <columns>
-                                    <TableColumn fx:id="GNewReleases_Date" editable="false" prefWidth="70.0" resizable="false" sortable="false" text="Date" />
-                                    <TableColumn fx:id="GNewReleases_Type" editable="false" prefWidth="55.0" resizable="false" sortable="false" style="-fx-highlight-fill: red;" text="Type" />
-                                    <TableColumn fx:id="GNewReleases_Release" editable="false" maxWidth="1.7976931348623157E308" prefWidth="247.0" resizable="false" sortable="false" text="Release" />
-                                    <TableColumn fx:id="GNewReleases_Artist" editable="false" prefWidth="230.0" resizable="false" sortable="false" text="Artist" />
-                                 </columns>
-                                 <stylesheets>
-                                    <URL value="@../css/show_results/tableview.css" />
-                                    <URL value="@../css/show_results/table_row.css" />
-                                 </stylesheets>
-                              </TableView>
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </TitledPane>
-                <TitledPane fx:id="GTitledPaneAllReleases" animated="false" stylesheets="@../css/show_results/tableview.css" text="All releases">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <TableView fx:id="GTableAllReleases" prefHeight="254.0" prefWidth="618.0">
-                                 <columns>
-                                    <TableColumn fx:id="GAllReleases_Date" editable="false" prefWidth="70.0" resizable="false" sortable="false" text="Date" />
-                                    <TableColumn fx:id="GAllReleases_Type" editable="false" prefWidth="55.0" resizable="false" sortable="false" text="Type" />
-                                    <TableColumn fx:id="GAllReleases_Release" editable="false" maxWidth="1.7976931348623157E308" prefWidth="247.0" resizable="false" sortable="false" text="Release" />
-                                    <TableColumn fx:id="GAllReleases_Artist" editable="false" prefWidth="230.0" resizable="false" sortable="false" text="Artist" />
-                                 </columns>
-                                 <stylesheets>
-                                    <URL value="@../css/show_results/tableview.css" />
-                                    <URL value="@../css/show_results/table_row.css" />
-                                 </stylesheets>
-                              </TableView>
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </TitledPane>
-              </panes>
-            </Accordion>
-            <ImageView fx:id="GCoverImageView" fitHeight="300.0" fitWidth="300.0" layoutX="14.0" layoutY="381.0" pickOnBounds="true" preserveRatio="true" />
-            <Accordion fx:id="GAccordionTracklist" layoutX="330.0" layoutY="381.0" prefHeight="300.0" prefWidth="300.0">
-              <panes>
-                <TitledPane fx:id="GTitledPaneTracklist" animated="false" expanded="false" text="Tracklist">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <ListView fx:id="GListTracklist" prefHeight="250.0" prefWidth="300.0" stylesheets="@../css/show_results/listview.css" />
-                           </children>
-                        </AnchorPane>
-                  </content>
-                </TitledPane>
-                <TitledPane fx:id="GTitledPaneInfo" animated="false" expanded="false" text="Info">
-                  <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                  </content>
-                </TitledPane>
-              </panes>
-            </Accordion>
-            <Text fx:id="GTextVolume" fill="#8d8d8d" layoutX="571.0" layoutY="352.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Volume" />
-            <Slider fx:id="GSliderVolume" layoutX="552.0" layoutY="358.0" prefHeight="14.0" prefWidth="78.0" value="33.0" />
-            <Text fx:id="GTextCurrentPlaying" fill="#757575" layoutX="330.0" layoutY="363.0" strokeType="OUTSIDE" strokeWidth="0.0" text="text-current-playing" wrappingWidth="163.13671875" />
-            <Button fx:id="GButtonStopPlaying" layoutX="500.0" layoutY="346.0" mnemonicParsing="false" onAction="#onActionGButtonStopPlaying" prefHeight="0.0" prefWidth="41.0" text="Stop" />
-            <HBox alignment="CENTER" layoutX="66.0" layoutY="2.0" opacity="0.8" prefHeight="25.0" prefWidth="511.0" spacing="20.0">
-               <children>
-                  <CheckBox fx:id="GCheckboxAlbums" mnemonicParsing="false" onAction="#recalculateFilteredAlbums" selected="true" text="Albums" textFill="#4a4a4a" />
-                  <CheckBox fx:id="GCheckboxSingles" mnemonicParsing="false" onAction="#recalculateFilteredAlbums" selected="true" text="Singles" textFill="#4a4a4a" />
-                  <CheckBox fx:id="GCheckboxFeaturing" mnemonicParsing="false" onAction="#recalculateFilteredAlbums" selected="true" text="Featuring" textFill="#7c7c7c">
-                     <font>
-                        <Font name="System Italic" size="12.0" />
-                     </font>
-                  </CheckBox>
-               </children>
-            </HBox>
-            <ProgressBar fx:id="GProgressBar" layoutX="14.0" layoutY="341.0" prefHeight="34.0" prefWidth="300.0" progress="0.0" />
-            <Button fx:id="GButtonBack" layoutX="12.0" layoutY="2.0" mnemonicParsing="false" onAction="#onActionGButtonBack" prefHeight="0.0" prefWidth="41.0" stylesheets="@../css/show_results/back_button.css" text="&lt;" />
-            <Text fx:id="GTextLoadingArtist" layoutX="14.0" layoutY="363.0" strokeType="OUTSIDE" strokeWidth="0.0" text="loading-artist" textAlignment="CENTER" wrappingWidth="300.0" />
-         </children>
+            <children>
+                <Accordion fx:id="GAccordionAlbums" layoutX="12.0" layoutY="27.0" prefHeight="306.0" prefWidth="618.0">
+                    <panes>
+                        <TitledPane fx:id="GTitledPaneNewReleases" animated="false" expanded="false" prefWidth="653.0"
+                                    stylesheets="@../css/show_results/new_titled_pane.css" text="New releases">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="255.0" prefWidth="891.0">
+                                    <children>
+                                        <TableView fx:id="GTableNewReleases" prefHeight="257.0" prefWidth="618.0">
+                                            <columns>
+                                                <TableColumn fx:id="GNewReleases_Date" editable="false" prefWidth="70.0"
+                                                             resizable="false" sortable="false" text="Date"/>
+                                                <TableColumn fx:id="GNewReleases_Type" editable="false" prefWidth="55.0"
+                                                             resizable="false" sortable="false"
+                                                             style="-fx-highlight-fill: red;" text="Type"/>
+                                                <TableColumn fx:id="GNewReleases_Release" editable="false"
+                                                             maxWidth="1.7976931348623157E308" prefWidth="247.0"
+                                                             resizable="false" sortable="false" text="Release"/>
+                                                <TableColumn fx:id="GNewReleases_Artist" editable="false"
+                                                             prefWidth="230.0" resizable="false" sortable="false"
+                                                             text="Artist"/>
+                                            </columns>
+                                            <stylesheets>
+                                                <URL value="@../css/show_results/tableview.css"/>
+                                                <URL value="@../css/show_results/table_row.css"/>
+                                            </stylesheets>
+                                        </TableView>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </TitledPane>
+                        <TitledPane fx:id="GTitledPaneAllReleases" animated="false"
+                                    stylesheets="@../css/show_results/tableview.css" text="All releases">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <TableView fx:id="GTableAllReleases" prefHeight="254.0" prefWidth="618.0">
+                                            <columns>
+                                                <TableColumn fx:id="GAllReleases_Date" editable="false" prefWidth="70.0"
+                                                             resizable="false" sortable="false" text="Date"/>
+                                                <TableColumn fx:id="GAllReleases_Type" editable="false" prefWidth="55.0"
+                                                             resizable="false" sortable="false" text="Type"/>
+                                                <TableColumn fx:id="GAllReleases_Release" editable="false"
+                                                             maxWidth="1.7976931348623157E308" prefWidth="247.0"
+                                                             resizable="false" sortable="false" text="Release"/>
+                                                <TableColumn fx:id="GAllReleases_Artist" editable="false"
+                                                             prefWidth="230.0" resizable="false" sortable="false"
+                                                             text="Artist"/>
+                                            </columns>
+                                            <stylesheets>
+                                                <URL value="@../css/show_results/tableview.css"/>
+                                                <URL value="@../css/show_results/table_row.css"/>
+                                            </stylesheets>
+                                        </TableView>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </TitledPane>
+                    </panes>
+                </Accordion>
+                <ImageView fx:id="GCoverImageView" fitHeight="300.0" fitWidth="300.0" layoutX="14.0" layoutY="381.0"
+                           pickOnBounds="true" preserveRatio="true"/>
+                <Accordion fx:id="GAccordionTracklist" layoutX="330.0" layoutY="381.0" prefHeight="300.0"
+                           prefWidth="300.0">
+                    <panes>
+                        <TitledPane fx:id="GTitledPaneTracklist" animated="false" expanded="false" text="Tracklist">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <ListView fx:id="GListTracklist" prefHeight="250.0" prefWidth="300.0"
+                                                  stylesheets="@../css/show_results/listview.css"/>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </TitledPane>
+                        <TitledPane fx:id="GTitledPaneInfo" animated="false" expanded="false" text="Info">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+                            </content>
+                        </TitledPane>
+                    </panes>
+                </Accordion>
+                <Text fx:id="GTextVolume" fill="#8d8d8d" layoutX="571.0" layoutY="352.0" strokeType="OUTSIDE"
+                      strokeWidth="0.0" text="Volume"/>
+                <Slider fx:id="GSliderVolume" layoutX="552.0" layoutY="358.0" prefHeight="14.0" prefWidth="78.0"
+                        value="33.0"/>
+                <Text fx:id="GTextCurrentPlaying" fill="#757575" layoutX="330.0" layoutY="363.0" strokeType="OUTSIDE"
+                      strokeWidth="0.0" text="text-current-playing" wrappingWidth="163.13671875"/>
+                <Button fx:id="GButtonStopPlaying" layoutX="500.0" layoutY="346.0" mnemonicParsing="false"
+                        onAction="#onActionGButtonStopPlaying" prefHeight="0.0" prefWidth="41.0" text="Stop"/>
+                <HBox alignment="CENTER" layoutX="66.0" layoutY="2.0" opacity="0.8" prefHeight="25.0" prefWidth="511.0"
+                      spacing="20.0">
+                    <children>
+                        <CheckBox fx:id="GCheckboxAlbums" mnemonicParsing="false" onAction="#recalculateFilteredAlbums"
+                                  selected="true" text="Albums" textFill="#4a4a4a"/>
+                        <CheckBox fx:id="GCheckboxSingles" mnemonicParsing="false" onAction="#recalculateFilteredAlbums"
+                                  selected="true" text="Singles" textFill="#4a4a4a"/>
+                        <CheckBox fx:id="GCheckboxFeaturing" mnemonicParsing="false"
+                                  onAction="#recalculateFilteredAlbums" selected="true" text="Featuring"
+                                  textFill="#7c7c7c">
+                            <font>
+                                <Font name="System Italic" size="12.0"/>
+                            </font>
+                        </CheckBox>
+                    </children>
+                </HBox>
+                <ProgressBar fx:id="GProgressBar" layoutX="14.0" layoutY="341.0" prefHeight="34.0" prefWidth="300.0"
+                             progress="0.0"/>
+                <Button fx:id="GButtonBack" layoutX="12.0" layoutY="2.0" mnemonicParsing="false"
+                        onAction="#onActionGButtonBack" prefHeight="0.0" prefWidth="41.0"
+                        stylesheets="@../css/show_results/back_button.css" text="&lt;"/>
+                <Text fx:id="GTextLoadingArtist" layoutX="14.0" layoutY="363.0" strokeType="OUTSIDE" strokeWidth="0.0"
+                      text="loading-artist" textAlignment="CENTER" wrappingWidth="300.0"/>
+            </children>
         </AnchorPane>
     </children>
 </VBox>

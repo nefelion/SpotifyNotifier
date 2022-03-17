@@ -16,16 +16,16 @@ public final class TempData {
         return instance;
     }
 
+    public static void setInstance(TempData instance) {
+        TempData.instance = instance;
+    }
+
     public FileData getFileData() {
         return fileData;
     }
 
     public void setFileData(FileData fileData) {
         this.fileData = fileData;
-    }
-
-    public static void setInstance(TempData instance) {
-        TempData.instance = instance;
     }
 
     public double getVolumeSliderValue() {

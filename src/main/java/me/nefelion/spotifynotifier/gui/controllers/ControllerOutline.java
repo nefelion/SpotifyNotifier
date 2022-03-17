@@ -17,12 +17,6 @@ public class ControllerOutline {
         GTabPane.getTabs().get(2).setDisable(true);
     }
 
-    public enum TAB {
-        FOLLOWED,
-        ALBUMS,
-        SETTINGS
-    }
-
     public void setFollowedVBOX(VBox vbox) {
         GFollowedAnchorPane.getChildren().clear();
         GFollowedAnchorPane.getChildren().add(vbox);
@@ -41,6 +35,12 @@ public class ControllerOutline {
     public void selectTab(TAB tab) {
         GTabPane.getSelectionModel().select(tab.ordinal());
 
+    }
+
+    public enum TAB {
+        FOLLOWED,
+        ALBUMS,
+        SETTINGS
     }
 
 }
