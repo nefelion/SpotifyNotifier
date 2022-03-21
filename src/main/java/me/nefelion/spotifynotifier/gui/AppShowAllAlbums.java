@@ -8,14 +8,14 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
-import me.nefelion.spotifynotifier.gui.controllers.ControllerProgress;
 import me.nefelion.spotifynotifier.data.TempData;
+import me.nefelion.spotifynotifier.gui.controllers.ControllerProgress;
 
 public class AppShowAllAlbums extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists().get(15));
+        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
 
 
         FXMLLoader progressLoader = new FXMLLoader(getClass().getResource("/fxml/G_VBOX__PROGRESS.fxml"));
@@ -32,7 +32,9 @@ public class AppShowAllAlbums extends Application {
         Task<Boolean> task = new Task<>() {
             @Override
             public Boolean call() {
-                processor.process(progressController::setProgress, progressController::setInfo);
+                processor.setCurrentArtistConsumer(progressController::setInfo);
+                processor.setProgressConsumer(progressController::setProgress);
+                processor.process();
                 return true;
             }
         };

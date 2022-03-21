@@ -20,6 +20,9 @@ public class ReleasesProcessor {
     private final List<ReleasedAlbum> newAlbums = new ArrayList<>();
     private final List<ReleasedAlbum> allAlbums = new ArrayList<>();
 
+    private DoubleConsumer progressConsumer;
+    private Consumer<String> currentArtistConsumer, processedArtistsConsumer, releasesConsumer, newReleasesConsumer;
+
     public ReleasesProcessor(List<FollowedArtist> artists) {
         this.artists = artists;
         savedIDhashSet = new HashSet<>(FileManager.getAlbumHashSet());
@@ -30,39 +33,29 @@ public class ReleasesProcessor {
     }
 
     public void process() {
-        process(null, null);
-    }
-
-    public void process(DoubleConsumer progressConsumer) {
-        process(progressConsumer, null);
-    }
-
-    public void process(Consumer<String> infoConsumer) {
-        process(null, infoConsumer);
-    }
-
-
-    public void process(DoubleConsumer progressConsumer, Consumer<String> infoConsumer) {
         AtomicInteger i = new AtomicInteger();
 
         for (FollowedArtist artist : artists) {
-            if (infoConsumer != null) Platform.runLater(() -> infoConsumer.accept(artist.getName()));
+            if (currentArtistConsumer != null) Platform.runLater(() -> currentArtistConsumer.accept(artist.getName()));
 
             for (AlbumSimplified album : theEngine.getAlbums(artist.getID())) {
                 if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON))
                     featuringHashMap.put(album.getId(), new ReleasedAlbum(album, artist));
                 else if (!loadedIDhashSet.contains(album.getId())) {
+                    ReleasedAlbum releasedAlbum = new ReleasedAlbum(album, artist);
                     if (!savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(artist.getID())) {
                         savedIDhashSet.add(album.getId());
-                        newAlbums.add(new ReleasedAlbum(album, artist));
+                        addToNewAlbums(releasedAlbum);
                     }
-                    allAlbums.add(new ReleasedAlbum(album, artist));
+                    addToAllAlbums(releasedAlbum);
                     loadedIDhashSet.add(album.getId());
                 }
             }
 
             if (progressConsumer != null)
                 Platform.runLater(() -> progressConsumer.accept((double) (i.incrementAndGet()) / artists.size()));
+            if (processedArtistsConsumer != null)
+                Platform.runLater(() -> processedArtistsConsumer.accept(i.intValue() + "/" + artists.size()));
         }
 
         loadUniqueFeaturing();
@@ -70,17 +63,28 @@ public class ReleasesProcessor {
         FileManager.saveAlbumHashSet(savedIDhashSet);
     }
 
+
     private void loadUniqueFeaturing() {
         for (ReleasedAlbum album : featuringHashMap.values()) {
             if (loadedIDhashSet.contains(album.getId())) continue;
 
             if (!savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(album.getArtistId())) {
                 savedIDhashSet.add(album.getId());
-                newAlbums.add(album);
+                addToNewAlbums(album);
             }
-            allAlbums.add(album);
+            addToAllAlbums(album);
             loadedIDhashSet.add(album.getId());
         }
+    }
+
+    private void addToAllAlbums(ReleasedAlbum releasedAlbum) {
+        allAlbums.add(releasedAlbum);
+        if (releasesConsumer != null) Platform.runLater(() -> releasesConsumer.accept(allAlbums.size() + ""));
+    }
+
+    private void addToNewAlbums(ReleasedAlbum releasedAlbum) {
+        newAlbums.add(releasedAlbum);
+        if (newReleasesConsumer != null) Platform.runLater(() -> newReleasesConsumer.accept(newAlbums.size() + ""));
     }
 
 
@@ -93,4 +97,23 @@ public class ReleasesProcessor {
     }
 
 
+    public void setProcessedArtistsConsumer(Consumer<String> processedArtistsConsumer) {
+        this.processedArtistsConsumer = processedArtistsConsumer;
+    }
+
+    public void setReleasesConsumer(Consumer<String> releasesConsumer) {
+        this.releasesConsumer = releasesConsumer;
+    }
+
+    public void setNewReleasesConsumer(Consumer<String> newReleasesConsumer) {
+        this.newReleasesConsumer = newReleasesConsumer;
+    }
+
+    public void setProgressConsumer(DoubleConsumer progressConsumer) {
+        this.progressConsumer = progressConsumer;
+    }
+
+    public void setCurrentArtistConsumer(Consumer<String> currentArtistConsumer) {
+        this.currentArtistConsumer = currentArtistConsumer;
+    }
 }
