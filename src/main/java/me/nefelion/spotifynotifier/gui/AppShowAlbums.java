@@ -35,6 +35,7 @@ public class AppShowAlbums {
         }
         controller = loader.getController();
         ControllerFollowed controllerFollowed = loaderFollowed.getController();
+        controllerFollowed.setControllerOutline(controller);
         ControllerAlbums controllerAlbums = loaderAlbums.getController();
         controllerAlbums.setControllerOutline(controller);
 

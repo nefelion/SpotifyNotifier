@@ -15,7 +15,7 @@ public class AppShowAllAlbums extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
+        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists().get(74));
 
 
         FXMLLoader progressLoader = new FXMLLoader(getClass().getResource("/fxml/G_VBOX__PROGRESS.fxml"));

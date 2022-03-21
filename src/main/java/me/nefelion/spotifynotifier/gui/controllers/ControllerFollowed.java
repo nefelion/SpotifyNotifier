@@ -5,16 +5,15 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import me.nefelion.spotifynotifier.FollowedArtist;
+import me.nefelion.spotifynotifier.ReleasesProcessor;
 import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.data.TempData;
+import me.nefelion.spotifynotifier.gui.AppShowAlbums;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
 import java.util.ArrayList;
@@ -26,21 +25,26 @@ import java.util.stream.Collectors;
 public class ControllerFollowed {
     private static final String DEFAULT_CONTROL_INNER_BACKGROUND = "derive(-fx-base,80%)";
     private static final String HIGHLIGHTED_CONTROL_INNER_BACKGROUND = "derive(palegreen, 50%)";
-
     private final Label placeholderLabelGListFollowed, placeholderLabelGListSpotify;
+    private ControllerOutline controllerOutline;
     private String lastSearch = "";
     private double maxGListSpotifyPopularity = Double.MAX_VALUE;
+    private Task<Boolean> task;
 
     @FXML
-    private VBox GMainVBOX;
+    private VBox GMainVBOX, GVboxInfo;
     @FXML
     private ListView<String> GListFollowed;
-
-
     @FXML
     private ListView<Artist> GListSpotify;
     @FXML
     private TextField GTextFieldSearchFollowed, GTextFieldSearchSpotify;
+    @FXML
+    private Label GLabelCurrentArtist, GLabelProcessedArtists, GLabelLoadedReleases, GLabelNewReleases, GLabelPercentage;
+    @FXML
+    private ProgressBar GProgressBar;
+    @FXML
+    private Button GButtonCheckReleases, GButtonAbort;
 
 
     public ControllerFollowed() {
@@ -52,11 +56,16 @@ public class ControllerFollowed {
         return GMainVBOX;
     }
 
+    public void setControllerOutline(ControllerOutline controllerOutline) {
+        this.controllerOutline = controllerOutline;
+    }
+
 
     @FXML
     private void initialize() {
         initializeGListFollowedArtists();
         initializeGListSearchSpotifyArtists();
+        initializeGVboxInfo();
     }
 
     @FXML
@@ -67,6 +76,48 @@ public class ControllerFollowed {
     @FXML
     private void onActionTextFieldSearchSpotify(ActionEvent actionEvent) {
         searchSpotify();
+    }
+
+    @FXML
+    private void onActionCheckReleases(ActionEvent actionEvent) {
+        GButtonCheckReleases.setDisable(true);
+        GVboxInfo.setVisible(true);
+
+        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
+        processor.setProgressConsumer((var) -> {
+                    GLabelPercentage.setText((int) (var * 100) + "%");
+                    GProgressBar.setProgress(var);
+                })
+                .setCurrentArtistConsumer(GLabelCurrentArtist::setText)
+                .setProcessedArtistsConsumer(GLabelProcessedArtists::setText)
+                .setReleasesConsumer(GLabelLoadedReleases::setText)
+                .setNewReleasesConsumer(GLabelNewReleases::setText);
+
+        task = new Task<>() {
+            @Override
+            public Boolean call() {
+                processor.process();
+                return true;
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            GButtonCheckReleases.setDisable(false);
+            controllerOutline.setAlbumsVBOX(AppShowAlbums.getAlbumsVBOX(processor.getNewAlbums(), processor.getAllAlbums()));
+            controllerOutline.selectTab(ControllerOutline.TAB.ALBUMS);
+
+            resetInfoBoard();
+            GVboxInfo.setVisible(false);
+        });
+        new Thread(task).start();
+    }
+
+    public void onActionGButtonAbort(ActionEvent actionEvent) {
+        task.setOnCancelled(e -> {
+            GVboxInfo.setVisible(false);
+            GButtonCheckReleases.setDisable(false);
+        });
+        task.cancel();
     }
 
 
@@ -120,6 +171,11 @@ public class ControllerFollowed {
         });
     }
 
+    private void initializeGVboxInfo() {
+        GVboxInfo.setVisible(false);
+        resetInfoBoard();
+    }
+
 
     private void searchSpotify() {
         String search = GTextFieldSearchSpotify.getText().trim();
@@ -160,6 +216,15 @@ public class ControllerFollowed {
         });
         Optional<Integer> optional = GListSpotify.getItems().stream().max(Comparator.comparingInt(Artist::getPopularity)).map(Artist::getPopularity);
         optional.ifPresent(integer -> maxGListSpotifyPopularity = (double) integer);
+    }
+
+    private void resetInfoBoard() {
+        GLabelPercentage.setText("");
+        GProgressBar.setProgress(0.0);
+        GLabelCurrentArtist.setText("...");
+        GLabelProcessedArtists.setText("0");
+        GLabelLoadedReleases.setText("0");
+        GLabelNewReleases.setText("0");
     }
 
 }

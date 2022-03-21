@@ -12,6 +12,7 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 import javax.swing.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CancellationException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -190,7 +191,7 @@ public class TheEngine {
                 allAlbums.addAll(List.of(paging.getItems()));
                 offset += n;
             } while (paging.getNext() != null);
-
+        } catch (CancellationException ignored) {
         } catch (Exception e) {
             if (Utilities.tryAgainMSGBOX("getAlbums: Something went wrong!\n" + e.getMessage()))
                 return getAlbums(artistID);

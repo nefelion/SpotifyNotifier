@@ -1,6 +1,7 @@
 package me.nefelion.spotifynotifier;
 
 import javafx.application.Platform;
+import javafx.concurrent.Task;
 import me.nefelion.spotifynotifier.data.FileManager;
 import se.michaelthelin.spotify.enums.AlbumGroup;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
@@ -36,7 +37,8 @@ public class ReleasesProcessor {
         AtomicInteger i = new AtomicInteger();
 
         for (FollowedArtist artist : artists) {
-            if (currentArtistConsumer != null) Platform.runLater(() -> currentArtistConsumer.accept(artist.getName()));
+            if (currentArtistConsumer != null)
+                Platform.runLater(() -> currentArtistConsumer.accept(artist.getName()));
 
             for (AlbumSimplified album : theEngine.getAlbums(artist.getID())) {
                 if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON))
@@ -58,11 +60,11 @@ public class ReleasesProcessor {
                 Platform.runLater(() -> processedArtistsConsumer.accept(i.intValue() + "/" + artists.size()));
         }
 
+
         loadUniqueFeaturing();
 
         FileManager.saveAlbumHashSet(savedIDhashSet);
     }
-
 
     private void loadUniqueFeaturing() {
         for (ReleasedAlbum album : featuringHashMap.values()) {
@@ -97,23 +99,28 @@ public class ReleasesProcessor {
     }
 
 
-    public void setProcessedArtistsConsumer(Consumer<String> processedArtistsConsumer) {
+    public ReleasesProcessor setProcessedArtistsConsumer(Consumer<String> processedArtistsConsumer) {
         this.processedArtistsConsumer = processedArtistsConsumer;
+        return this;
     }
 
-    public void setReleasesConsumer(Consumer<String> releasesConsumer) {
+    public ReleasesProcessor setReleasesConsumer(Consumer<String> releasesConsumer) {
         this.releasesConsumer = releasesConsumer;
+        return this;
     }
 
-    public void setNewReleasesConsumer(Consumer<String> newReleasesConsumer) {
+    public ReleasesProcessor setNewReleasesConsumer(Consumer<String> newReleasesConsumer) {
         this.newReleasesConsumer = newReleasesConsumer;
+        return this;
     }
 
-    public void setProgressConsumer(DoubleConsumer progressConsumer) {
+    public ReleasesProcessor setProgressConsumer(DoubleConsumer progressConsumer) {
         this.progressConsumer = progressConsumer;
+        return this;
     }
 
-    public void setCurrentArtistConsumer(Consumer<String> currentArtistConsumer) {
+    public ReleasesProcessor setCurrentArtistConsumer(Consumer<String> currentArtistConsumer) {
         this.currentArtistConsumer = currentArtistConsumer;
+        return this;
     }
 }
