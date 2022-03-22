@@ -1,5 +1,6 @@
 package me.nefelion.spotifynotifier.gui.controllers;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -19,6 +20,8 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.AppShowAlbums;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
+import javax.swing.*;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -71,6 +74,12 @@ public class ControllerFollowed {
         initializeGListSearchSpotifyArtists();
         initializeGVboxInfo();
         initializeGLabelLastChecked();
+        startTimer();
+    }
+
+    private void startTimer() {
+        ActionListener taskPerformer = evt -> Platform.runLater(this::refreshGLabelLastChecked);
+        new Timer(1000, taskPerformer).start();
     }
 
     @FXML
