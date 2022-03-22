@@ -1,6 +1,7 @@
 package me.nefelion.spotifynotifier.gui.controllers;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -34,7 +35,7 @@ public class ControllerFollowed {
     @FXML
     private VBox GMainVBOX, GVboxInfo;
     @FXML
-    private ListView<String> GListFollowed;
+    private ListView<FollowedArtist> GListFollowed;
     @FXML
     private ListView<Artist> GListSpotify;
     @FXML
@@ -80,6 +81,7 @@ public class ControllerFollowed {
 
     @FXML
     private void onActionCheckReleases(ActionEvent actionEvent) {
+        resetInfoBoard();
         GButtonCheckReleases.setDisable(true);
         GVboxInfo.setVisible(true);
 
@@ -103,8 +105,7 @@ public class ControllerFollowed {
 
         task.setOnSucceeded(e -> {
             GButtonCheckReleases.setDisable(false);
-            controllerOutline.setAlbumsVBOX(AppShowAlbums.getAlbumsVBOX(processor.getNewAlbums(), processor.getAllAlbums()));
-            controllerOutline.selectTab(ControllerOutline.TAB.ALBUMS);
+            showReleases(processor);
 
             resetInfoBoard();
             GVboxInfo.setVisible(false);
@@ -137,6 +138,55 @@ public class ControllerFollowed {
 
     private void initializeGListFollowedArtists() {
         GListFollowed.setPlaceholder(placeholderLabelGListFollowed);
+
+        GListFollowed.setCellFactory(listView -> {
+            ListCell<FollowedArtist> cell = new ListCell<>() {
+                @Override
+                protected void updateItem(FollowedArtist item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) setText(null);
+                    else setText(item.getName());
+                }
+            };
+
+            final ContextMenu contextMenu = new ContextMenu();
+            final MenuItem showReleasesMenuItem = new MenuItem("Show releases");
+            final MenuItem unfollowMenuItem = new MenuItem("Unfollow");
+
+            showReleasesMenuItem.setOnAction(event -> {
+                FollowedArtist artist = cell.getItem();
+                ReleasesProcessor processor = new ReleasesProcessor(artist);
+                Task<Boolean> task = new Task<>() {
+                    @Override
+                    protected Boolean call() {
+                        processor.process();
+                        return true;
+                    }
+                };
+                task.setOnSucceeded(b -> showReleases(processor));
+                new Thread(task).start();
+            });
+            unfollowMenuItem.setOnAction(event -> {
+                FollowedArtist artist = cell.getItem();
+                TheEngine.getInstance().unfollowArtistID(artist.getID());
+                refreshGListFollowedArtists();
+            });
+
+            contextMenu.getItems().add(showReleasesMenuItem);
+            contextMenu.getItems().add(unfollowMenuItem);
+
+            // Set context menu on row, but use a binding to make it only show for non-empty rows:
+            cell.contextMenuProperty().bind(
+                    Bindings.when(cell.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(contextMenu)
+            );
+
+
+            return cell;
+        });
+
+
         refreshGListFollowedArtists();
     }
 
@@ -198,9 +248,9 @@ public class ControllerFollowed {
     private void refreshGListFollowedArtists() {
         String search = GTextFieldSearchFollowed.getText().trim();
         List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists();
-        GListFollowed.setItems(FXCollections.observableList(followedArtists.stream()
-                .map(FollowedArtist::getName)
-                .filter(p -> p.toLowerCase().contains(search.toLowerCase()))
+        GListFollowed.setItems(FXCollections.observableList(followedArtists
+                .stream()
+                .filter(p -> p.getName().toLowerCase().contains(search.toLowerCase()))
                 .collect(Collectors.toList())));
 
         placeholderLabelGListFollowed.setText(followedArtists.isEmpty()
@@ -225,6 +275,11 @@ public class ControllerFollowed {
         GLabelProcessedArtists.setText("0");
         GLabelLoadedReleases.setText("0");
         GLabelNewReleases.setText("0");
+    }
+
+    private void showReleases(ReleasesProcessor processor) {
+        controllerOutline.setAlbumsVBOX(AppShowAlbums.getAlbumsVBOX(processor.getNewAlbums(), processor.getAllAlbums()));
+        controllerOutline.selectTab(ControllerOutline.TAB.ALBUMS);
     }
 
 }

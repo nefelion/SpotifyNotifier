@@ -199,12 +199,12 @@ public class ControllerAlbums {
 
     private void initializeGTableNewReleases() {
         addAlbumSelectionListenerFor(GTableNewReleases);
-        setRowFactory(GTableNewReleases);
+        setTableViewRowFactory(GTableNewReleases);
     }
 
     private void initializeGTableAllReleases() {
         addAlbumSelectionListenerFor(GTableAllReleases);
-        setRowFactory(GTableAllReleases);
+        setTableViewRowFactory(GTableAllReleases);
     }
 
     private void initializeGListTracklist() {
@@ -442,7 +442,7 @@ public class ControllerAlbums {
         player.setVolume(volume);
     }
 
-    private void setRowFactory(TableView<ReleasedAlbum> GTable) {
+    private void setTableViewRowFactory(TableView<ReleasedAlbum> GTable) {
 
         GTable.setRowFactory(tableView -> {
             TableRow<ReleasedAlbum> row = new TableRow<>() {
