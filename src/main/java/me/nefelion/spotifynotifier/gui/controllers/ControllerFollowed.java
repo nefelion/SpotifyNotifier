@@ -1,6 +1,5 @@
 package me.nefelion.spotifynotifier.gui.controllers;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
@@ -260,12 +259,11 @@ public class ControllerFollowed {
 
     private void updateGListSearchSpotifyArtistsWith(List<Artist> list) {
         String search = GTextFieldSearchSpotify.getText().trim();
-        Platform.runLater(() -> {
-            placeholderLabelGListSpotify.setText("Can't find '" + search + "' on Spotify");
-            GListSpotify.setItems(FXCollections.observableArrayList(list));
-        });
-        Optional<Integer> optional = GListSpotify.getItems().stream().max(Comparator.comparingInt(Artist::getPopularity)).map(Artist::getPopularity);
+
+        Optional<Integer> optional = list.stream().max(Comparator.comparingInt(Artist::getPopularity)).map(Artist::getPopularity);
         optional.ifPresent(integer -> maxGListSpotifyPopularity = (double) integer);
+        placeholderLabelGListSpotify.setText("Can't find '" + search + "' on Spotify");
+        GListSpotify.setItems(FXCollections.observableArrayList(list));
     }
 
     private void resetInfoBoard() {
