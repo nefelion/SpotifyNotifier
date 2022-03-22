@@ -13,6 +13,8 @@ import me.nefelion.spotifynotifier.FollowedArtist;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
 import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.Utilities;
+import me.nefelion.spotifynotifier.data.FileData;
+import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.AppShowAlbums;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
@@ -107,6 +109,9 @@ public class ControllerFollowed {
 
         task.setOnSucceeded(e -> {
             GButtonCheckReleases.setDisable(false);
+            FileData fileData = TempData.getInstance().getFileData();
+            fileData.setLastChecked(Utilities.now());
+            FileManager.saveFileData(fileData);
             showReleases(processor);
 
             resetInfoBoard();
