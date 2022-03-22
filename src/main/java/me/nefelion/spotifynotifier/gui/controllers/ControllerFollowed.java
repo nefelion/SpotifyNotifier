@@ -6,6 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
@@ -250,11 +251,15 @@ public class ControllerFollowed {
                 Task<Boolean> task = new Task<>() {
                     @Override
                     protected Boolean call() {
+                        GMainVBOX.setCursor(Cursor.WAIT);
                         TheEngine.getInstance().followArtistID(artist.getId());
                         return true;
                     }
                 };
-                task.setOnSucceeded(t -> refreshGListFollowedArtists());
+                task.setOnSucceeded(t -> {
+                    refreshGListFollowedArtists();
+                    GMainVBOX.setCursor(Cursor.DEFAULT);
+                });
                 new Thread(task).start();
             });
 
@@ -356,6 +361,7 @@ public class ControllerFollowed {
     }
 
     private void showFollowedArtistReleases(FollowedArtist artist) {
+        GMainVBOX.setCursor(Cursor.WAIT);
         ReleasesProcessor processor = new ReleasesProcessor(artist);
         Task<Boolean> task = new Task<>() {
             @Override
@@ -364,7 +370,10 @@ public class ControllerFollowed {
                 return true;
             }
         };
-        task.setOnSucceeded(b -> showReleases(processor));
+        task.setOnSucceeded(b -> {
+            showReleases(processor);
+            GMainVBOX.setCursor(Cursor.DEFAULT);
+        });
         new Thread(task).start();
     }
 
