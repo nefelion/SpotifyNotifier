@@ -54,57 +54,62 @@
                 <Separator layoutX="308.0" layoutY="63.0" orientation="VERTICAL" prefHeight="590.0" prefWidth="25.0" />
                 <ListView fx:id="GListFollowed" layoutX="20.0" layoutY="103.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="550.0" prefWidth="275.0" />
                 <ListView fx:id="GListSpotify" layoutX="345.0" layoutY="103.0" prefHeight="225.0" prefWidth="275.0" />
-            <TitledPane collapsible="false" layoutX="345.0" layoutY="370.0" prefHeight="283.0" prefWidth="275.0">
-               <content>
-                  <VBox fx:id="GVboxInfo" prefHeight="0.0" prefWidth="273.0" spacing="10.0">
-                     <children>
-                        <HBox prefHeight="0.0" prefWidth="247.0" spacing="5.0">
+            <Group layoutX="345.0" layoutY="370.0">
+               <children>
+                  <TitledPane collapsible="false" prefHeight="283.0" prefWidth="275.0">
+                     <content>
+                        <VBox fx:id="GVboxInfo" prefHeight="0.0" prefWidth="273.0" spacing="10.0">
                            <children>
-                              <Group HBox.hgrow="ALWAYS">
+                              <HBox prefHeight="0.0" prefWidth="247.0" spacing="5.0">
                                  <children>
-                                    <ProgressBar fx:id="GProgressBar" prefHeight="40.0" prefWidth="195.0" progress="0.0" />
-                                    <Label fx:id="GLabelPercentage" alignment="CENTER" contentDisplay="CENTER" layoutX="78.0" layoutY="12.0" prefHeight="17.0" prefWidth="39.0" text="0%" textAlignment="CENTER" />
+                                    <Group HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <ProgressBar fx:id="GProgressBar" prefHeight="40.0" prefWidth="195.0" progress="0.0" />
+                                          <Label fx:id="GLabelPercentage" alignment="CENTER" contentDisplay="CENTER" layoutX="78.0" layoutY="12.0" prefHeight="17.0" prefWidth="39.0" text="0%" textAlignment="CENTER" />
+                                       </children>
+                                       <cursor>
+                                          <Cursor fx:constant="DEFAULT" />
+                                       </cursor>
+                                    </Group>
+                                    <Button fx:id="GButtonAbort" mnemonicParsing="false" onAction="#onActionGButtonAbort" prefHeight="38.0" prefWidth="47.0" text="Abort" />
                                  </children>
-                                 <cursor>
-                                    <Cursor fx:constant="DEFAULT" />
-                                 </cursor>
-                              </Group>
-                              <Button fx:id="GButtonAbort" mnemonicParsing="false" onAction="#onActionGButtonAbort" prefHeight="38.0" prefWidth="47.0" text="Abort" />
+                              </HBox>
+                              <HBox prefHeight="0.0" prefWidth="247.0">
+                                 <children>
+                                    <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label text="Current artist" />
+                                          <Separator prefWidth="200.0" />
+                                          <Label text="Processed artists" />
+                                          <Label text="Loaded releases" />
+                                          <Label text="New releases" />
+                                          <Separator layoutX="10.0" layoutY="27.0" prefWidth="200.0" />
+                                          <Label layoutX="10.0" layoutY="10.0" text="Time elapsed" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
+                                       <children>
+                                          <Label fx:id="GLabelCurrentArtist" text="Loading..." />
+                                          <Separator prefWidth="200.0" />
+                                          <Label fx:id="GLabelProcessedArtists" nodeOrientation="LEFT_TO_RIGHT" text="0/0" />
+                                          <Label fx:id="GLabelLoadedReleases" text="0" />
+                                          <Label fx:id="GLabelNewReleases" text="0" />
+                                          <Separator layoutX="10.0" layoutY="27.0" prefWidth="200.0" />
+                                          <Label layoutX="62.0" layoutY="10.0" text="0:00" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
                            </children>
-                        </HBox>
-                        <HBox prefHeight="0.0" prefWidth="247.0">
-                           <children>
-                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label text="Current artist" />
-                                    <Separator prefWidth="200.0" />
-                                    <Label text="Processed artists" />
-                                    <Label text="Loaded releases" />
-                                    <Label text="New releases" />
-                                    <Separator layoutX="10.0" layoutY="27.0" prefWidth="200.0" />
-                                    <Label layoutX="10.0" layoutY="10.0" text="Time elapsed" />
-                                 </children>
-                              </VBox>
-                              <VBox alignment="TOP_RIGHT" prefHeight="200.0" prefWidth="100.0" spacing="5.0" HBox.hgrow="ALWAYS">
-                                 <children>
-                                    <Label fx:id="GLabelCurrentArtist" text="Loading..." />
-                                    <Separator prefWidth="200.0" />
-                                    <Label fx:id="GLabelProcessedArtists" nodeOrientation="LEFT_TO_RIGHT" text="0/0" />
-                                    <Label fx:id="GLabelLoadedReleases" text="0" />
-                                    <Label fx:id="GLabelNewReleases" text="0" />
-                                    <Separator layoutX="10.0" layoutY="27.0" prefWidth="200.0" />
-                                    <Label layoutX="62.0" layoutY="10.0" text="0:00" />
-                                 </children>
-                              </VBox>
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
-               </content>
-               <graphic>
-                  <Button fx:id="GButtonCheckReleases" mnemonicParsing="false" onAction="#onActionCheckReleases" text="Check for new releases" />
-               </graphic>
-            </TitledPane>
+                        </VBox>
+                     </content>
+                     <graphic>
+                        <Button fx:id="GButtonCheckReleases" mnemonicParsing="false" onAction="#onActionCheckReleases" text="Check releases" />
+                     </graphic>
+                  </TitledPane>
+                  <Label fx:id="GLabelLastChecked" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="110.0" layoutY="8.0" opacity="0.5" prefHeight="17.0" prefWidth="155.0" text="Last checked: ..." textAlignment="RIGHT" />
+               </children>
+            </Group>
                 <Text layoutX="20.0" layoutY="43.0" opacity="0.8" strokeType="OUTSIDE" strokeWidth="0.0" text="Followed artists" textAlignment="CENTER" wrappingWidth="275.0">
                     <font>
                         <Font size="14.0" />

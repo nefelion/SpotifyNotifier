@@ -12,6 +12,7 @@ import javafx.scene.paint.Color;
 import me.nefelion.spotifynotifier.FollowedArtist;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
 import me.nefelion.spotifynotifier.TheEngine;
+import me.nefelion.spotifynotifier.Utilities;
 import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.AppShowAlbums;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
@@ -40,7 +41,8 @@ public class ControllerFollowed {
     @FXML
     private TextField GTextFieldSearchFollowed, GTextFieldSearchSpotify;
     @FXML
-    private Label GLabelCurrentArtist, GLabelProcessedArtists, GLabelLoadedReleases, GLabelNewReleases, GLabelPercentage;
+    private Label GLabelCurrentArtist, GLabelProcessedArtists, GLabelLoadedReleases, GLabelNewReleases, GLabelPercentage,
+            GLabelLastChecked;
     @FXML
     private ProgressBar GProgressBar;
     @FXML
@@ -66,6 +68,7 @@ public class ControllerFollowed {
         initializeGListFollowedArtists();
         initializeGListSearchSpotifyArtists();
         initializeGVboxInfo();
+        initializeGLabelLastChecked();
     }
 
     @FXML
@@ -108,6 +111,7 @@ public class ControllerFollowed {
 
             resetInfoBoard();
             GVboxInfo.setVisible(false);
+            refreshGLabelLastChecked();
         });
         new Thread(task).start();
     }
@@ -223,6 +227,14 @@ public class ControllerFollowed {
     private void initializeGVboxInfo() {
         GVboxInfo.setVisible(false);
         resetInfoBoard();
+    }
+
+    private void initializeGLabelLastChecked() {
+        refreshGLabelLastChecked();
+    }
+
+    private void refreshGLabelLastChecked() {
+        GLabelLastChecked.setText("Last checked: " + Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked()));
     }
 
 
