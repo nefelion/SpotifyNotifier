@@ -248,19 +248,7 @@ public class ControllerFollowed {
             });
             followMenuItem.setOnAction(event -> {
                 Artist artist = cell.getItem();
-                Task<Boolean> task = new Task<>() {
-                    @Override
-                    protected Boolean call() {
-                        GMainVBOX.setCursor(Cursor.WAIT);
-                        TheEngine.getInstance().followArtistID(artist.getId());
-                        return true;
-                    }
-                };
-                task.setOnSucceeded(t -> {
-                    refreshGListFollowedArtists();
-                    GMainVBOX.setCursor(Cursor.DEFAULT);
-                });
-                new Thread(task).start();
+                followArtist(artist);
             });
 
             contextMenu.getItems().add(followMenuItem);
@@ -281,10 +269,25 @@ public class ControllerFollowed {
         GListSpotify.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getClickCount() == 2) {
                 Artist artist = GListSpotify.getSelectionModel().getSelectedItem();
-                if (artist == null) return;
-                showArtistsReleases(artist);
+                followArtist(artist);
             }
         });
+    }
+
+    private void followArtist(Artist artist) {
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                GMainVBOX.setCursor(Cursor.WAIT);
+                TheEngine.getInstance().followArtistID(artist.getId());
+                return true;
+            }
+        };
+        task.setOnSucceeded(t -> {
+            refreshGListFollowedArtists();
+            GMainVBOX.setCursor(Cursor.DEFAULT);
+        });
+        new Thread(task).start();
     }
 
 
