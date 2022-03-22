@@ -17,7 +17,6 @@ import me.nefelion.spotifynotifier.Utilities;
 import me.nefelion.spotifynotifier.data.FileData;
 import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
-import me.nefelion.spotifynotifier.gui.AppShowAlbums;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
 import javax.swing.*;
@@ -248,8 +247,15 @@ public class ControllerFollowed {
             });
             followMenuItem.setOnAction(event -> {
                 Artist artist = cell.getItem();
-                TheEngine.getInstance().followArtistID(artist.getId());
-                refreshGListFollowedArtists();
+                Task<Boolean> task = new Task<>() {
+                    @Override
+                    protected Boolean call() {
+                        TheEngine.getInstance().followArtistID(artist.getId());
+                        return true;
+                    }
+                };
+                task.setOnSucceeded(t -> refreshGListFollowedArtists());
+                new Thread(task).start();
             });
 
             contextMenu.getItems().add(followMenuItem);

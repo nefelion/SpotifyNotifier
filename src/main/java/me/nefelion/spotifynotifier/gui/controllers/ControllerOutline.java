@@ -29,14 +29,14 @@ public class ControllerOutline {
         GFollowedAnchorPane.getChildren().add(vbox);
     }
 
+    public VBox getAlbumsVBOX() {
+        return (VBox) (GAlbumAnchorPane.getChildren().isEmpty() ? null : GAlbumAnchorPane.getChildren().get(0));
+    }
+
     public void setAlbumsVBOX(VBox vbox) {
         GTabPane.getTabs().get(TAB.ALBUMS.ordinal()).setDisable(false);
         GAlbumAnchorPane.getChildren().clear();
         GAlbumAnchorPane.getChildren().add(vbox);
-    }
-
-    public VBox getAlbumsVBOX() {
-        return (VBox) (GAlbumAnchorPane.getChildren().isEmpty() ? null : GAlbumAnchorPane.getChildren().get(0));
     }
 
     public void setSettingsVBOX(VBox vbox) {

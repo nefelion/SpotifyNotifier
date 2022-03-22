@@ -1,4 +1,4 @@
-package me.nefelion.spotifynotifier.gui;
+package me.nefelion.spotifynotifier.gui.apps;
 
 import javafx.application.Application;
 

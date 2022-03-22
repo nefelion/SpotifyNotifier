@@ -74,7 +74,7 @@ public class TheEngine {
 
     }
 
-    public void unfollowArtistID(String id) {
+    public synchronized void unfollowArtistID(String id) {
         if (id == null || id.trim().isEmpty()) return;
 
         FileData fileData = TempData.getInstance().getFileData();

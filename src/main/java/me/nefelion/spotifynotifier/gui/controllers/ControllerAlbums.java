@@ -26,7 +26,7 @@ import me.nefelion.spotifynotifier.ReleasedAlbum;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
 import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.data.TempData;
-import me.nefelion.spotifynotifier.gui.AppShowAlbums;
+import me.nefelion.spotifynotifier.gui.apps.AppShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
@@ -41,9 +41,9 @@ import java.util.stream.Collectors;
 
 public class ControllerAlbums {
     public static final Stack<VBox> VBOXSTACK = new Stack<>();
+    private static MediaPlayer player;
     private final HashMap<String, TempAlbumInfo> infoHashMap = new HashMap<>();
     private ControllerOutline controllerOutline;
-    private static MediaPlayer player;
     private List<ReleasedAlbum> newAlbums, allAlbums, filteredNewAlbums, filteredAllAlbums;
     private ReleasedAlbum currentSelectedAlbum;
     private TrackSimplified currentSelectedTrack;

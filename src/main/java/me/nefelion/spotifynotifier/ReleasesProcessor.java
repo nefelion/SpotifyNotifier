@@ -1,7 +1,6 @@
 package me.nefelion.spotifynotifier;
 
 import javafx.application.Platform;
-import javafx.concurrent.Task;
 import me.nefelion.spotifynotifier.data.FileManager;
 import se.michaelthelin.spotify.enums.AlbumGroup;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;

@@ -2,7 +2,7 @@ package me.nefelion.spotifynotifier;
 
 import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
-import me.nefelion.spotifynotifier.gui.Starter;
+import me.nefelion.spotifynotifier.gui.apps.Starter;
 import me.nefelion.spotifynotifier.subcommands.*;
 import se.michaelthelin.spotify.SpotifyApi;
 
