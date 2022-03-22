@@ -40,10 +40,10 @@ import java.util.stream.Collectors;
 
 
 public class ControllerAlbums {
-    private static final Stack<VBox> vboxStack = new Stack<>();
+    public static final Stack<VBox> VBOXSTACK = new Stack<>();
     private final HashMap<String, TempAlbumInfo> infoHashMap = new HashMap<>();
     private ControllerOutline controllerOutline;
-    private MediaPlayer player;
+    private static MediaPlayer player;
     private List<ReleasedAlbum> newAlbums, allAlbums, filteredNewAlbums, filteredAllAlbums;
     private ReleasedAlbum currentSelectedAlbum;
     private TrackSimplified currentSelectedTrack;
@@ -113,7 +113,7 @@ public class ControllerAlbums {
     @FXML
     private void onActionGButtonBack(ActionEvent actionEvent) {
         stopCurrent();
-        controllerOutline.setAlbumsVBOX(vboxStack.pop());
+        controllerOutline.setAlbumsVBOX(VBOXSTACK.pop());
     }
 
     @FXML
@@ -171,7 +171,7 @@ public class ControllerAlbums {
     }
 
     private void initializeGButtonBack() {
-        if (vboxStack.isEmpty()) GButtonBack.setVisible(false);
+        if (VBOXSTACK.isEmpty()) GButtonBack.setVisible(false);
     }
 
     private void initializeGProgressBar() {
@@ -527,6 +527,7 @@ public class ControllerAlbums {
             Stage stage = new Stage(StageStyle.UTILITY);
             stage.setTitle("Pick an artist");
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
             ListView<ArtistSimplified> list = initializeListOfArtistsToPick(stage);
             list.setItems(FXCollections.observableArrayList(artistsAndPerformers));
             list.setPrefHeight(artistsAndPerformers.size() * 24 + 2);
@@ -585,12 +586,18 @@ public class ControllerAlbums {
         };
 
         task.setOnSucceeded(e -> {
-            vboxStack.add(GMainVBOX);
-            controllerOutline.setAlbumsVBOX(AppShowAlbums.getAlbumsVBOX(processor.getNewAlbums(), processor.getAllAlbums()));
+            showReleases(processor);
             disableAllElements(false);
             showProgressBar(false);
         });
         new Thread(task).start();
+    }
+
+    public void showReleases(ReleasesProcessor processor) {
+        stopCurrent();
+        VBox oldVbox = controllerOutline.getAlbumsVBOX();
+        if (oldVbox != null) VBOXSTACK.push(oldVbox);
+        controllerOutline.setAlbumsVBOX(AppShowAlbums.getAlbumsVBOX(processor.getNewAlbums(), processor.getAllAlbums()));
     }
 
     private void showProgressBar(boolean b) {

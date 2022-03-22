@@ -172,16 +172,7 @@ public class ControllerFollowed {
 
             showReleasesMenuItem.setOnAction(event -> {
                 FollowedArtist artist = cell.getItem();
-                ReleasesProcessor processor = new ReleasesProcessor(artist);
-                Task<Boolean> task = new Task<>() {
-                    @Override
-                    protected Boolean call() {
-                        processor.process();
-                        return true;
-                    }
-                };
-                task.setOnSucceeded(b -> showReleases(processor));
-                new Thread(task).start();
+                showFollowedArtistReleases(artist);
             });
             unfollowMenuItem.setOnAction(event -> {
                 FollowedArtist artist = cell.getItem();
@@ -203,6 +194,14 @@ public class ControllerFollowed {
             return cell;
         });
 
+        GListFollowed.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getClickCount() == 2) {
+                FollowedArtist artist = GListFollowed.getSelectionModel().getSelectedItem();
+                if (artist == null) return;
+                showFollowedArtistReleases(artist);
+            }
+        });
+
 
         refreshGListFollowedArtists();
     }
@@ -210,33 +209,73 @@ public class ControllerFollowed {
     private void initializeGListSearchSpotifyArtists() {
         GListSpotify.setPlaceholder(placeholderLabelGListSpotify);
 
-        GListSpotify.setCellFactory((param) -> new ListCell<>() {
-            @Override
-            protected void updateItem(Artist item, boolean empty) {
-                super.updateItem(item, empty);
+        GListSpotify.setCellFactory(listView -> {
+            ListCell<Artist> cell = new ListCell<>() {
+                @Override
+                protected void updateItem(Artist item, boolean empty) {
+                    super.updateItem(item, empty);
 
-                if (item == null || empty) {
-                    setText(null);
-                    setStyle("-fx-control-inner-background: " + DEFAULT_CONTROL_INNER_BACKGROUND + ";");
-                } else {
-                    setText(item.getName());
-                    StringBuilder style = new StringBuilder();
-
-                    if (TheEngine.getInstance().isFollowed(item.getId())) {
-                        style.append("-fx-control-inner-background: " + HIGHLIGHTED_CONTROL_INNER_BACKGROUND + ";");
+                    if (item == null || empty) {
+                        setText(null);
+                        setStyle("-fx-control-inner-background: " + DEFAULT_CONTROL_INNER_BACKGROUND + ";");
                     } else {
-                        style.append("-fx-control-inner-background: " + DEFAULT_CONTROL_INNER_BACKGROUND + ";");
+                        setText(item.getName());
+                        StringBuilder style = new StringBuilder();
+
+                        if (TheEngine.getInstance().isFollowed(item.getId())) {
+                            style.append("-fx-control-inner-background: " + HIGHLIGHTED_CONTROL_INNER_BACKGROUND + ";");
+                        } else {
+                            style.append("-fx-control-inner-background: " + DEFAULT_CONTROL_INNER_BACKGROUND + ";");
+                        }
+
+                        double vis = 0.5 + (item.getPopularity() / maxGListSpotifyPopularity) / 2;
+                        style.append("-fx-text-fill: " + "rgba(0,0,0,").append(vis).append(");");
+
+                        setStyle(style.toString());
                     }
 
-                    double vis = 0.5 + (item.getPopularity() / maxGListSpotifyPopularity) / 2;
-                    style.append("-fx-text-fill: " + "rgba(0,0,0,").append(vis).append(");");
-
-                    setStyle(style.toString());
                 }
+            };
 
+            final ContextMenu contextMenu = new ContextMenu();
+            final MenuItem followMenuItem = new MenuItem("Follow");
+            final MenuItem showReleasesMenuItem = new MenuItem("Show releases");
+
+
+            showReleasesMenuItem.setOnAction(event -> {
+                Artist artist = cell.getItem();
+                showArtistsReleases(artist);
+            });
+            followMenuItem.setOnAction(event -> {
+                Artist artist = cell.getItem();
+                TheEngine.getInstance().followArtistID(artist.getId());
+                refreshGListFollowedArtists();
+            });
+
+            contextMenu.getItems().add(followMenuItem);
+            contextMenu.getItems().add(showReleasesMenuItem);
+
+
+            // Set context menu on row, but use a binding to make it only show for non-empty rows:
+            cell.contextMenuProperty().bind(
+                    Bindings.when(cell.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(contextMenu)
+            );
+
+
+            return cell;
+        });
+
+        GListSpotify.setOnMouseClicked(mouseEvent -> {
+            if (mouseEvent.getClickCount() == 2) {
+                Artist artist = GListSpotify.getSelectionModel().getSelectedItem();
+                if (artist == null) return;
+                showArtistsReleases(artist);
             }
         });
     }
+
 
     private void initializeGVboxInfo() {
         GVboxInfo.setVisible(false);
@@ -302,8 +341,26 @@ public class ControllerFollowed {
     }
 
     private void showReleases(ReleasesProcessor processor) {
-        controllerOutline.setAlbumsVBOX(AppShowAlbums.getAlbumsVBOX(processor.getNewAlbums(), processor.getAllAlbums()));
+        controllerOutline.showAlbums(processor);
         controllerOutline.selectTab(ControllerOutline.TAB.ALBUMS);
     }
+
+    private void showArtistsReleases(Artist artist) {
+        showFollowedArtistReleases(new FollowedArtist(artist.getName(), artist.getId()));
+    }
+
+    private void showFollowedArtistReleases(FollowedArtist artist) {
+        ReleasesProcessor processor = new ReleasesProcessor(artist);
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() {
+                processor.process();
+                return true;
+            }
+        };
+        task.setOnSucceeded(b -> showReleases(processor));
+        new Thread(task).start();
+    }
+
 
 }

@@ -107,7 +107,7 @@
                         <Button fx:id="GButtonCheckReleases" mnemonicParsing="false" onAction="#onActionCheckReleases" text="Check releases" />
                      </graphic>
                   </TitledPane>
-                  <Label fx:id="GLabelLastChecked" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="110.0" layoutY="8.0" opacity="0.5" prefHeight="17.0" prefWidth="155.0" text="Last checked: ..." textAlignment="RIGHT" />
+                  <Label fx:id="GLabelLastChecked" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="105.0" layoutY="8.0" opacity="0.5" prefHeight="17.0" prefWidth="160.0" text="Last checked: ..." textAlignment="RIGHT" />
                </children>
             </Group>
                 <Text layoutX="20.0" layoutY="43.0" opacity="0.8" strokeType="OUTSIDE" strokeWidth="0.0" text="Followed artists" textAlignment="CENTER" wrappingWidth="275.0">

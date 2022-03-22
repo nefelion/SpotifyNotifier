@@ -35,19 +35,21 @@ public class AppShowAlbums {
         }
         controller = loader.getController();
         ControllerFollowed controllerFollowed = loaderFollowed.getController();
-        controllerFollowed.setControllerOutline(controller);
         ControllerAlbums controllerAlbums = loaderAlbums.getController();
-        controllerAlbums.setControllerOutline(controller);
 
+        controllerFollowed.setControllerOutline(controller);
+        controllerAlbums.setControllerOutline(controller);
+        controller.setControllerAlbums(controllerAlbums);
 
         controllerAlbums.setNewAlbums(newAlbums);
         controllerAlbums.setAllAlbums(allAlbums);
 
         stage.setTitle("Title");
 
+
         controller.setAlbumsVBOX(controllerAlbums.getGMainVBOX());
         controller.setFollowedVBOX(controllerFollowed.getGMainVBOX());
-        controller.selectTab(ControllerOutline.TAB.ALBUMS);
+        controller.selectTab(ControllerOutline.TAB.FOLLOWED);
         Scene home = new Scene(outline);
         stage.setScene(home);
         stage.show();
