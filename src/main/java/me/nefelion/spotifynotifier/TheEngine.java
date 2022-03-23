@@ -11,7 +11,10 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.OptionalInt;
 import java.util.concurrent.CancellationException;
 import java.util.stream.IntStream;
 
@@ -117,40 +120,6 @@ public class TheEngine {
     }
 
 
-    public void printAllArtistAlbums(String id) {
-        if (id == null || id.trim().isEmpty()) return;
-
-        FileData fileData = TempData.getInstance().getFileData();
-        List<FollowedArtist> followedArtists = fileData.getFollowedArtists();
-        FollowedArtist artist;
-
-        OptionalInt indexOfExistingID = IntStream.range(0, followedArtists.size())
-                .filter(i -> id.equalsIgnoreCase(followedArtists.get(i).getID()))
-                .findFirst();
-        if (indexOfExistingID.isPresent()) artist = followedArtists.get(indexOfExistingID.getAsInt());
-        else {
-            Artist temp = getArtist(id);
-            artist = new FollowedArtist(temp.getName(), temp.getId());
-        }
-
-        ReleasesProcessor processor = new ReleasesProcessor(artist);
-        processor.process();
-
-        List<ReleasedAlbum> releasedAlbums = processor.getAllAlbums();
-
-
-    }
-
-    public void printAllRecentAlbums() {
-
-        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
-        processor.process();
-
-        List<ReleasedAlbum> releasedAlbums = processor.getAllAlbums();
-
-
-    }
-
     public synchronized List<AlbumSimplified> getAlbums(String artistID) {
 
         List<AlbumSimplified> allAlbums = new ArrayList<>();
@@ -247,31 +216,6 @@ public class TheEngine {
 
     public boolean isFollowed(String id) {
         return TempData.getInstance().getFileData().getFollowedArtists().stream().anyMatch(p -> p.getID().equals(id));
-    }
-
-    public void showRelatedAlbums() {
-        HashSet<String> uniqueArtistsID = new HashSet<>();
-        ArrayList<FollowedArtist> relatedArtists = new ArrayList<>();
-        List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists();
-
-
-        for (FollowedArtist followedArtist : followedArtists) {
-            for (Artist artist : getRelatedArtists(followedArtist.getID())) {
-                String id = artist.getId();
-                if (isFollowed(id)) continue;
-                if (!uniqueArtistsID.add(id)) continue;
-                relatedArtists.add(new FollowedArtist(artist.getName(), id));
-            }
-
-        }
-
-
-        relatedArtists.sort(Comparator.comparing(FollowedArtist::getName));
-        ReleasesProcessor processor = new ReleasesProcessor(relatedArtists);
-        processor.process();
-
-        List<ReleasedAlbum> albums = new ArrayList<>(processor.getAllAlbums());
-
     }
 
 }

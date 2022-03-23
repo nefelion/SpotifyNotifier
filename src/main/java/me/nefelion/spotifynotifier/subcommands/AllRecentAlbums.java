@@ -1,12 +1,11 @@
 package me.nefelion.spotifynotifier.subcommands;
 
+import javafx.application.Application;
 import me.nefelion.spotifynotifier.ISubCommand;
 import me.nefelion.spotifynotifier.TheEngine;
+import me.nefelion.spotifynotifier.gui.apps.AppAllAlbums;
 
 public class AllRecentAlbums implements ISubCommand {
-
-    private final TheEngine theEngine = TheEngine.getInstance();
-
     public AllRecentAlbums() {
     }
 
@@ -14,7 +13,7 @@ public class AllRecentAlbums implements ISubCommand {
     public void execute(String[] args) {
 
         switch (args.length) {
-            case 0 -> theEngine.printAllRecentAlbums();
+            case 0 -> Application.launch(AppAllAlbums.class);
 
             default -> System.err.println("Wrong number of arguments (" + args.length + ")");
         }

@@ -28,7 +28,7 @@ public class UtilAlbums {
         Stage progressStage = new Stage(StageStyle.UTILITY);
         progressStage.setAlwaysOnTop(true);
         progressStage.setResizable(false);
-        progressStage.setTitle("Checking for new releases...");
+        progressStage.setTitle("Downloading album data...");
         progressStage.setScene(new Scene(progress));
         if (!quiet) progressStage.show();
 
