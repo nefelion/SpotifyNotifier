@@ -10,6 +10,9 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
+import me.nefelion.spotifynotifier.Utilities;
+import me.nefelion.spotifynotifier.data.FileData;
+import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.controllers.ControllerProgress;
 
@@ -43,6 +46,9 @@ public class UtilAlbums {
         };
 
         task.setOnSucceeded(e -> {
+            FileData fileData = TempData.getInstance().getFileData();
+            fileData.setLastChecked(Utilities.now());
+            FileManager.saveFileData(fileData);
             progressStage.close();
 
             if (!quiet && newOnly && processor.getNewAlbums().isEmpty()) {
