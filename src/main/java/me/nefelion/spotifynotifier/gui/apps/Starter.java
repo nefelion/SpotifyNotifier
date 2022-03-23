@@ -6,7 +6,7 @@ public class Starter {
 
 
     public static void main(String[] args) {
-        Application.launch(AppShowNewAlbums.class);
+        Application.launch(AppNewAlbums.class);
     }
 
 }

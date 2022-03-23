@@ -44,12 +44,12 @@ public class AppShowAlbums {
         controllerAlbums.setNewAlbums(newAlbums);
         controllerAlbums.setAllAlbums(allAlbums);
 
-        stage.setTitle("Title");
+        stage.setTitle("Spotify Notifier");
 
 
         controller.setAlbumsVBOX(controllerAlbums.getGMainVBOX());
         controller.setFollowedVBOX(controllerFollowed.getGMainVBOX());
-        controller.selectTab(ControllerOutline.TAB.FOLLOWED);
+        controller.selectTab(ControllerOutline.TAB.ALBUMS);
         Scene home = new Scene(outline);
         stage.setScene(home);
         stage.show();
