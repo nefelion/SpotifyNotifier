@@ -26,7 +26,7 @@ import me.nefelion.spotifynotifier.ReleasedAlbum;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
 import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.data.TempData;
-import me.nefelion.spotifynotifier.gui.apps.AppShowAlbums;
+import me.nefelion.spotifynotifier.gui.apps.util.UtilShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
@@ -597,7 +597,7 @@ public class ControllerAlbums {
         stopCurrent();
         VBox oldVbox = controllerOutline.getAlbumsVBOX();
         if (oldVbox != null) VBOXSTACK.push(oldVbox);
-        controllerOutline.setAlbumsVBOX(AppShowAlbums.getAlbumsVBOX(processor.getNewAlbums(), processor.getAllAlbums()));
+        controllerOutline.setAlbumsVBOX(UtilShowAlbums.getAlbumsVBOX(processor.getNewAlbums(), processor.getAllAlbums()));
     }
 
     private void showProgressBar(boolean b) {

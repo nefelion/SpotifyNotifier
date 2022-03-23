@@ -1,4 +1,4 @@
-package me.nefelion.spotifynotifier.gui.apps;
+package me.nefelion.spotifynotifier.gui.apps.util;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
@@ -15,13 +15,13 @@ import me.nefelion.spotifynotifier.gui.controllers.ControllerProgress;
 
 import java.io.IOException;
 
-public class AppAlbums {
+public class UtilAlbums {
 
-    public static void start(Stage primaryStage, boolean newOnly) throws IOException {
+    public static void process(Stage primaryStage, boolean newOnly, boolean quiet) throws IOException {
         ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
 
 
-        FXMLLoader progressLoader = new FXMLLoader(AppAlbums.class.getResource("/fxml/G_VBOX__PROGRESS.fxml"));
+        FXMLLoader progressLoader = new FXMLLoader(UtilAlbums.class.getResource("/fxml/G_VBOX__PROGRESS.fxml"));
         Parent progress = progressLoader.load();
         ControllerProgress progressController = progressLoader.getController();
 
@@ -30,7 +30,7 @@ public class AppAlbums {
         progressStage.setResizable(false);
         progressStage.setTitle("Checking for new releases...");
         progressStage.setScene(new Scene(progress));
-        progressStage.show();
+        if (!quiet) progressStage.show();
 
         Task<Boolean> task = new Task<>() {
             @Override
@@ -45,7 +45,7 @@ public class AppAlbums {
         task.setOnSucceeded(e -> {
             progressStage.close();
 
-            if (newOnly && processor.getNewAlbums().isEmpty()) {
+            if (!quiet && newOnly && processor.getNewAlbums().isEmpty()) {
                 ButtonType closeButton = new ButtonType("Close");
                 ButtonType anywayButton = new ButtonType("Show anyway");
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "No new releases", closeButton, anywayButton);
@@ -65,7 +65,7 @@ public class AppAlbums {
 
     private static void startTheApp(Stage primaryStage, ReleasesProcessor processor) {
         primaryStage.setResizable(false);
-        AppShowAlbums.start(primaryStage, processor.getNewAlbums(), processor.getAllAlbums());
+        UtilShowAlbums.start(primaryStage, processor.getNewAlbums(), processor.getAllAlbums());
     }
 
 

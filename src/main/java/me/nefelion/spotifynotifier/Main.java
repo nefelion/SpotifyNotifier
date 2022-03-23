@@ -1,8 +1,9 @@
 package me.nefelion.spotifynotifier;
 
+import javafx.application.Application;
 import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
-import me.nefelion.spotifynotifier.gui.apps.Starter;
+import me.nefelion.spotifynotifier.gui.apps.AppMain;
 import me.nefelion.spotifynotifier.subcommands.*;
 import se.michaelthelin.spotify.SpotifyApi;
 
@@ -58,7 +59,7 @@ public class Main {
 
 
         if (args.length == 0) {
-            Starter.main(new String[]{""});
+            Application.launch(AppMain.class);
         } else if (subCommands.containsKey(args[0].toLowerCase()))
             subCommands.get(args[0].toLowerCase()).execute(Arrays.copyOfRange(args, 1, args.length));
         else Utilities.showMessageDialog("Wrong arg '" + args[0] + "'", "Error!", JOptionPane.ERROR_MESSAGE);

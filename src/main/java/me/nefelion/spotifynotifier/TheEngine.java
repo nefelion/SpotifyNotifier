@@ -13,7 +13,6 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CancellationException;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TheEngine {
@@ -117,30 +116,6 @@ public class TheEngine {
 
     }
 
-    public void checkForNewReleases(boolean quiet) {
-        FileData fd = TempData.getInstance().getFileData();
-
-        ReleasesProcessor processor = new ReleasesProcessor(fd.getFollowedArtists());
-        processor.process();
-
-        List<ReleasedAlbum> releasedAlbums = processor.getAllAlbums();
-
-        fd.setLastChecked(Utilities.now());
-        FileManager.saveFileData(fd);
-
-        if (!releasedAlbums.isEmpty()) {
-
-        } else if (!quiet) {
-            Utilities.showMessageDialog("No new releases.", "Check releases", JOptionPane.INFORMATION_MESSAGE);
-        }
-
-    }
-
-    public void showFollowedList() {
-        List<FollowedArtist> followedArtistSortedList = TempData.getInstance().getFileData().getFollowedArtists().stream().sorted(Comparator.comparing(FollowedArtist::getName)).collect(Collectors.toList());
-
-
-    }
 
     public void printAllArtistAlbums(String id) {
         if (id == null || id.trim().isEmpty()) return;
