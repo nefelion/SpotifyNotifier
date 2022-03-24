@@ -8,11 +8,21 @@ import me.nefelion.spotifynotifier.ReleasesProcessor;
 
 public class ControllerOutline {
 
+    private static ControllerOutline instance;
+
     @FXML
     private TabPane GTabPane;
     @FXML
     private AnchorPane GFollowedAnchorPane, GAlbumAnchorPane, GSettingsAnchorPane;
     private ControllerAlbums controllerAlbums;
+
+    public ControllerOutline() {
+        instance = this;
+    }
+
+    public static ControllerOutline getInstance() {
+        return instance;
+    }
 
     public void setControllerAlbums(ControllerAlbums controllerAlbums) {
         this.controllerAlbums = controllerAlbums;

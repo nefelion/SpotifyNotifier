@@ -29,7 +29,7 @@ public class AppMain extends Application {
             System.exit(1);
             return;
         }
-        ControllerOutline controller = loader.getController();
+        ControllerOutline controller = ControllerOutline.getInstance();
         ControllerFollowed controllerFollowed = loaderFollowed.getController();
         ControllerAlbums controllerAlbums = loaderAlbums.getController();
 

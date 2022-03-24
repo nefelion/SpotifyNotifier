@@ -16,8 +16,6 @@ import java.util.List;
 
 public class UtilShowAlbums {
 
-    private static ControllerOutline controller;
-
     public static void start(Stage stage, List<ReleasedAlbum> newAlbums, List<ReleasedAlbum> allAlbums) {
 
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/fxml/G_VBOX__OUTLINE.fxml"));
@@ -33,7 +31,7 @@ public class UtilShowAlbums {
             System.exit(1);
             return;
         }
-        controller = loader.getController();
+        ControllerOutline controller = ControllerOutline.getInstance();
         ControllerFollowed controllerFollowed = loaderFollowed.getController();
         ControllerAlbums controllerAlbums = loaderAlbums.getController();
 
@@ -66,7 +64,7 @@ public class UtilShowAlbums {
         ControllerAlbums controllerAlbums = loaderAlbums.getController();
         controllerAlbums.setNewAlbums(newAlbums);
         controllerAlbums.setAllAlbums(allAlbums);
-        controllerAlbums.setControllerOutline(controller);
+        controllerAlbums.setControllerOutline(ControllerOutline.getInstance());
         return controllerAlbums.getGMainVBOX();
     }
 
