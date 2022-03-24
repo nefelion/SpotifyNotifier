@@ -28,12 +28,15 @@ public class UtilAlbums {
         Parent progress = progressLoader.load();
         ControllerProgress progressController = progressLoader.getController();
 
+
         Stage progressStage = new Stage(StageStyle.UTILITY);
-        progressStage.setAlwaysOnTop(true);
-        progressStage.setResizable(false);
-        progressStage.setTitle("Downloading album data...");
-        progressStage.setScene(new Scene(progress));
-        if (!quiet) progressStage.show();
+        if (!quiet) {
+            progressStage.setAlwaysOnTop(true);
+            progressStage.setResizable(false);
+            progressStage.setTitle("Downloading album data...");
+            progressStage.setScene(new Scene(progress));
+            progressStage.show();
+        }
 
         Task<Boolean> task = new Task<>() {
             @Override
@@ -51,7 +54,9 @@ public class UtilAlbums {
             FileManager.saveFileData(fileData);
             progressStage.close();
 
-            if (!quiet && newOnly && processor.getNewAlbums().isEmpty()) {
+            if (quiet && processor.getNewAlbums().isEmpty()) System.exit(0);
+
+            if (newOnly && processor.getNewAlbums().isEmpty()) {
                 ButtonType closeButton = new ButtonType("Close");
                 ButtonType anywayButton = new ButtonType("Show anyway");
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "No new releases", closeButton, anywayButton);
