@@ -488,7 +488,6 @@ public class ControllerAlbums {
                                 null
                         );
             });
-
             showReleasesMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
                 showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
@@ -499,6 +498,7 @@ public class ControllerAlbums {
             contextMenu.getItems().add(copySpotifyLinkMenuItem);
             contextMenu.getItems().add(showReleasesMenuItem);
             contextMenu.getItems().add(followUnfollowMenuItem);
+            contextMenu.getItems().forEach(p -> p.setVisible(false));
 
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
             row.contextMenuProperty().bind(
@@ -509,10 +509,10 @@ public class ControllerAlbums {
 
 
             tableView.getSelectionModel().getSelectedIndices().addListener((InvalidationListener) (event) -> {
-                getContextMenuLambdaBody(row, showReleasesMenuItem, followUnfollowMenuItem);
+                getContextMenuLambdaBody(row, showReleasesMenuItem, followUnfollowMenuItem, contextMenu);
             });
             contextMenu.setOnHiding((event) -> {
-                getContextMenuLambdaBody(row, showReleasesMenuItem, followUnfollowMenuItem);
+                getContextMenuLambdaBody(row, showReleasesMenuItem, followUnfollowMenuItem, contextMenu);
             });
 
 
@@ -521,7 +521,7 @@ public class ControllerAlbums {
 
     }
 
-    private void getContextMenuLambdaBody(TableRow<ReleasedAlbum> row, MenuItem showReleasesMenuItem, MenuItem followUnfollowMenuItem) {
+    private void getContextMenuLambdaBody(TableRow<ReleasedAlbum> row, MenuItem showReleasesMenuItem, MenuItem followUnfollowMenuItem, ContextMenu contextMenu) {
         ReleasedAlbum album = row.getItem();
         if (album == null) {
             showReleasesMenuItem.setDisable(true);
@@ -530,6 +530,7 @@ public class ControllerAlbums {
         }
 
         showReleasesMenuItem.setDisable(false);
+        contextMenu.getItems().forEach(p -> p.setVisible(true));
         showReleasesMenuItem.setOnAction((ev) -> showPickArtistDialog(album));
 
         boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
