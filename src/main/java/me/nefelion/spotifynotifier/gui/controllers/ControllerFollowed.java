@@ -22,6 +22,7 @@ import se.michaelthelin.spotify.model_objects.specification.Artist;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -168,11 +169,22 @@ public class ControllerFollowed {
 
             final ContextMenu contextMenu = new ContextMenu();
             final MenuItem showReleasesMenuItem = new MenuItem("Show releases");
+            final MenuItem showOnSpotifyMenuItem = new MenuItem("Show on Spotify");
             final MenuItem unfollowMenuItem = new MenuItem("Unfollow");
 
             showReleasesMenuItem.setOnAction(event -> {
                 FollowedArtist artist = cell.getItem();
                 showFollowedArtistReleases(artist);
+            });
+            showOnSpotifyMenuItem.setOnAction(event -> {
+                FollowedArtist artist = cell.getItem();
+                Runtime rt = Runtime.getRuntime();
+                String url = "https://open.spotify.com/artist/" + artist.getID();
+                try {
+                    rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             });
             unfollowMenuItem.setOnAction(event -> {
                 FollowedArtist artist = cell.getItem();
@@ -181,6 +193,7 @@ public class ControllerFollowed {
             });
 
             contextMenu.getItems().add(showReleasesMenuItem);
+            contextMenu.getItems().add(showOnSpotifyMenuItem);
             contextMenu.getItems().add(unfollowMenuItem);
 
             // Set context menu on row, but use a binding to make it only show for non-empty rows:

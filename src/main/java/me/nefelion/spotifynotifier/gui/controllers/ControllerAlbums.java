@@ -9,6 +9,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -32,9 +35,12 @@ import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -459,14 +465,38 @@ public class ControllerAlbums {
             };
 
             final ContextMenu contextMenu = new ContextMenu();
+            final MenuItem showOnSpotifyMenuItem = new MenuItem("Show on Spotify");
+            final MenuItem copySpotifyLinkMenuItem = new MenuItem("Copy Spotify link");
             final MenuItem showReleasesMenuItem = new MenuItem("Show releases by...");
             final MenuItem followUnfollowMenuItem = new MenuItem();
+            showOnSpotifyMenuItem.setOnAction(event -> {
+                ReleasedAlbum album = row.getItem();
+                Runtime rt = Runtime.getRuntime();
+                String url = "https://open.spotify.com/album/" + album.getId();
+                try {
+                    rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+            copySpotifyLinkMenuItem.setOnAction(event -> {
+                String copiedStuff = getSelectedAlbum().getLink();
+                Toolkit.getDefaultToolkit()
+                        .getSystemClipboard()
+                        .setContents(
+                                new StringSelection(copiedStuff),
+                                null
+                        );
+            });
+
             showReleasesMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
                 showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
             });
 
             showReleasesMenuItem.setDisable(true);
+            contextMenu.getItems().add(showOnSpotifyMenuItem);
+            contextMenu.getItems().add(copySpotifyLinkMenuItem);
             contextMenu.getItems().add(showReleasesMenuItem);
             contextMenu.getItems().add(followUnfollowMenuItem);
 
