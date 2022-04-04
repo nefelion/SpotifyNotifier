@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.concurrent.CancellationException;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TheEngine {
@@ -214,8 +215,19 @@ public class TheEngine {
         return artists;
     }
 
-    public boolean isFollowed(String id) {
+    public synchronized boolean isFollowed(String id) {
         return TempData.getInstance().getFileData().getFollowedArtists().stream().anyMatch(p -> p.getID().equals(id));
+    }
+
+    public synchronized AudioFeatures[] getAudioFeatures(List<String> idList) {
+        try {
+            return spotifyAPI.getAudioFeaturesForSeveralTracks(String.join(",", idList)).build().execute();
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            if (Utilities.tryAgainMSGBOX("getAudioFeatures: Something went wrong!\n" + e.getMessage()))
+                return getAudioFeatures(idList);
+            System.exit(-17322);
+            return null;
+        }
     }
 
 }

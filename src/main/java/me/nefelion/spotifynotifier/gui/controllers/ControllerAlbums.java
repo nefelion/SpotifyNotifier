@@ -33,6 +33,7 @@ import me.nefelion.spotifynotifier.gui.apps.util.UtilShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
+import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
 import java.awt.*;
@@ -370,6 +371,7 @@ public class ControllerAlbums {
         String id = releasedAlbum.getId();
         Album album = TheEngine.getInstance().getAlbum(id);
         List<TrackSimplified> trackList = TheEngine.getInstance().getTracks(album.getId());
+        //AudioFeatures[] features = TheEngine.getInstance().getAudioFeatures(trackList.stream().map(TrackSimplified::getId).collect(Collectors.toList()));
         try {
             URL url = new URL(album.getImages()[1].getUrl());
             InputStream input = url.openStream();
