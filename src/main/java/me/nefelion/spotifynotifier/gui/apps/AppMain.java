@@ -43,6 +43,7 @@ public class AppMain extends Application {
         controller.setFollowedVBOX(controllerFollowed.getGMainVBOX());
         controller.selectTab(ControllerOutline.TAB.FOLLOWED);
         Scene home = new Scene(outline);
+        primaryStage.setResizable(false);
         primaryStage.setScene(home);
         primaryStage.show();
     }
