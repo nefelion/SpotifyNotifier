@@ -33,7 +33,8 @@ public class ReleasesProcessor {
     }
 
     public void process() {
-        Platform.runLater(() -> processedArtistsConsumer.accept(0 + "/" + artists.size()));
+        if (processedArtistsConsumer != null)
+            Platform.runLater(() -> processedArtistsConsumer.accept(0 + "/" + artists.size()));
 
         AtomicInteger i = new AtomicInteger();
 
