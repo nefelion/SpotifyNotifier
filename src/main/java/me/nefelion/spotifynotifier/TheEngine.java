@@ -16,12 +16,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.concurrent.CancellationException;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TheEngine {
     private static TheEngine instance;
     private SpotifyApi spotifyAPI;
+    private int tried = 0;
 
     private TheEngine() {
     }
@@ -138,11 +138,13 @@ public class TheEngine {
             } while (paging.getNext() != null);
         } catch (CancellationException ignored) {
         } catch (Exception e) {
+            if (tried++ < 10) return getAlbums(artistID);
             if (Utilities.tryAgainMSGBOX("getAlbums: Something went wrong!\n" + e.getMessage()))
                 return getAlbums(artistID);
             System.exit(-1006);
         }
 
+        tried = 0;
         allAlbums.removeIf(p -> p.getAlbumType().equals(AlbumType.COMPILATION));
         return allAlbums;
     }
