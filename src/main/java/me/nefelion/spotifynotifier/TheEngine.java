@@ -19,6 +19,7 @@ import java.util.concurrent.CancellationException;
 import java.util.stream.IntStream;
 
 public class TheEngine {
+    private static final int TRY_AGAIN = 10;
     private static TheEngine instance;
     private SpotifyApi spotifyAPI;
     private int tried = 0;
@@ -45,9 +46,7 @@ public class TheEngine {
 
         HashSet<String> hashSet = FileManager.getAlbumHashSet();
 
-        OptionalInt indexOfExistingID = IntStream.range(0, followedArtists.size())
-                .filter(i -> id.equalsIgnoreCase(followedArtists.get(i).getID()))
-                .findFirst();
+        OptionalInt indexOfExistingID = IntStream.range(0, followedArtists.size()).filter(i -> id.equalsIgnoreCase(followedArtists.get(i).getID())).findFirst();
         if (indexOfExistingID.isPresent()) {
             Utilities.showMessageDialog(followedArtists.get(indexOfExistingID.getAsInt()).getName() + " is already followed.", "Already followed!", JOptionPane.ERROR_MESSAGE);
             System.out.println(followedArtists.get(indexOfExistingID.getAsInt()).getName() + " is already followed.");
@@ -83,9 +82,7 @@ public class TheEngine {
         FileData fileData = TempData.getInstance().getFileData();
         List<FollowedArtist> followedArtists = fileData.getFollowedArtists();
 
-        OptionalInt indexOfExistingID = IntStream.range(0, followedArtists.size())
-                .filter(i -> id.equalsIgnoreCase(followedArtists.get(i).getID()))
-                .findFirst();
+        OptionalInt indexOfExistingID = IntStream.range(0, followedArtists.size()).filter(i -> id.equalsIgnoreCase(followedArtists.get(i).getID())).findFirst();
         if (indexOfExistingID.isEmpty()) {
             System.out.println(id + " is not followed.");
             Utilities.showMessageDialog(id + " is not followed.", "Something went wrong!", JOptionPane.ERROR_MESSAGE);
@@ -100,16 +97,7 @@ public class TheEngine {
             String message = "Removed: " + artistToBeRemoved.getName() + ".";
 
             String[] choices = {"OK", "Undo"};
-            int response = JOptionPane.showOptionDialog(
-                    null,
-                    message,
-                    "Done!",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.INFORMATION_MESSAGE,
-                    null,
-                    choices,
-                    "OK"
-            );
+            int response = JOptionPane.showOptionDialog(null, message, "Done!", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, "OK");
 
             if (response == 1) followArtistID(artistToBeRemoved.getID());
 
@@ -138,8 +126,7 @@ public class TheEngine {
             } while (paging.getNext() != null);
         } catch (CancellationException ignored) {
         } catch (Exception e) {
-            if (tried++ < 10) return getAlbums(artistID);
-            if (Utilities.tryAgainMSGBOX("getAlbums: Something went wrong!\n" + e.getMessage()))
+            if (tried++ < TRY_AGAIN || Utilities.tryAgainMSGBOX("getAlbums: Something went wrong!\n" + e.getMessage()))
                 return getAlbums(artistID);
             System.exit(-1006);
         }
@@ -165,71 +152,93 @@ public class TheEngine {
             } while (paging.getNext() != null);
 
         } catch (Exception e) {
-            if (Utilities.tryAgainMSGBOX("getTracks: Something went wrong!\n" + e.getMessage()))
+            if (tried++ < TRY_AGAIN || Utilities.tryAgainMSGBOX("getTracks: Something went wrong!\n" + e.getMessage()))
                 return getTracks(albumID);
             System.exit(-1016);
         }
+
+        tried = 0;
         return allTracks;
     }
 
     public synchronized Album getAlbum(String albumID) {
+        Album album;
         try {
-            return spotifyAPI.getAlbum(albumID).build().execute();
+            album = spotifyAPI.getAlbum(albumID).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            if (Utilities.tryAgainMSGBOX("getAlbum: Something went wrong!\n" + e.getMessage()))
+            if (tried++ < TRY_AGAIN || Utilities.tryAgainMSGBOX("getAlbum: Something went wrong!\n" + e.getMessage()))
                 return getAlbum(albumID);
             System.exit(-1007);
             return null;
         }
+
+        tried = 0;
+        return album;
     }
 
     public synchronized Artist getArtist(String albumID) {
+        Artist artist;
         try {
-            return spotifyAPI.getArtist(albumID).build().execute();
+            artist = spotifyAPI.getArtist(albumID).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            if (Utilities.tryAgainMSGBOX("getArtist: Something went wrong!\n" + e.getMessage()))
+            if (tried++ < TRY_AGAIN || Utilities.tryAgainMSGBOX("getArtist: Something went wrong!\n" + e.getMessage()))
                 return getArtist(albumID);
             System.exit(-1367);
             return null;
         }
+
+        tried = 0;
+        return artist;
     }
 
     public synchronized Artist[] getRelatedArtists(String id) {
+        Artist[] artists;
         try {
-            return spotifyAPI.getArtistsRelatedArtists(id).build().execute();
+            artists = spotifyAPI.getArtistsRelatedArtists(id).build().execute();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            if (Utilities.tryAgainMSGBOX("getSimilarArtists: Something went wrong!\n" + e.getMessage()))
+            if (tried++ < TRY_AGAIN || Utilities.tryAgainMSGBOX("getSimilarArtists: Something went wrong!\n" + e.getMessage()))
                 return getRelatedArtists(id);
             System.exit(-17327);
             return null;
         }
+
+        tried = 0;
+        return artists;
     }
 
     public synchronized List<Artist> searchArtist(String name) {
-
-        List<Artist> artists = new ArrayList<>();
+        List<Artist> artists;
         try {
-            artists.addAll(List.of(spotifyAPI.searchArtists(name).offset(0).limit(50).build().execute().getItems()));
+            artists = new ArrayList<>(List.of(spotifyAPI.searchArtists(name).offset(0).limit(50).build().execute().getItems()));
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            Utilities.showMessageDialog(e.getMessage(), "searchArtist ERROR", JOptionPane.ERROR_MESSAGE);
+            if (tried++ < TRY_AGAIN || Utilities.tryAgainMSGBOX("searchArtist: Something went wrong!\n" + e.getMessage()))
+                return searchArtist(name);
+            System.exit(-1367);
+            return null;
         }
 
+        tried = 0;
         return artists;
+    }
+
+    public synchronized AudioFeatures[] getAudioFeatures(List<String> idList) {
+        AudioFeatures[] features;
+        try {
+            features = spotifyAPI.getAudioFeaturesForSeveralTracks(String.join(",", idList)).build().execute();
+        } catch (IOException | SpotifyWebApiException | ParseException e) {
+            if (tried++ < TRY_AGAIN || Utilities.tryAgainMSGBOX("getAudioFeatures: Something went wrong!\n" + e.getMessage()))
+                return getAudioFeatures(idList);
+            System.exit(-17322);
+            return null;
+        }
+
+        tried = 0;
+        return features;
     }
 
     public synchronized boolean isFollowed(String id) {
         return TempData.getInstance().getFileData().getFollowedArtists().stream().anyMatch(p -> p.getID().equals(id));
     }
 
-    public synchronized AudioFeatures[] getAudioFeatures(List<String> idList) {
-        try {
-            return spotifyAPI.getAudioFeaturesForSeveralTracks(String.join(",", idList)).build().execute();
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            if (Utilities.tryAgainMSGBOX("getAudioFeatures: Something went wrong!\n" + e.getMessage()))
-                return getAudioFeatures(idList);
-            System.exit(-17322);
-            return null;
-        }
-    }
 
 }
