@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -231,6 +232,12 @@ public class ControllerAlbums {
                 } else {
                     setStyle("");
                 }
+
+                setOnMouseClicked(mouseClickedEvent -> {
+                    if (mouseClickedEvent.getButton().equals(MouseButton.PRIMARY) && mouseClickedEvent.getClickCount() == 2) {
+                        playSelected();
+                    }
+                });
             }
         });
 
