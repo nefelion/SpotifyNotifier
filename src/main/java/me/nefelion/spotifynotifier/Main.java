@@ -22,10 +22,11 @@ import java.util.Properties;
 public class Main {
     private final static HashMap<String, ISubCommand> subCommands = new HashMap<>();
     private static int buildNumber;
+    private static String version;
     private static FileLock lock = null;
 
     public static void main(String[] args) {
-        loadBuildVersion();
+        loadVersionNumber();
 
         try {
             FileManager.setPath(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent());
@@ -69,20 +70,27 @@ public class Main {
 
     }
 
-    private static void loadBuildVersion() {
-        Properties prop = new Properties();
-        FileReader fr;
+    private static void loadVersionNumber() {
+        final Properties properties = new Properties();
         try {
-            fr = new FileReader("buildNumber.properties");
-            prop.load(fr);
+            properties.load(Main.class.getClassLoader().getResourceAsStream("project.properties"));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        buildNumber = Integer.parseInt(prop.getProperty("buildNumber"));
+        version = properties.getProperty("version");
+        buildNumber = Integer.parseInt(properties.getProperty("buildVersion"));
     }
 
     public static int getBuildNumber() {
         return buildNumber;
+    }
+
+    public static String getVersion() {
+        return version;
+    }
+
+    public static String getFullVersion() {
+        return getVersion() + "." + getBuildNumber();
     }
 
     private static void loadSubcommands() {

@@ -23,6 +23,12 @@
         <url>http://127.0.0.1/dummy</url>
     </scm>
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -90,7 +96,6 @@
         </plugins>
         <finalName>${project.artifactId}</finalName>
     </build>
-
 
 
     <dependencies>

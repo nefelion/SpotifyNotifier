@@ -38,7 +38,7 @@ public class ControllerOutline {
     private void initialize() {
         GTabPane.getTabs().get(TAB.ALBUMS.ordinal()).setDisable(true);
         GTabPane.getTabs().get(TAB.SETTINGS.ordinal()).setDisable(true);
-        GLabelVersionNumber.setText("build " + Main.getBuildNumber());
+        GLabelVersionNumber.setText(Main.getFullVersion());
     }
 
     public void setFollowedVBOX(VBox vbox) {
