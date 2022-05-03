@@ -25,16 +25,12 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-import me.nefelion.spotifynotifier.FollowedArtist;
-import me.nefelion.spotifynotifier.ReleasedAlbum;
-import me.nefelion.spotifynotifier.ReleasesProcessor;
-import me.nefelion.spotifynotifier.TheEngine;
+import me.nefelion.spotifynotifier.*;
 import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.apps.util.UtilShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
-import se.michaelthelin.spotify.model_objects.specification.AudioFeatures;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
 import java.awt.*;
@@ -58,11 +54,12 @@ public class ControllerAlbums {
     private boolean oneArtist;
 
     @FXML
-    private VBox GMainVBOX;
+    private VBox GMainVBOX, GVboxInfo;
     @FXML
     private Accordion GAccordionAlbums, GAccordionTracklist;
     @FXML
-    private TitledPane GTitledPaneNewReleases, GTitledPaneAllReleases, GTitledPaneTracklist, GTitledPaneInfo;
+    private TitledPane GTitledPaneNewReleases, GTitledPaneAllReleases, GTitledPaneTracklist, GTitledPaneInfo,
+            GTitledPaneInfoArtists, GTitledPaneInfoFeaturing;
     @FXML
     private TableView<ReleasedAlbum> GTableNewReleases, GTableAllReleases;
     @FXML
@@ -82,6 +79,8 @@ public class ControllerAlbums {
     private CheckBox GCheckboxAlbums, GCheckboxSingles, GCheckboxFeaturing;
     @FXML
     private ProgressBar GProgressBar;
+    @FXML
+    private Label GLabelInfoLength, GLabelInfoArtists, GLabelInfoFeaturing;
 
     public void setControllerOutline(ControllerOutline controllerOutline) {
         this.controllerOutline = controllerOutline;
@@ -371,6 +370,22 @@ public class ControllerAlbums {
         if (info == null) return;
         GCoverImageView.setImage(info.cover());
         GListTracklist.setItems(FXCollections.observableArrayList(info.trackList()));
+        updateInfoTab(info);
+        GTitledPaneInfo.setDisable(false);
+    }
+
+    private void updateInfoTab(TempAlbumInfo info) {
+//GLabelInfoLength, GLabelInfoArtists, GLabelInfoFeaturing;
+        List<ArtistSimplified> artists = List.of(info.album().getArtists());
+        GTitledPaneInfoArtists.setText(artists.size() > 1 ? "Artists" : "Artist");
+        List<ArtistSimplified> performers = getPerformers(info.album(), info.trackList());
+        String length = Utilities.convertMsToDuration(info.trackList().stream().mapToInt(TrackSimplified::getDurationMs).sum());
+        int tracks = info.trackList().size();
+
+        GLabelInfoLength.setText(length + " (" + tracks + " " + (tracks > 1 ? "tracks" : "track") + ")");
+        GLabelInfoArtists.setText(artists.stream().map(ArtistSimplified::getName).collect(Collectors.joining(", ")));
+        GLabelInfoFeaturing.setText(performers.stream().map(ArtistSimplified::getName).collect(Collectors.joining(", ")));
+
     }
 
     private synchronized void downloadInfoForAlbum(ReleasedAlbum releasedAlbum) {
@@ -655,6 +670,15 @@ public class ControllerAlbums {
 
     public VBox getGMainVBOX() {
         return GMainVBOX;
+    }
+
+    private List<ArtistSimplified> getPerformers(Album album, List<TrackSimplified> tracklist) {
+        HashSet<String> artistSet = Arrays.stream(album.getArtists()).map(ArtistSimplified::getId).collect(Collectors.toCollection(HashSet::new));
+
+        List<ArtistSimplified> performers = getArtistsAndPerformers(tracklist);
+        performers.removeIf(p -> artistSet.contains(p.getId()));
+
+        return performers;
     }
 
     private List<ArtistSimplified> getArtistsAndPerformers(List<TrackSimplified> tracklist) {

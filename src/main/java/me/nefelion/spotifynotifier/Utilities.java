@@ -75,7 +75,7 @@ public class Utilities {
         // w sec zostały tylko minuty i sekundy
 
         int min = sec / 60;
-        str += hours > 0 && min > 9 ? "0" + min + ":" : min + ":";
+        str += (hours > 0 && min < 10) ? "0" + min + ":" :  min + ":";
         sec %= 60; // w sec zostały tylko sekundy
 
         str += sec > 9 ? sec : "0" + sec;
