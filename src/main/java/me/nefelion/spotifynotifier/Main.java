@@ -9,6 +9,7 @@ import se.michaelthelin.spotify.SpotifyApi;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
@@ -16,13 +17,15 @@ import java.nio.channels.FileLock;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Properties;
 
 public class Main {
-
     private final static HashMap<String, ISubCommand> subCommands = new HashMap<>();
+    private static int buildNumber;
     private static FileLock lock = null;
 
     public static void main(String[] args) {
+        loadBuildVersion();
 
         try {
             FileManager.setPath(new File(Main.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent());
@@ -64,6 +67,22 @@ public class Main {
             subCommands.get(args[0].toLowerCase()).execute(Arrays.copyOfRange(args, 1, args.length));
         else Utilities.showMessageDialog("Wrong arg '" + args[0] + "'", "Error!", JOptionPane.ERROR_MESSAGE);
 
+    }
+
+    private static void loadBuildVersion() {
+        Properties prop = new Properties();
+        FileReader fr;
+        try {
+            fr = new FileReader("buildNumber.properties");
+            prop.load(fr);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        buildNumber = Integer.parseInt(prop.getProperty("buildNumber"));
+    }
+
+    public static int getBuildNumber() {
+        return buildNumber;
     }
 
     private static void loadSubcommands() {

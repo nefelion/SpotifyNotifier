@@ -1,9 +1,11 @@
 package me.nefelion.spotifynotifier.gui.controllers;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import me.nefelion.spotifynotifier.Main;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
 
 public class ControllerOutline {
@@ -14,7 +16,11 @@ public class ControllerOutline {
     private TabPane GTabPane;
     @FXML
     private AnchorPane GFollowedAnchorPane, GAlbumAnchorPane, GSettingsAnchorPane;
+    @FXML
+    private Label GLabelVersionNumber;
+
     private ControllerAlbums controllerAlbums;
+
 
     public ControllerOutline() {
         instance = this;
@@ -32,6 +38,7 @@ public class ControllerOutline {
     private void initialize() {
         GTabPane.getTabs().get(TAB.ALBUMS.ordinal()).setDisable(true);
         GTabPane.getTabs().get(TAB.SETTINGS.ordinal()).setDisable(true);
+        GLabelVersionNumber.setText("build " + Main.getBuildNumber());
     }
 
     public void setFollowedVBOX(VBox vbox) {
