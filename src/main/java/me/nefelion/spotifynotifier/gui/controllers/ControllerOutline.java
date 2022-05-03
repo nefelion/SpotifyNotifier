@@ -55,7 +55,7 @@ public class ControllerOutline {
 
         GButtonDownloadUpdate.setOnAction(e -> {
             Runtime rt = Runtime.getRuntime();
-            String url = "http://dl.dropbox.com/s/t2yndvh2xqo074d/SpotifyNotifier.jar";
+            String url = "https://dl.dropbox.com/s/t2yndvh2xqo074d/SpotifyNotifier.jar";
             try {
                 rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
             } catch (IOException ex) {
