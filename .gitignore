@@ -9,3 +9,4 @@
 *.class
 .idea
 target
+/buildNumber.properties
