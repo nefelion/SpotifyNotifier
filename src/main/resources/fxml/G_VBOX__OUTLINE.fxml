@@ -62,7 +62,7 @@
                       </Tab>
                   </tabs>
               </TabPane>
-            <Label fx:id="GLabelVersionNumber" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="135.0" layoutY="6.0" prefHeight="17.0" prefWidth="500.0" text="version-number" textAlignment="RIGHT" textFill="#8d8d8d" />
+            <Label fx:id="GLabelVersionNumber" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="335.0" layoutY="6.0" prefHeight="17.0" prefWidth="300.0" text="version-number" textAlignment="RIGHT" textFill="#8d8d8d" />
          </children>
       </Group>
     </children>
