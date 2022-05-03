@@ -1,12 +1,21 @@
 package me.nefelion.spotifynotifier.gui.controllers;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import me.nefelion.spotifynotifier.Main;
+import me.nefelion.spotifynotifier.ReleasedAlbum;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Scanner;
 
 public class ControllerOutline {
 
@@ -18,8 +27,12 @@ public class ControllerOutline {
     private AnchorPane GFollowedAnchorPane, GAlbumAnchorPane, GSettingsAnchorPane;
     @FXML
     private Label GLabelVersionNumber;
+    @FXML
+    private Button GButtonDownloadUpdate;
 
     private ControllerAlbums controllerAlbums;
+
+
 
 
     public ControllerOutline() {
@@ -39,6 +52,29 @@ public class ControllerOutline {
         GTabPane.getTabs().get(TAB.ALBUMS.ordinal()).setDisable(true);
         GTabPane.getTabs().get(TAB.SETTINGS.ordinal()).setDisable(true);
         GLabelVersionNumber.setText(Main.getFullVersion());
+
+        GButtonDownloadUpdate.setOnAction(e -> {
+            Runtime rt = Runtime.getRuntime();
+            String url = "http://dl.dropbox.com/s/t2yndvh2xqo074d/SpotifyNotifier.jar";
+            try {
+                rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        checkForUpdates();
+    }
+
+    private void checkForUpdates() {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                if (isUpdateAvailable()) Platform.runLater(ControllerOutline.this::setLabelForUpdate);
+                return null;
+            }
+        };
+        new Thread(task).start();
     }
 
     public void setFollowedVBOX(VBox vbox) {
@@ -67,6 +103,26 @@ public class ControllerOutline {
 
     public void showAlbums(ReleasesProcessor processor) {
         controllerAlbums.showReleases(processor);
+    }
+
+
+    private boolean isUpdateAvailable() {
+        URL url;
+        try {
+            url = new URL("https://dl.dropbox.com/s/4duqne8r4mvwadn/spotifynotifier.ver");
+            Scanner s = new Scanner(url.openStream());
+            int onlineBuildNumber = Integer.parseInt(s.nextLine());
+            if (onlineBuildNumber > Main.getBuildNumber()) return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private void setLabelForUpdate() {
+        GLabelVersionNumber.setVisible(false);
+        GButtonDownloadUpdate.setVisible(true);
     }
 
 

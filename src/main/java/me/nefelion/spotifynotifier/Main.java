@@ -9,7 +9,6 @@ import se.michaelthelin.spotify.SpotifyApi;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
@@ -78,7 +77,7 @@ public class Main {
             e.printStackTrace();
         }
         version = properties.getProperty("version");
-        buildNumber = Integer.parseInt(properties.getProperty("buildVersion"));
+        buildNumber = Integer.parseInt(properties.getProperty("buildNumber"));
     }
 
     public static int getBuildNumber() {
