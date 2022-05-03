@@ -109,7 +109,7 @@ public class ControllerAlbums {
         initializeGButtonBack();
         initializeGButtonRandom();
 
-        GTitledPaneInfo.setDisable(true);
+        initializeInfoTitledPanes();
     }
 
     @FXML
@@ -269,6 +269,12 @@ public class ControllerAlbums {
         GAllReleases_Release.setCellValueFactory(new PropertyValueFactory<>("albumName"));
     }
 
+    private void initializeInfoTitledPanes() {
+        GTitledPaneInfo.setDisable(true);
+        GTitledPaneInfoArtists.managedProperty().bind(GTitledPaneInfoArtists.visibleProperty());
+        GTitledPaneInfoFeaturing.managedProperty().bind(GTitledPaneInfoFeaturing.visibleProperty());
+    }
+
 
     public void setNewAlbums(List<ReleasedAlbum> newAlbums) {
         if (newAlbums == null) return;
@@ -381,6 +387,8 @@ public class ControllerAlbums {
         List<ArtistSimplified> performers = getPerformers(info.album(), info.trackList());
         String length = Utilities.convertMsToDuration(info.trackList().stream().mapToInt(TrackSimplified::getDurationMs).sum());
         int tracks = info.trackList().size();
+
+        GTitledPaneInfoFeaturing.setVisible(!performers.isEmpty());
 
         GLabelInfoLength.setText(length + " (" + tracks + " " + (tracks > 1 ? "tracks" : "track") + ")");
         GLabelInfoArtists.setText(artists.stream().map(ArtistSimplified::getName).collect(Collectors.joining(", ")));
