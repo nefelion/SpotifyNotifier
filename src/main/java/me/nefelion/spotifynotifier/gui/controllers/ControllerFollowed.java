@@ -290,6 +290,7 @@ public class ControllerFollowed {
         GListSpotify.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getClickCount() == 2) {
                 Artist artist = GListSpotify.getSelectionModel().getSelectedItem();
+                if (artist == null) return;
                 followArtist(artist);
             }
         });

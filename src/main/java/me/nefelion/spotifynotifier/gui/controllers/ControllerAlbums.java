@@ -375,7 +375,7 @@ public class ControllerAlbums {
     }
 
     private void updateInfoTab(TempAlbumInfo info) {
-//GLabelInfoLength, GLabelInfoArtists, GLabelInfoFeaturing;
+
         List<ArtistSimplified> artists = List.of(info.album().getArtists());
         GTitledPaneInfoArtists.setText(artists.size() > 1 ? "Artists" : "Artist");
         List<ArtistSimplified> performers = getPerformers(info.album(), info.trackList());
