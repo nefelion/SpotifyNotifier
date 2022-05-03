@@ -37,6 +37,7 @@ public class ControllerFollowed {
     private String lastSearch = "";
     private double maxGListSpotifyPopularity = Double.MAX_VALUE;
     private Task<Boolean> task;
+    private Timer elapsed;
 
     @FXML
     private VBox GMainVBOX, GVboxInfo;
@@ -48,7 +49,7 @@ public class ControllerFollowed {
     private TextField GTextFieldSearchFollowed, GTextFieldSearchSpotify;
     @FXML
     private Label GLabelCurrentArtist, GLabelProcessedArtists, GLabelLoadedReleases, GLabelNewReleases, GLabelPercentage,
-            GLabelLastChecked;
+            GLabelLastChecked, GLabelTimeElapsed;
     @FXML
     private ProgressBar GProgressBar;
     @FXML
@@ -75,10 +76,10 @@ public class ControllerFollowed {
         initializeGListSearchSpotifyArtists();
         initializeGVboxInfo();
         initializeGLabelLastChecked();
-        startTimer();
+        startRefreshingTimer();
     }
 
-    private void startTimer() {
+    private void startRefreshingTimer() {
         ActionListener taskPerformer = evt -> Platform.runLater(this::refreshGLabelLastChecked);
         new Timer(1000, taskPerformer).start();
     }
@@ -98,6 +99,13 @@ public class ControllerFollowed {
         resetInfoBoard();
         GButtonCheckReleases.setDisable(true);
         GVboxInfo.setVisible(true);
+
+        final long startMs = System.currentTimeMillis();
+        ActionListener taskPerformer = evt -> Platform.runLater(() ->
+                GLabelTimeElapsed.setText(Utilities.convertMsToDuration((int) (System.currentTimeMillis() - startMs)) + "")
+        );
+        elapsed = new Timer(1000, taskPerformer);
+        elapsed.start();
 
         ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
         processor.setProgressConsumer((var) -> {
@@ -365,6 +373,8 @@ public class ControllerFollowed {
         GLabelProcessedArtists.setText("0");
         GLabelLoadedReleases.setText("0");
         GLabelNewReleases.setText("0");
+        if (elapsed != null) elapsed.stop();
+        GLabelTimeElapsed.setText("0:00");
     }
 
     private void showReleases(ReleasesProcessor processor) {
