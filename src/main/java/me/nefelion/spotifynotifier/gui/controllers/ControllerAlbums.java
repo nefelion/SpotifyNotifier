@@ -17,6 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -238,6 +239,10 @@ public class ControllerAlbums {
                     }
                 });
             }
+        });
+
+        GListTracklist.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            if (e.isSecondaryButtonDown()) e.consume();
         });
 
         GListTracklist.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
