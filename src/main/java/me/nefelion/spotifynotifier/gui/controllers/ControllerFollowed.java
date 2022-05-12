@@ -2,6 +2,7 @@ package me.nefelion.spotifynotifier.gui.controllers;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -76,6 +77,9 @@ public class ControllerFollowed {
         initializeGListSearchSpotifyArtists();
         initializeGVboxInfo();
         initializeGLabelLastChecked();
+        initializeGTextFieldSearchFollowed();
+        initializeGTextFieldSearchSpotify();
+
         startRefreshingTimer();
     }
 
@@ -296,6 +300,30 @@ public class ControllerFollowed {
         });
     }
 
+    private void initializeGTextFieldSearchSpotify() {
+        GTextFieldSearchSpotify.focusedProperty().addListener(getFocusChangeListener(GTextFieldSearchSpotify));
+        GTextFieldSearchSpotify.setOnKeyTyped(e -> {
+            if (GTextFieldSearchSpotify.getText().trim().isEmpty()) {
+                placeholderLabelGListSpotify.setText("");
+                GListSpotify.setItems(null);
+            }
+        });
+    }
+
+    private void initializeGTextFieldSearchFollowed() {
+        GTextFieldSearchFollowed.focusedProperty().addListener(getFocusChangeListener(GTextFieldSearchFollowed));
+    }
+
+    private void initializeGVboxInfo() {
+        GVboxInfo.setVisible(false);
+        resetInfoBoard();
+    }
+
+    private void initializeGLabelLastChecked() {
+        refreshGLabelLastChecked();
+    }
+
+
     private void followArtist(Artist artist) {
         Task<Boolean> task = new Task<>() {
             @Override
@@ -310,16 +338,6 @@ public class ControllerFollowed {
             GMainVBOX.setCursor(Cursor.DEFAULT);
         });
         new Thread(task).start();
-    }
-
-
-    private void initializeGVboxInfo() {
-        GVboxInfo.setVisible(false);
-        resetInfoBoard();
-    }
-
-    private void initializeGLabelLastChecked() {
-        refreshGLabelLastChecked();
     }
 
     private void refreshGLabelLastChecked() {
@@ -404,5 +422,12 @@ public class ControllerFollowed {
         new Thread(task).start();
     }
 
+    private ChangeListener<Boolean> getFocusChangeListener(TextField GTextField) {
+        return (arg0, oldPropertyValue, newPropertyValue) -> {
+            if (newPropertyValue) {
+                Platform.runLater(GTextField::selectAll);
+            }
+        };
+    }
 
 }
