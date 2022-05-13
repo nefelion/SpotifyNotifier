@@ -1,5 +1,10 @@
 package me.nefelion.spotifynotifier;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.stage.Window;
+
 import javax.swing.*;
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -8,6 +13,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 import java.util.function.Predicate;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -75,7 +82,7 @@ public class Utilities {
         // w sec zostały tylko minuty i sekundy
 
         int min = sec / 60;
-        str += (hours > 0 && min < 10) ? "0" + min + ":" :  min + ":";
+        str += (hours > 0 && min < 10) ? "0" + min + ":" : min + ":";
         sec %= 60; // w sec zostały tylko sekundy
 
         str += sec > 9 ? sec : "0" + sec;
@@ -101,17 +108,32 @@ public class Utilities {
     }
 
     public static boolean tryAgainMSGBOX(String errMsg) {
-        String[] choices = {"Try again", "Exit"};
-        return JOptionPane.showOptionDialog(
-                null,
-                errMsg,
-                errMsg,
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.ERROR_MESSAGE,
-                null,
-                choices,
-                "Try again"
-        ) == 0;
+        final FutureTask<Boolean> query = new FutureTask<>(() -> showTryAgainMSGBOX(errMsg));
+        Platform.runLater(query);
+        try {
+            query.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            System.exit(-929);
+        }
+
+        return true;
+    }
+
+    private static boolean showTryAgainMSGBOX(String errMsg) {
+        ButtonType try_again = new ButtonType("Try again");
+        ButtonType exit = new ButtonType("Exit");
+
+        Alert alert = new Alert(Alert.AlertType.ERROR, errMsg, try_again, exit);
+        Window window = alert.getDialogPane().getScene().getWindow();
+        window.setOnCloseRequest(event -> window.hide());
+
+        alert.setTitle("");
+        alert.setHeaderText(null);
+        alert.showAndWait();
+        if (alert.getResult() == exit) System.exit(-1000);
+
+        return true;
     }
 
     public static Predicate<String> haveWordsThatStartWith(final String startsWith) {
