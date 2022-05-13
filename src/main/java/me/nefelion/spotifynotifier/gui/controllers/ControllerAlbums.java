@@ -655,17 +655,19 @@ public class ControllerAlbums {
         list.setItems(FXCollections.observableArrayList(artists));
         list.setPrefHeight(artists.size() * 24 + 2);
 
-        Button button = new Button("Select all");
-        button.setOnAction(e -> {
-            showReleases(artists.toArray(new FollowedArtist[0]));
-            stage.close();
-        });
-        Platform.runLater(button::requestFocus);
-
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.getChildren().add(list);
-        vBox.getChildren().add(button);
+
+        if (artists.size() > 1) {
+            Button button = new Button("Select all");
+            button.setOnAction(e -> {
+                showReleases(artists.toArray(new FollowedArtist[0]));
+                stage.close();
+            });
+            Platform.runLater(button::requestFocus);
+            vBox.getChildren().add(button);
+        }
 
         Scene scene = new Scene(vBox);
         stage.setScene(scene);
