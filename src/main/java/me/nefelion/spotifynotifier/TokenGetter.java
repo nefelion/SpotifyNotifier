@@ -6,6 +6,7 @@ import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 
+import javax.swing.*;
 import java.io.IOException;
 
 public class TokenGetter {
@@ -34,8 +35,8 @@ public class TokenGetter {
             System.out.println("Expires in: " + clientCredentials.getExpiresIn());
             return spotifyApi.getAccessToken();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-            //System.exit(-1001);
+            Utilities.showMessageDialog(e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+            System.exit(-1001);
             return null;
         }
     }
