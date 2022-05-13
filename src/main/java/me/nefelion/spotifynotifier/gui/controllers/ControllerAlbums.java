@@ -7,6 +7,7 @@ import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -651,10 +652,22 @@ public class ControllerAlbums {
         });
         list.setMaxHeight(500);
 
-
         list.setItems(FXCollections.observableArrayList(artists));
         list.setPrefHeight(artists.size() * 24 + 2);
-        Scene scene = new Scene(list);
+
+        Button button = new Button("Select all");
+        button.setOnAction(e -> {
+            showReleases(artists.toArray(new FollowedArtist[0]));
+            stage.close();
+        });
+        Platform.runLater(button::requestFocus);
+
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        vBox.getChildren().add(list);
+        vBox.getChildren().add(button);
+
+        Scene scene = new Scene(vBox);
         stage.setScene(scene);
         stage.showAndWait();
     }
@@ -663,9 +676,9 @@ public class ControllerAlbums {
         showReleases(new FollowedArtist(artistSimplified.getName(), artistSimplified.getId()));
     }
 
-    private void showReleases(FollowedArtist artist) {
+    private void showReleases(FollowedArtist... artists) {
         stopCurrent();
-        ReleasesProcessor processor = new ReleasesProcessor(artist);
+        ReleasesProcessor processor = new ReleasesProcessor(artists);
         disableAllElements(true);
         showProgressBar(true);
 
