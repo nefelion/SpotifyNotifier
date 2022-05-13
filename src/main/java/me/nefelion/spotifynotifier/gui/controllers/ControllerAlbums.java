@@ -31,6 +31,7 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.apps.util.UtilShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import se.michaelthelin.spotify.model_objects.specification.Album;
+import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
@@ -435,7 +436,7 @@ public class ControllerAlbums {
             if (selected == null) return;
             if (selected.getPreviewUrl() == null) {
                 Platform.runLater(() -> {
-                    GTextCurrentPlaying.setText("Spotify blocks this track from being played.");
+                    GTextCurrentPlaying.setText("Spotify blocks this track from being played here.");
                     GTextCurrentPlaying.setVisible(true);
                     GMainVBOX.setCursor(Cursor.DEFAULT);
                 });
@@ -505,6 +506,7 @@ public class ControllerAlbums {
             final MenuItem showOnSpotifyMenuItem = new MenuItem("Show on Spotify");
             final MenuItem copySpotifyLinkMenuItem = new MenuItem("Copy Spotify link");
             final MenuItem showReleasesMenuItem = new MenuItem("Show releases by...");
+            final MenuItem showSimilarMenuItem = new MenuItem("Show similar artists");
             final MenuItem followUnfollowMenuItem = new MenuItem();
             showOnSpotifyMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
@@ -529,11 +531,13 @@ public class ControllerAlbums {
                 ReleasedAlbum album = row.getItem();
                 showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
             });
+            showSimilarMenuItem.setOnAction(event -> requestSimilarArtistsView(row.getItem().getArtistId(), row.getItem().getFollowedArtistName()));
 
             showReleasesMenuItem.setDisable(true);
             contextMenu.getItems().add(showOnSpotifyMenuItem);
             contextMenu.getItems().add(copySpotifyLinkMenuItem);
             contextMenu.getItems().add(showReleasesMenuItem);
+            contextMenu.getItems().add(showSimilarMenuItem);
             contextMenu.getItems().add(followUnfollowMenuItem);
             contextMenu.getItems().forEach(p -> p.setVisible(false));
 
@@ -568,7 +572,7 @@ public class ControllerAlbums {
 
         showReleasesMenuItem.setDisable(false);
         contextMenu.getItems().forEach(p -> p.setVisible(true));
-        showReleasesMenuItem.setOnAction((ev) -> showPickArtistDialog(album));
+        showReleasesMenuItem.setOnAction((ev) -> requestPerformersView(album));
 
         boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
         followUnfollowMenuItem.setDisable(false);
@@ -579,7 +583,28 @@ public class ControllerAlbums {
         });
     }
 
-    private void showPickArtistDialog(ReleasedAlbum album) {
+    private void requestSimilarArtistsView(String id, String name) {
+        List<FollowedArtist> similarArtists = new ArrayList<>();
+        Task<Void> task = new Task<>() {
+            @Override
+            public Void call() {
+                List<Artist> artists = List.of(TheEngine.getInstance().getRelatedArtists(id));
+                similarArtists.addAll(artists.stream().map(p -> new FollowedArtist(p.getName(), p.getId())).toList());
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> Platform.runLater(() -> showSimilarArtists(name, similarArtists)));
+
+        new Thread(task).start();
+    }
+
+    private void showSimilarArtists(String name, List<FollowedArtist> similarArtists) {
+        similarArtists.removeIf(p -> TheEngine.getInstance().isFollowed(p.getID()));
+        String title = "Artists similar to " + name;
+        showModalWindowWithArtistsToPick(similarArtists, title);
+    }
+
+    private void requestPerformersView(ReleasedAlbum album) {
         Task<Boolean> task = new Task<>() {
             @Override
             public Boolean call() {
@@ -589,33 +614,28 @@ public class ControllerAlbums {
         };
 
         task.setOnSucceeded(e -> {
-            List<ArtistSimplified> artistsAndPerformers = getArtistsAndPerformers(infoHashMap.get(album.getId()).trackList());
-            artistsAndPerformers.removeIf(p -> oneArtist && p.getId().equals(allAlbums.get(0).getArtistId()));
-
-            Stage stage = new Stage(StageStyle.UTILITY);
-            stage.setTitle("Pick an artist");
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setResizable(false);
-            ListView<ArtistSimplified> list = initializeListOfArtistsToPick(stage);
-            list.setItems(FXCollections.observableArrayList(artistsAndPerformers));
-            list.setPrefHeight(artistsAndPerformers.size() * 24 + 2);
-            Scene scene = new Scene(list);
-            stage.setScene(scene);
-            stage.showAndWait();
+            List<FollowedArtist> artistsAndPerformers = getArtistsAndPerformers(infoHashMap.get(album.getId()).trackList())
+                    .stream().map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList());
+            artistsAndPerformers.removeIf(p -> oneArtist && p.getID().equals(allAlbums.get(0).getArtistId()));
+            showModalWindowWithArtistsToPick(artistsAndPerformers, "Pick an artist");
         });
         new Thread(task).start();
 
 
     }
 
-    private ListView<ArtistSimplified> initializeListOfArtistsToPick(Stage stage) {
-        ListView<ArtistSimplified> list = new ListView<>();
+    private void showModalWindowWithArtistsToPick(List<FollowedArtist> artists, String title) {
+        Stage stage = new Stage(StageStyle.UTILITY);
+        stage.setTitle(title);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
 
+
+        ListView<FollowedArtist> list = new ListView<>();
         list.setPlaceholder(new Label("Nothing to be found here"));
-
         list.setCellFactory((param) -> new ListCell<>() {
             @Override
-            protected void updateItem(ArtistSimplified item, boolean empty) {
+            protected void updateItem(FollowedArtist item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item == null || empty) {
                     setText(null);
@@ -624,14 +644,19 @@ public class ControllerAlbums {
                 setText(item.getName());
             }
         });
-
         list.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection == null) return;
             showReleases(newSelection);
             stage.close();
         });
         list.setMaxHeight(500);
-        return list;
+
+
+        list.setItems(FXCollections.observableArrayList(artists));
+        list.setPrefHeight(artists.size() * 24 + 2);
+        Scene scene = new Scene(list);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 
     private void showReleases(ArtistSimplified artistSimplified) {
