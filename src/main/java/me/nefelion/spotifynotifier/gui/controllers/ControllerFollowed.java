@@ -84,7 +84,10 @@ public class ControllerFollowed {
     }
 
     private void startRefreshingTimer() {
-        ActionListener taskPerformer = evt -> Platform.runLater(this::refreshGLabelLastChecked);
+        ActionListener taskPerformer = evt -> Platform.runLater(() -> {
+            refreshGLabelLastChecked();
+            refreshGListFollowedArtists();
+        });
         new Timer(1000, taskPerformer).start();
     }
 
