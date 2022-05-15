@@ -1,5 +1,6 @@
 package me.nefelion.spotifynotifier;
 
+import javafx.application.Platform;
 import me.nefelion.spotifynotifier.data.FileData;
 import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
@@ -61,8 +62,13 @@ public class TheEngine {
             followedArtists.add(newArtist);
             FileManager.saveFileData(fileData);
             FileManager.saveAlbumHashSet(hashSet);
-            System.out.println("Added: " + artist.getName() + " / " + artist.getId());
-            Utilities.showMessageDialog("Added: " + artist.getName(), "Done!", JOptionPane.INFORMATION_MESSAGE);
+            String message = "Added: " + artist.getName();
+            System.out.println(message);
+
+            Platform.runLater(() -> {
+                if (Utilities.okUndoMSGBOX(message)) unfollowArtistID(artist.getId());
+            });
+
         } catch (SpotifyWebApiException e) {
             System.out.println("followArtistID: Something went wrong!\n" + e.getMessage());
             Utilities.showMessageDialog(e.getMessage(), "Something went wrong!", JOptionPane.ERROR_MESSAGE);
@@ -92,14 +98,12 @@ public class TheEngine {
 
         if (followedArtists.remove(artistToBeRemoved)) {
             FileManager.saveFileData(fileData);
-            System.out.println("Removed: " + artistToBeRemoved.getName() + ".");
-
             String message = "Removed: " + artistToBeRemoved.getName() + ".";
+            System.out.println(message);
 
-            String[] choices = {"OK", "Undo"};
-            int response = JOptionPane.showOptionDialog(null, message, "Done!", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, choices, "OK");
-
-            if (response == 1) followArtistID(artistToBeRemoved.getID());
+            Platform.runLater(() -> {
+                if (Utilities.okUndoMSGBOX(message)) followArtistID(artistToBeRemoved.getID());
+            });
 
         } else {
             System.err.println("Error while removing " + artistToBeRemoved.getID());

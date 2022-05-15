@@ -136,6 +136,20 @@ public class Utilities {
         return true;
     }
 
+    public static boolean okUndoMSGBOX(String errMsg) {
+        ButtonType ok = new ButtonType("Ok");
+        ButtonType undo = new ButtonType("Undo");
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, errMsg, ok, undo);
+        Window window = alert.getDialogPane().getScene().getWindow();
+        window.setOnCloseRequest(event -> window.hide());
+
+        alert.setTitle("");
+        alert.setHeaderText(null);
+        alert.showAndWait();
+        return alert.getResult() == undo;
+    }
+
     public static Predicate<String> haveWordsThatStartWith(final String startsWith) {
         return s -> Arrays.stream(s.split(" ")).anyMatch(p -> p.toLowerCase().startsWith(startsWith.toLowerCase()));
     }
