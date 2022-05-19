@@ -590,7 +590,10 @@ public class ControllerAlbums {
             @Override
             public Void call() {
                 List<Artist> artists = List.of(TheEngine.getInstance().getRelatedArtists(id));
-                similarArtists.addAll(artists.stream().map(p -> new FollowedArtist(p.getName(), p.getId())).toList());
+                similarArtists.addAll(artists.stream()
+                        .map(p -> new FollowedArtist(p.getName(), p.getId()))
+                        .sorted(Comparator.comparing(FollowedArtist::getName))
+                        .toList());
                 return null;
             }
         };
