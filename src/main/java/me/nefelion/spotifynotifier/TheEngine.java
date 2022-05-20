@@ -12,10 +12,7 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.OptionalInt;
+import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.stream.IntStream;
 
@@ -244,5 +241,22 @@ public class TheEngine {
         return TempData.getInstance().getFileData().getFollowedArtists().stream().anyMatch(p -> p.getID().equals(id));
     }
 
+    public List<FollowedArtist> getRelatedArtists(List<FollowedArtist> artists) {
+        HashSet<String> uniqueArtistsID = new HashSet<>();
+        ArrayList<FollowedArtist> relatedArtists = new ArrayList<>();
+
+        for (FollowedArtist followedArtist : artists) {
+            for (Artist artist : getRelatedArtists(followedArtist.getID())) {
+                String id = artist.getId();
+                if (isFollowed(id)) continue;
+                if (!uniqueArtistsID.add(id)) continue;
+                relatedArtists.add(new FollowedArtist(artist.getName(), id));
+            }
+        }
+
+
+        relatedArtists.sort(Comparator.comparing(FollowedArtist::getName));
+        return relatedArtists;
+    }
 
 }

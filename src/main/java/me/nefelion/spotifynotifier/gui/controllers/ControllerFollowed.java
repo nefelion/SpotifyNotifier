@@ -114,7 +114,7 @@ public class ControllerFollowed {
         elapsed = new Timer(1000, taskPerformer);
         elapsed.start();
 
-        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
+        ReleasesProcessor processor = new ReleasesProcessor(TheEngine.getInstance().getRelatedArtists(TempData.getInstance().getFileData().getFollowedArtists()));
         processor.setProgressConsumer((var) -> {
                     GLabelPercentage.setText((int) (var * 100) + "%");
                     GProgressBar.setProgress(var);
