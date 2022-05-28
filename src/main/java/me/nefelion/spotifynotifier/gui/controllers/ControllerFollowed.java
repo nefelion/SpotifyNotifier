@@ -50,7 +50,7 @@ public class ControllerFollowed {
     private TextField GTextFieldSearchFollowed, GTextFieldSearchSpotify;
     @FXML
     private Label GLabelCurrentArtist, GLabelProcessedArtists, GLabelLoadedReleases, GLabelNewReleases, GLabelPercentage,
-            GLabelLastChecked, GLabelTimeElapsed;
+            GLabelLastChecked, GLabelTimeElapsed, GLabelNumberOfArtists;
     @FXML
     private ProgressBar GProgressBar;
     @FXML
@@ -77,6 +77,7 @@ public class ControllerFollowed {
         initializeGListSearchSpotifyArtists();
         initializeGVboxInfo();
         initializeGLabelLastChecked();
+        refreshGLabelNumberOfArtists();
         initializeGTextFieldSearchFollowed();
         initializeGTextFieldSearchSpotify();
 
@@ -347,6 +348,10 @@ public class ControllerFollowed {
         GLabelLastChecked.setText("Last checked: " + Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked()));
     }
 
+    private void refreshGLabelNumberOfArtists() {
+        int size = GListFollowed.getItems().size();
+        GLabelNumberOfArtists.setText("" + (size > 0 ? size : ""));
+    }
 
     private void searchSpotify() {
         String search = GTextFieldSearchSpotify.getText().trim();
@@ -377,6 +382,8 @@ public class ControllerFollowed {
         placeholderLabelGListFollowed.setText(followedArtists.isEmpty()
                 ? "You do not follow any artists yet"
                 : "Nothing matches a search for '" + search + "'");
+
+        refreshGLabelNumberOfArtists();
     }
 
     private void updateGListSearchSpotifyArtistsWith(List<Artist> list) {
