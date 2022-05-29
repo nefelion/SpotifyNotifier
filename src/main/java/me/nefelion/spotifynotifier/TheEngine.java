@@ -113,7 +113,7 @@ public class TheEngine {
     }
 
 
-    public synchronized List<AlbumSimplified> getAlbums(String artistID) {
+    public synchronized List<AlbumSimplified> getAlbums(String artistID) throws CancellationException {
 
         List<AlbumSimplified> allAlbums = new ArrayList<>();
 
@@ -128,7 +128,8 @@ public class TheEngine {
                 allAlbums.addAll(List.of(paging.getItems()));
                 offset += n;
             } while (paging.getNext() != null);
-        } catch (CancellationException ignored) {
+        } catch (CancellationException e) {
+            throw e;
         } catch (Exception e) {
             if (tried++ < TRY_AGAIN || Utilities.tryAgainMSGBOX("getAlbums: Something went wrong!\n" + e.getMessage()))
                 return getAlbums(artistID);
