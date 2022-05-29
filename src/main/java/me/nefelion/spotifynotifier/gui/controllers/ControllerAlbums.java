@@ -23,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -388,14 +389,29 @@ public class ControllerAlbums {
     }
 
     private void updateInfoTab(TempAlbumInfo info) {
+        Comparator<ArtistSimplified> comparator = (o1, o2) -> {
+            TheEngine instance = TheEngine.getInstance();
+            return (instance.isFollowed(o2.getId()) ? 1 : 0) - (instance.isFollowed(o1.getId()) ? 1 : 0);
+        };
+        comparator.thenComparing(ArtistSimplified::getName);
 
-        List<ArtistSimplified> artists = List.of(info.album().getArtists());
-        GTitledPaneInfoArtists.setText(artists.size() > 1 ? "Artists" : "Artist");
+        List<ArtistSimplified> artists = new ArrayList<>(List.of(info.album().getArtists()));
         List<ArtistSimplified> performers = getPerformers(info.album(), info.trackList());
+
+        artists.sort(comparator);
+        performers.sort(comparator);
+
+        TextFlow flowArtists = getInfoTextFlow(artists);
+        TextFlow flowPerformers = getInfoTextFlow(performers);
+
+
         String length = Utilities.convertMsToDuration(info.trackList().stream().mapToInt(TrackSimplified::getDurationMs).sum());
         int tracks = info.trackList().size();
 
+        GTitledPaneInfoArtists.setText(artists.size() > 1 ? "Artists" : "Artist");
+        GTitledPaneInfoArtists.setContent(flowArtists);
         GTitledPaneInfoFeaturing.setVisible(!performers.isEmpty());
+        GTitledPaneInfoFeaturing.setContent(flowPerformers);
 
         GLabelInfoLength.setText(length + " (" + tracks + " " + (tracks > 1 ? "tracks" : "track") + ")");
         GLabelInfoArtists.setText(artists.stream().map(ArtistSimplified::getName).collect(Collectors.joining(", ")));
@@ -747,4 +763,21 @@ public class ControllerAlbums {
 
         return artistsAndPerformers.stream().sorted(Comparator.comparing(ArtistSimplified::getName)).collect(Collectors.toList());
     }
+
+    private TextFlow getInfoTextFlow(List<ArtistSimplified> artists) {
+        TextFlow flow = new TextFlow();
+        flow.setMaxWidth(270);
+        if (artists.isEmpty()) return flow;
+
+        TheEngine engine = TheEngine.getInstance();
+        for (ArtistSimplified a : artists) {
+            Text text = new Text(a.getName());
+            if (engine.isFollowed(a.getId())) text.setStyle("-fx-font-weight: bold");
+            flow.getChildren().addAll(text, new Text(", "));
+        }
+        flow.getChildren().remove(flow.getChildren().size() - 1);
+
+        return flow;
+    }
+
 }

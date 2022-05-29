@@ -114,35 +114,36 @@
                         <TitledPane fx:id="GTitledPaneInfo" animated="false" expanded="false" text="Info">
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <ScrollPane prefHeight="250.0" prefWidth="300.0">
-                                <content>
-                                  <AnchorPane>
-                                       <children>
-                                          <VBox fx:id="GVboxInfo" layoutX="2.0" layoutY="6.0" spacing="5.0">
-                                             <children>
-                                                <TitledPane animated="false" collapsible="false" prefWidth="295.0" text="Length">
-                                                   <content>
-                                                      <Label fx:id="GLabelInfoLength" prefWidth="269.0" text="length-text" wrapText="true" />
-                                                   </content>
-                                                </TitledPane>
-                                                <TitledPane fx:id="GTitledPaneInfoArtists" animated="false" collapsible="false" layoutX="10.0" layoutY="10.0" prefWidth="295.0" text="Artists">
-                                                   <content>
-                                                      <Label fx:id="GLabelInfoArtists" prefWidth="269.0" text="artists-text" wrapText="true" />
-                                                   </content>
-                                                </TitledPane>
-                                                <TitledPane fx:id="GTitledPaneInfoFeaturing" animated="false" collapsible="false" layoutX="10.0" layoutY="73.0" prefWidth="295.0" text="Featuring">
-                                                   <content>
-                                                      <Label fx:id="GLabelInfoFeaturing" prefWidth="269.0" text="featuring-text" wrapText="true" />
-                                                   </content>
-                                                </TitledPane>
-                                             </children>
-                                          </VBox>
-                                       </children>
-                                    </AnchorPane>
-                                </content>
-                              </ScrollPane>
-                           </children></AnchorPane>
+                                    <children>
+                                        <ScrollPane prefHeight="250.0" prefWidth="300.0">
+                                            <content>
+                                                <AnchorPane>
+                                                    <children>
+                                                        <VBox fx:id="GVboxInfo" layoutX="2.0" layoutY="6.0" spacing="5.0">
+                                                            <children>
+                                                                <TitledPane animated="false" collapsible="false" maxWidth="295.0" prefWidth="295.0" text="Length">
+                                                                    <content>
+                                                                        <Label fx:id="GLabelInfoLength" prefWidth="270.0" text="length-text" wrapText="true" />
+                                                                    </content>
+                                                                </TitledPane>
+                                                                <TitledPane fx:id="GTitledPaneInfoArtists" animated="false" collapsible="false" layoutX="10.0" layoutY="10.0" maxWidth="295.0" prefWidth="295.0" text="Artists">
+                                                                    <content>
+                                                                        <Label fx:id="GLabelInfoArtists" prefWidth="270.0" text="artists-text" wrapText="true" />
+                                                                    </content>
+                                                                </TitledPane>
+                                                                <TitledPane fx:id="GTitledPaneInfoFeaturing" animated="false" collapsible="false" layoutX="10.0" layoutY="73.0" maxWidth="295.0" prefWidth="295.0" text="Featuring">
+                                                                    <content>
+                                                                        <Label fx:id="GLabelInfoFeaturing" prefWidth="270.0" text="featuring-text" wrapText="true" />
+                                                                    </content>
+                                                                </TitledPane>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </AnchorPane>
+                                            </content>
+                                        </ScrollPane>
+                                    </children>
+                                </AnchorPane>
                             </content>
                         </TitledPane>
                     </panes>
