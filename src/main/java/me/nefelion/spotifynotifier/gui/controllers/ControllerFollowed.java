@@ -76,7 +76,6 @@ public class ControllerFollowed {
         initializeGListSearchSpotifyArtists();
         initializeGVboxInfo();
         initializeGLabelLastChecked();
-        refreshGLabelNumberOfArtists();
         initializeGTextFieldSearchFollowed();
         initializeGTextFieldSearchSpotify();
         initializeGButtonCheckReleases();
@@ -400,8 +399,7 @@ public class ControllerFollowed {
         GLabelLastChecked.setText("Last checked: " + Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked()));
     }
 
-    private void refreshGLabelNumberOfArtists() {
-        int size = GListFollowed.getItems().size();
+    private void refreshGLabelNumberOfArtists(int size) {
         GLabelNumberOfArtists.setText("" + (size > 0 ? size : ""));
     }
 
@@ -435,7 +433,7 @@ public class ControllerFollowed {
                 ? "You do not follow any artists yet"
                 : "Nothing matches a search for '" + search + "'");
 
-        refreshGLabelNumberOfArtists();
+        refreshGLabelNumberOfArtists(followedArtists.size());
     }
 
     private void updateGListSearchSpotifyArtistsWith(List<Artist> list) {
