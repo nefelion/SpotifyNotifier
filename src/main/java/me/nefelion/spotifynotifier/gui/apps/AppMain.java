@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import me.nefelion.spotifynotifier.Main;
 import me.nefelion.spotifynotifier.gui.controllers.ControllerAlbums;
@@ -11,6 +12,7 @@ import me.nefelion.spotifynotifier.gui.controllers.ControllerFollowed;
 import me.nefelion.spotifynotifier.gui.controllers.ControllerOutline;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class AppMain extends Application {
 
@@ -38,6 +40,7 @@ public class AppMain extends Application {
         controller.setControllerAlbums(controllerAlbums);
 
         primaryStage.setTitle("Spotify Notifier");
+        primaryStage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
 
 
         controller.setFollowedVBOX(controllerFollowed.getGMainVBOX());

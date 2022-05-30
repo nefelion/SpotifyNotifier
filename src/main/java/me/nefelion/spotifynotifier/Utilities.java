@@ -3,6 +3,8 @@ package me.nefelion.spotifynotifier;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import javax.swing.*;
@@ -13,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.function.Predicate;
@@ -129,6 +132,8 @@ public class Utilities {
         window.setOnCloseRequest(event -> window.hide());
 
         alert.setTitle("");
+        ((Stage) (alert.getDialogPane().getScene().getWindow())).getIcons()
+                .add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
         alert.setHeaderText(null);
         alert.showAndWait();
         if (alert.getResult() == exit) System.exit(-1000);
@@ -145,6 +150,8 @@ public class Utilities {
         window.setOnCloseRequest(event -> window.hide());
 
         alert.setTitle("");
+        ((Stage) (alert.getDialogPane().getScene().getWindow())).getIcons()
+                .add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
         alert.setHeaderText(null);
         alert.showAndWait();
         return alert.getResult() == undo;

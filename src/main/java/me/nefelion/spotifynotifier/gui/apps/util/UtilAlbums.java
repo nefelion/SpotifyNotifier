@@ -6,9 +6,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import me.nefelion.spotifynotifier.Main;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
 import me.nefelion.spotifynotifier.Utilities;
 import me.nefelion.spotifynotifier.data.FileData;
@@ -17,6 +19,7 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.controllers.ControllerProgress;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class UtilAlbums {
 
@@ -63,6 +66,8 @@ public class UtilAlbums {
                 Window window = alert.getDialogPane().getScene().getWindow();
                 window.setOnCloseRequest(event -> window.hide());
                 alert.setTitle("");
+                ((Stage) (alert.getDialogPane().getScene().getWindow())).getIcons()
+                        .add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
                 alert.setHeaderText(null);
                 alert.showAndWait();
                 if (alert.getResult() == anywayButton) startTheApp(primaryStage, processor);

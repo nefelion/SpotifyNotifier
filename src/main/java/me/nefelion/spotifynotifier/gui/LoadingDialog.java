@@ -6,8 +6,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import me.nefelion.spotifynotifier.Main;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class LoadingDialog extends Dialog<String> {
@@ -19,6 +23,11 @@ public class LoadingDialog extends Dialog<String> {
     private Runnable cancelListener = this::close;
 
     public LoadingDialog() {
+
+        ((Stage) (getDialogPane().getScene().getWindow())).getIcons()
+                .add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
+
+
         setResizable(false);
         getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
 
