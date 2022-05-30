@@ -117,7 +117,8 @@ public class ControllerFollowed {
         };
         task.setOnSucceeded((e) -> {
             dialog.close();
-            startLoadingAlbums(processor.getOutputArtists().stream().map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList()));
+            startLoadingAlbums(processor.getOutputArtists().stream()
+                    .map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList()), false);
         });
         dialog.setCancelListener(task::cancel);
 
@@ -146,10 +147,10 @@ public class ControllerFollowed {
 
     @FXML
     private void onActionCheckReleases(ActionEvent actionEvent) {
-        startLoadingAlbums(TempData.getInstance().getFileData().getFollowedArtists());
+        startLoadingAlbums(TempData.getInstance().getFileData().getFollowedArtists(), true);
     }
 
-    private void startLoadingAlbums(List<FollowedArtist> list) {
+    private void startLoadingAlbums(List<FollowedArtist> list, boolean updateLastChecked) {
         resetInfoBoard();
         GButtonCheckReleases.setDisable(true);
         GVboxInfo.setVisible(true);
@@ -182,9 +183,11 @@ public class ControllerFollowed {
 
         task.setOnSucceeded(e -> {
             GButtonCheckReleases.setDisable(false);
-            FileData fileData = TempData.getInstance().getFileData();
-            fileData.setLastChecked(Utilities.now());
-            FileManager.saveFileData(fileData);
+            if (updateLastChecked) {
+                FileData fileData = TempData.getInstance().getFileData();
+                fileData.setLastChecked(Utilities.now());
+                FileManager.saveFileData(fileData);
+            }
             showReleases(processor);
 
             resetInfoBoard();
