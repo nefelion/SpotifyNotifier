@@ -4,6 +4,7 @@ import me.nefelion.spotifynotifier.data.TempData;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
@@ -33,10 +34,12 @@ public class ExploreProcessor {
 
             for (Artist artist : instance.getRelatedArtists(followedArtist.getID())) {
                 String artistName = artist.getName();
-                if (processedArtists.contains(artistName)) continue;
-                if (instance.isFollowed(artist.getId())) continue;
+                String id = artist.getId();
 
-                processedArtists.add(artist.getId());
+                if (processedArtists.contains(id)) continue;
+                if (instance.isFollowed(id)) continue;
+
+                processedArtists.add(id);
                 outputArtists.add(artist);
 
                 acceptArtistConsumer(artistName);
@@ -44,6 +47,7 @@ public class ExploreProcessor {
                 acceptProgress(currentFollowedArtist, totalFollowedArtists);
             }
         }
+        outputArtists.sort(Comparator.comparing(Artist::getName));
     }
 
     private void acceptProgress(int currentArtist, int totalArtists) {

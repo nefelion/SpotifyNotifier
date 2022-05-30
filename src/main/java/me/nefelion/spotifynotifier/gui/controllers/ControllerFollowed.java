@@ -113,7 +113,10 @@ public class ControllerFollowed {
                 return null;
             }
         };
-        task.setOnSucceeded((e) -> dialog.close());
+        task.setOnSucceeded((e) -> {
+            dialog.close();
+            startLoadingAlbums(processor.getOutputArtists().stream().map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList()));
+        });
         new Thread(task).start();
 
         dialog.showAndWait();
@@ -139,18 +142,15 @@ public class ControllerFollowed {
 
     @FXML
     private void onActionCheckReleases(ActionEvent actionEvent) {
+        startLoadingAlbums(TempData.getInstance().getFileData().getFollowedArtists());
+    }
+
+    private void startLoadingAlbums(List<FollowedArtist> list) {
         resetInfoBoard();
         GButtonCheckReleases.setDisable(true);
         GVboxInfo.setVisible(true);
 
-        final long startMs = System.currentTimeMillis();
-        ActionListener taskPerformer = evt -> Platform.runLater(() ->
-                GLabelTimeElapsed.setText(Utilities.convertMsToDuration((int) (System.currentTimeMillis() - startMs)) + "")
-        );
-        elapsed = new Timer(1000, taskPerformer);
-        elapsed.start();
-
-        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
+        ReleasesProcessor processor = new ReleasesProcessor(list);
         processor.setProgressConsumer((var) -> {
                     GLabelPercentage.setText((int) (var * 100) + "%");
                     GProgressBar.setProgress(var);
@@ -159,6 +159,14 @@ public class ControllerFollowed {
                 .setProcessedArtistsConsumer(GLabelProcessedArtists::setText)
                 .setReleasesConsumer(GLabelLoadedReleases::setText)
                 .setNewReleasesConsumer(GLabelNewReleases::setText);
+
+        final long startMs = System.currentTimeMillis();
+        ActionListener taskPerformer = evt -> Platform.runLater(() ->
+                GLabelTimeElapsed.setText(Utilities.convertMsToDuration((int) (System.currentTimeMillis() - startMs)) + "")
+        );
+        elapsed = new Timer(1000, taskPerformer);
+        elapsed.start();
+
 
         task = new Task<>() {
             @Override
