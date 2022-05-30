@@ -12,13 +12,12 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import me.nefelion.spotifynotifier.FollowedArtist;
-import me.nefelion.spotifynotifier.ReleasesProcessor;
-import me.nefelion.spotifynotifier.TheEngine;
-import me.nefelion.spotifynotifier.Utilities;
+import javafx.util.Duration;
+import me.nefelion.spotifynotifier.*;
 import me.nefelion.spotifynotifier.data.FileData;
 import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
+import me.nefelion.spotifynotifier.gui.LoadingDialog;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
 import javax.swing.*;
@@ -79,8 +78,45 @@ public class ControllerFollowed {
         initializeGLabelLastChecked();
         initializeGTextFieldSearchFollowed();
         initializeGTextFieldSearchSpotify();
+        initializeGButtonCheckReleases();
 
         startRefreshingTimer();
+    }
+
+    private void initializeGButtonCheckReleases() {
+        GButtonCheckReleases.setOnMousePressed(event -> {
+            if (event.isSecondaryButtonDown()) {
+                MenuItem explore1 = new MenuItem("Explore");
+                explore1.setOnAction(event1 -> explore());
+                GButtonCheckReleases.setContextMenu(new ContextMenu(explore1));
+            }
+        });
+
+        Tooltip tooltip = new Tooltip("Right-click for more options");
+        tooltip.setShowDelay(Duration.ZERO);
+        GButtonCheckReleases.setTooltip(tooltip);
+    }
+
+    private void explore() {
+        LoadingDialog dialog = new LoadingDialog();
+        dialog.setTitle("Explore");
+        dialog.setHeaderText("Loading similar artists to explore...");
+        dialog.setProgressText("Loaded artists: 0");
+        ExploreProcessor processor = new ExploreProcessor()
+                .setArtistCountConsumer(count -> dialog.setProgressText("Loaded artists: " + count))
+                .setProgressConsumer(dialog::setProgress);
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                processor.process();
+                return null;
+            }
+        };
+        task.setOnSucceeded((e) -> dialog.close());
+        new Thread(task).start();
+
+        dialog.showAndWait();
     }
 
     private void startRefreshingTimer() {
@@ -114,7 +150,7 @@ public class ControllerFollowed {
         elapsed = new Timer(1000, taskPerformer);
         elapsed.start();
 
-        ReleasesProcessor processor = new ReleasesProcessor(TheEngine.getInstance().getRelatedArtists(TempData.getInstance().getFileData().getFollowedArtists()));
+        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
         processor.setProgressConsumer((var) -> {
                     GLabelPercentage.setText((int) (var * 100) + "%");
                     GProgressBar.setProgress(var);
