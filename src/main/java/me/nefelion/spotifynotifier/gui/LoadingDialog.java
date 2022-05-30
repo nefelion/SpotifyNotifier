@@ -16,10 +16,13 @@ public class LoadingDialog extends Dialog<String> {
     private final ProgressBar progressBar = new ProgressBar();
     private final Consumer<Double> progressConsumer = progressBar::setProgress;
     private final Consumer<String> labelConsumer = label::setText;
+    private Runnable cancelListener = this::close;
 
     public LoadingDialog() {
         setResizable(false);
         getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+
+        setOnCloseRequest(event -> cancelListener.run());
 
         progressBar.setPrefWidth(300);
         progressBar.setPrefHeight(30);
@@ -53,5 +56,9 @@ public class LoadingDialog extends Dialog<String> {
 
     public Consumer<String> getLabelConsumer() {
         return labelConsumer;
+    }
+
+    public void setCancelListener(Runnable cancelListener) {
+        this.cancelListener = cancelListener;
     }
 }

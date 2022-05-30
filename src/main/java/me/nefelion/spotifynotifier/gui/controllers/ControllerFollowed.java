@@ -102,6 +102,7 @@ public class ControllerFollowed {
         dialog.setTitle("Explore");
         dialog.setHeaderText("Loading similar artists to explore...");
         dialog.setProgressText("Loaded artists: 0");
+
         ExploreProcessor processor = new ExploreProcessor()
                 .setArtistCountConsumer(count -> dialog.setProgressText("Loaded artists: " + count))
                 .setProgressConsumer(dialog::setProgress);
@@ -117,6 +118,8 @@ public class ControllerFollowed {
             dialog.close();
             startLoadingAlbums(processor.getOutputArtists().stream().map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList()));
         });
+        dialog.setCancelListener(task::cancel);
+
         new Thread(task).start();
 
         dialog.showAndWait();
