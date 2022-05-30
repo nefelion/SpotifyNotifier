@@ -97,10 +97,9 @@ public class ControllerOutline {
         GTabPane.getSelectionModel().select(tab.ordinal());
     }
 
-    public void showAlbums(ReleasesProcessor processor) {
-        controllerAlbums.showReleases(processor);
+    public void showAlbums(String title, ReleasesProcessor processor) {
+        controllerAlbums.showReleases(title, processor);
     }
-
 
     private boolean isUpdateAvailable() {
         URL url;
@@ -121,6 +120,13 @@ public class ControllerOutline {
         GButtonDownloadUpdate.setVisible(true);
     }
 
+    public void setAlbumsTitle(String s) {
+        GTabPane.getTabs().get(TAB.ALBUMS.ordinal()).setText(s);
+    }
+
+    public String getAlbumsTitle() {
+        return GTabPane.getTabs().get(TAB.ALBUMS.ordinal()).getText();
+    }
 
     public enum TAB {
         FOLLOWED,

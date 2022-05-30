@@ -188,7 +188,7 @@ public class ControllerFollowed {
                 fileData.setLastChecked(Utilities.now());
                 FileManager.saveFileData(fileData);
             }
-            showReleases(processor);
+            showReleases("Releases", processor);
 
             resetInfoBoard();
             GVboxInfo.setVisible(false);
@@ -458,8 +458,8 @@ public class ControllerFollowed {
         GLabelTimeElapsed.setText("0:00");
     }
 
-    private void showReleases(ReleasesProcessor processor) {
-        controllerOutline.showAlbums(processor);
+    private void showReleases(String title, ReleasesProcessor processor) {
+        controllerOutline.showAlbums(title, processor);
         controllerOutline.selectTab(ControllerOutline.TAB.ALBUMS);
     }
 
@@ -478,7 +478,7 @@ public class ControllerFollowed {
             }
         };
         task.setOnSucceeded(b -> {
-            showReleases(processor);
+            showReleases(artist.getName(), processor);
             GMainVBOX.setCursor(Cursor.DEFAULT);
         });
         new Thread(task).start();

@@ -34,6 +34,7 @@ import me.nefelion.spotifynotifier.*;
 import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.apps.util.UtilShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
+import me.nefelion.spotifynotifier.records.VBoxStack;
 import se.michaelthelin.spotify.model_objects.specification.Album;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
@@ -50,7 +51,7 @@ import java.util.stream.Collectors;
 
 
 public class ControllerAlbums {
-    public static final Stack<VBox> VBOXSTACK = new Stack<>();
+    public static final Stack<VBoxStack> VBOXSTACK = new Stack<>();
     private static MediaPlayer player;
     private final HashMap<String, TempAlbumInfo> infoHashMap = new HashMap<>();
     private ControllerOutline controllerOutline;
@@ -126,7 +127,9 @@ public class ControllerAlbums {
     @FXML
     private void onActionGButtonBack(ActionEvent actionEvent) {
         stopCurrent();
-        controllerOutline.setAlbumsVBOX(VBOXSTACK.pop());
+        VBoxStack vBox = VBOXSTACK.pop();
+        controllerOutline.setAlbumsVBOX(vBox.vbox());
+        controllerOutline.setAlbumsTitle(vBox.title());
     }
 
     @FXML
@@ -569,7 +572,7 @@ public class ControllerAlbums {
             });
             showReleasesMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
-                showReleases(new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
+                showReleases(album.getFollowedArtistName(), new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
             });
             showSimilarMenuItem.setOnAction(event -> requestSimilarArtistsView(row.getItem().getArtistId(), row.getItem().getFollowedArtistName()));
 
@@ -689,7 +692,7 @@ public class ControllerAlbums {
         });
         list.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection == null) return;
-            showReleases(newSelection);
+            showReleases(newSelection.getName(), newSelection);
             stage.close();
         });
         list.setMaxHeight(500);
@@ -704,7 +707,7 @@ public class ControllerAlbums {
         if (artists.size() > 1) {
             Button button = new Button("Select all");
             button.setOnAction(e -> {
-                showReleases(artists.toArray(new FollowedArtist[0]));
+                showReleases("Multiple artists", artists.toArray(new FollowedArtist[0]));
                 stage.close();
             });
             Platform.runLater(button::requestFocus);
@@ -716,11 +719,7 @@ public class ControllerAlbums {
         stage.showAndWait();
     }
 
-    private void showReleases(ArtistSimplified artistSimplified) {
-        showReleases(new FollowedArtist(artistSimplified.getName(), artistSimplified.getId()));
-    }
-
-    private void showReleases(FollowedArtist... artists) {
+    private void showReleases(String title, FollowedArtist... artists) {
         stopCurrent();
         ReleasesProcessor processor = new ReleasesProcessor(artists);
         disableAllElements(true);
@@ -736,18 +735,19 @@ public class ControllerAlbums {
         };
 
         task.setOnSucceeded(e -> {
-            showReleases(processor);
+            showReleases(title, processor);
             disableAllElements(false);
             showProgressBar(false);
         });
         new Thread(task).start();
     }
 
-    public void showReleases(ReleasesProcessor processor) {
+    public void showReleases(String title, ReleasesProcessor processor) {
         stopCurrent();
         VBox oldVbox = controllerOutline.getAlbumsVBOX();
-        if (oldVbox != null) VBOXSTACK.push(oldVbox);
+        if (oldVbox != null) VBOXSTACK.push(new VBoxStack(oldVbox, controllerOutline.getAlbumsTitle()));
         controllerOutline.setAlbumsVBOX(UtilShowAlbums.getAlbumsVBOX(processor.getNewAlbums(), processor.getAllAlbums()));
+        controllerOutline.setAlbumsTitle(title);
     }
 
     private void showProgressBar(boolean b) {
