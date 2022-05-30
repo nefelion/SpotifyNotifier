@@ -17,6 +17,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
@@ -24,6 +26,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -37,11 +40,15 @@ import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -382,10 +389,31 @@ public class ControllerAlbums {
     private void loadInfo() {
         TempAlbumInfo info = infoHashMap.get(getSelectedAlbum().getId());
         if (info == null) return;
-        GCoverImageView.setImage(info.cover());
+        updateGCoverImageView(info);
+
         GListTracklist.setItems(FXCollections.observableArrayList(info.trackList()));
         updateInfoTab(info);
         GTitledPaneInfo.setDisable(false);
+    }
+
+    private void updateGCoverImageView(TempAlbumInfo info) {
+        GCoverImageView.setImage(info.cover());
+        ContextMenu contextMenu = getCopyCoverToClipboardContextMenu(info);
+        GCoverImageView.setOnContextMenuRequested(e -> contextMenu.show(GCoverImageView, e.getScreenX(), e.getScreenY()));
+    }
+
+    private ContextMenu getCopyCoverToClipboardContextMenu(TempAlbumInfo info) {
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem menuItem = new MenuItem("Copy Cover to clipboard (300x300)");
+        menuItem.setOnAction(event1 -> {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putImage(info.cover());
+            clipboard.setContent(content);
+        });
+        contextMenu.getItems().add(menuItem);
+        contextMenu.setAutoHide(true);
+        return contextMenu;
     }
 
     private void updateInfoTab(TempAlbumInfo info) {
