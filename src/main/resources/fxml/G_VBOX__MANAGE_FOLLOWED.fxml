@@ -71,7 +71,7 @@
                                                         <Cursor fx:constant="DEFAULT" />
                                                     </cursor>
                                                 </Group>
-                                                <Button fx:id="GButtonAbort" mnemonicParsing="false" onAction="#onActionGButtonAbort" prefHeight="38.0" prefWidth="47.0" text="Abort" />
+                                                <Button fx:id="GButtonAbort" mnemonicParsing="false" onAction="#onActionGButtonAbort" prefHeight="38.0" prefWidth="500.0" text="Abort" />
                                             </children>
                                         </HBox>
                                         <HBox prefHeight="0.0" prefWidth="247.0">

@@ -6,6 +6,7 @@ import se.michaelthelin.spotify.enums.AlbumGroup;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 
 import java.util.*;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.DoubleConsumer;
@@ -42,7 +43,15 @@ public class ReleasesProcessor {
             if (currentArtistConsumer != null)
                 Platform.runLater(() -> currentArtistConsumer.accept(artist.getName()));
 
-            for (AlbumSimplified album : theEngine.getAlbums(artist.getID())) {
+            List<AlbumSimplified> albums;
+
+            try {
+                albums = theEngine.getAlbums(artist.getID());
+            } catch (CancellationException e) {
+                return;
+            }
+
+            for (AlbumSimplified album : albums) {
                 if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON))
                     featuringHashMap.put(album.getId(), new ReleasedAlbum(album, artist));
                 else if (!loadedIDhashSet.contains(album.getId())) {

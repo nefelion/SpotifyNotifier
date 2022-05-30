@@ -36,7 +36,7 @@ public class ControllerFollowed {
     private ControllerOutline controllerOutline;
     private String lastSearch = "";
     private double maxGListSpotifyPopularity = Double.MAX_VALUE;
-    private Task<Boolean> task;
+    private Task<Void> task;
     private Timer elapsed;
 
     @FXML
@@ -175,9 +175,9 @@ public class ControllerFollowed {
 
         task = new Task<>() {
             @Override
-            public Boolean call() {
+            public Void call() {
                 processor.process();
-                return true;
+                return null;
             }
         };
 
@@ -194,14 +194,16 @@ public class ControllerFollowed {
             GVboxInfo.setVisible(false);
             refreshGLabelLastChecked();
         });
-        new Thread(task).start();
-    }
-
-    public void onActionGButtonAbort(ActionEvent actionEvent) {
         task.setOnCancelled(e -> {
             GVboxInfo.setVisible(false);
             GButtonCheckReleases.setDisable(false);
+            resetInfoBoard();
         });
+        new Thread(task).start();
+    }
+
+    @FXML
+    private void onActionGButtonAbort(ActionEvent actionEvent) {
         task.cancel();
     }
 
