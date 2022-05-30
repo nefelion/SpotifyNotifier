@@ -4,13 +4,11 @@ import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import me.nefelion.spotifynotifier.Main;
-import me.nefelion.spotifynotifier.ReleasedAlbum;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
 
 import java.io.IOException;
@@ -31,8 +29,6 @@ public class ControllerOutline {
     private Button GButtonDownloadUpdate;
 
     private ControllerAlbums controllerAlbums;
-
-
 
 
     public ControllerOutline() {

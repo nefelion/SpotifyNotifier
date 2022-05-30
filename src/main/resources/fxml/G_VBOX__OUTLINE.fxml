@@ -32,40 +32,44 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
+<?import javafx.scene.control.*?>
 <?import javafx.scene.Group?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
-
-<VBox xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.nefelion.spotifynotifier.gui.controllers.ControllerOutline">
+<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/18"
+      fx:controller="me.nefelion.spotifynotifier.gui.controllers.ControllerOutline">
     <children>
-      <Group>
-         <children>
-              <TabPane fx:id="GTabPane" prefHeight="725.0" prefWidth="640.0" tabClosingPolicy="UNAVAILABLE">
-                  <tabs>
-                      <Tab closable="false" text="Followed Artists">
-                          <content>
-                              <AnchorPane fx:id="GFollowedAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="640.0" />
-                          </content>
-                      </Tab>
-                      <Tab closable="false" text="Album viewer">
-                          <content>
-                              <AnchorPane fx:id="GAlbumAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                          </content>
-                      </Tab>
-                      <Tab closable="false" text="Settings">
-                          <content>
-                              <AnchorPane fx:id="GSettingsAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                          </content>
-                      </Tab>
-                  </tabs>
-              </TabPane>
-            <Label fx:id="GLabelVersionNumber" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="335.0" layoutY="6.0" opacity="0.33" prefHeight="17.0" prefWidth="300.0" text="version-number" textAlignment="RIGHT" />
-            <Button fx:id="GButtonDownloadUpdate" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="520.0" layoutY="2.0" mnemonicParsing="false" text="Download Update!" textAlignment="RIGHT" visible="false" />
-         </children>
-      </Group>
+        <Group>
+            <children>
+                <TabPane fx:id="GTabPane" prefHeight="725.0" prefWidth="640.0" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                        <Tab closable="false" text="Followed Artists">
+                            <content>
+                                <AnchorPane fx:id="GFollowedAnchorPane" minHeight="0.0" minWidth="0.0"
+                                            prefHeight="180.0" prefWidth="640.0"/>
+                            </content>
+                        </Tab>
+                        <Tab closable="false" text="Album viewer">
+                            <content>
+                                <AnchorPane fx:id="GAlbumAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                            prefWidth="200.0"/>
+                            </content>
+                        </Tab>
+                        <Tab closable="false" text="Settings">
+                            <content>
+                                <AnchorPane fx:id="GSettingsAnchorPane" minHeight="0.0" minWidth="0.0"
+                                            prefHeight="180.0" prefWidth="200.0"/>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+                <Label fx:id="GLabelVersionNumber" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="335.0"
+                       layoutY="6.0" opacity="0.33" prefHeight="17.0" prefWidth="300.0" text="version-number"
+                       textAlignment="RIGHT"/>
+                <Button fx:id="GButtonDownloadUpdate" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="520.0"
+                        layoutY="2.0" mnemonicParsing="false" text="Download Update!" textAlignment="RIGHT"
+                        visible="false"/>
+            </children>
+        </Group>
     </children>
 </VBox>

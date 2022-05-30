@@ -2,7 +2,6 @@ package me.nefelion.spotifynotifier.subcommands;
 
 import javafx.application.Application;
 import me.nefelion.spotifynotifier.ISubCommand;
-import me.nefelion.spotifynotifier.TheEngine;
 import me.nefelion.spotifynotifier.gui.apps.AppAllAlbums;
 
 public class AllRecentAlbums implements ISubCommand {

@@ -1,7 +1,6 @@
 package me.nefelion.spotifynotifier.subcommands;
 
 import me.nefelion.spotifynotifier.ISubCommand;
-import me.nefelion.spotifynotifier.TheEngine;
 
 public class Explore implements ISubCommand {
 

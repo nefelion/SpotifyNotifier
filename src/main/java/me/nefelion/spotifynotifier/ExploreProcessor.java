@@ -11,10 +11,10 @@ import java.util.function.Consumer;
 
 public class ExploreProcessor {
 
+    private final List<Artist> outputArtists = new ArrayList<>();
     private Consumer<String> currentArtistConsumer;
     private Consumer<Integer> artistCountConsumer;
     private Consumer<Double> progressConsumer;
-    private final List<Artist> outputArtists = new ArrayList<>();
 
     public ExploreProcessor() {
     }

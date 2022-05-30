@@ -12,7 +12,10 @@ import se.michaelthelin.spotify.model_objects.specification.*;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.OptionalInt;
 import java.util.concurrent.CancellationException;
 import java.util.stream.IntStream;
 
