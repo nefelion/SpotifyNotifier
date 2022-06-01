@@ -263,8 +263,17 @@ public class ControllerFollowed {
             });
             unfollowMenuItem.setOnAction(event -> {
                 FollowedArtist artist = cell.getItem();
-                TheEngine.getInstance().unfollowArtistID(artist.getID());
-                refreshGListFollowedArtists();
+                Task<Boolean> task = new Task<>() {
+                    @Override
+                    protected Boolean call() {
+                        TheEngine.getInstance().unfollowArtistID(artist.getID());
+                        return null;
+                    }
+                };
+                task.setOnSucceeded(e -> refreshGListFollowedArtists());
+                Thread thread = new Thread(task);
+                thread.setDaemon(true);
+                thread.start();
             });
 
             contextMenu.getItems().add(showReleasesMenuItem);
