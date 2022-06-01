@@ -20,13 +20,8 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.LoadingDialog;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
-import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ControllerFollowed {
@@ -121,17 +116,24 @@ public class ControllerFollowed {
         });
         dialog.setCancelListener(task::cancel);
 
-        new Thread(task).start();
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
 
         dialog.showAndWait();
     }
 
     private void startRefreshingTimer() {
-        ActionListener taskPerformer = evt -> Platform.runLater(() -> {
-            refreshGLabelLastChecked();
-            refreshGListFollowedArtists();
-        });
-        new Timer(1000, taskPerformer).start();
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    refreshGLabelLastChecked();
+                    refreshGListFollowedArtists();
+                });
+            }
+        }, 0, 1000);
     }
 
     @FXML
@@ -165,11 +167,15 @@ public class ControllerFollowed {
                 .setNewReleasesConsumer(GLabelNewReleases::setText);
 
         final long startMs = System.currentTimeMillis();
-        ActionListener taskPerformer = evt -> Platform.runLater(() ->
-                GLabelTimeElapsed.setText(Utilities.convertMsToDuration((int) (System.currentTimeMillis() - startMs)) + "")
-        );
-        elapsed = new Timer(1000, taskPerformer);
-        elapsed.start();
+        elapsed = new Timer(true);
+        elapsed.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() ->
+                        GLabelTimeElapsed.setText(Utilities.convertMsToDuration((int) (System.currentTimeMillis() - startMs)))
+                );
+            }
+        }, 0, 1000);
 
 
         task = new Task<>() {
@@ -198,7 +204,9 @@ public class ControllerFollowed {
             GButtonCheckReleases.setDisable(false);
             resetInfoBoard();
         });
-        new Thread(task).start();
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     @FXML
@@ -392,7 +400,9 @@ public class ControllerFollowed {
             refreshGListFollowedArtists();
             GMainVBOX.setCursor(Cursor.DEFAULT);
         });
-        new Thread(task).start();
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void refreshGLabelLastChecked() {
@@ -418,7 +428,9 @@ public class ControllerFollowed {
         };
 
         task.setOnSucceeded(e -> updateGListSearchSpotifyArtistsWith(artistList));
-        new Thread(task).start();
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void refreshGListFollowedArtists() {
@@ -452,7 +464,7 @@ public class ControllerFollowed {
         GLabelProcessedArtists.setText("0");
         GLabelLoadedReleases.setText("0");
         GLabelNewReleases.setText("0");
-        if (elapsed != null) elapsed.stop();
+        if (elapsed != null) elapsed.cancel();
         GLabelTimeElapsed.setText("0:00");
     }
 
@@ -479,7 +491,9 @@ public class ControllerFollowed {
             showReleases(artist.getName(), processor);
             GMainVBOX.setCursor(Cursor.DEFAULT);
         });
-        new Thread(task).start();
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private ChangeListener<Boolean> getFocusChangeListener(TextField GTextField) {

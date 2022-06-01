@@ -374,6 +374,7 @@ public class ControllerAlbums {
 
                 GListTracklist.setItems(null);
                 Thread taskThread = new Thread(() -> downloadInfoForAlbum(getSelectedAlbum()));
+                taskThread.setDaemon(true);
                 taskThread.start();
             } else loadInfo();
 
@@ -494,6 +495,7 @@ public class ControllerAlbums {
                 if (selected.getId().equals(currentSelectedTrack.getId())) play();
             });
         });
+        taskThread.setDaemon(true);
         taskThread.start();
     }
 
@@ -641,7 +643,9 @@ public class ControllerAlbums {
         };
         task.setOnSucceeded(e -> Platform.runLater(() -> showSimilarArtists(name, similarArtists)));
 
-        new Thread(task).start();
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void showSimilarArtists(String name, List<FollowedArtist> similarArtists) {
@@ -665,7 +669,9 @@ public class ControllerAlbums {
             artistsAndPerformers.removeIf(p -> oneArtist && p.getID().equals(allAlbums.get(0).getArtistId()));
             showModalWindowWithArtistsToPick(artistsAndPerformers, "Pick an artist");
         });
-        new Thread(task).start();
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
 
 
     }
@@ -739,7 +745,9 @@ public class ControllerAlbums {
             disableAllElements(false);
             showProgressBar(false);
         });
-        new Thread(task).start();
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     public void showReleases(String title, ReleasesProcessor processor) {
