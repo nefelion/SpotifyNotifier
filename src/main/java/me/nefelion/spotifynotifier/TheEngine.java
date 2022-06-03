@@ -28,7 +28,7 @@ public class TheEngine {
     private TheEngine() {
     }
 
-    public synchronized static TheEngine getInstance() {
+    public static TheEngine getInstance() {
         if (instance == null) {
             instance = new TheEngine();
         }
@@ -39,7 +39,7 @@ public class TheEngine {
         this.spotifyAPI = spotifyApi;
     }
 
-    public synchronized void followArtistID(String id) {
+    public void followArtistID(String id) {
         if (id == null || id.trim().isEmpty()) return;
 
         FileData fileData = TempData.getInstance().getFileData();
@@ -82,7 +82,7 @@ public class TheEngine {
 
     }
 
-    public synchronized void unfollowArtistID(String id) {
+    public void unfollowArtistID(String id) {
         if (id == null || id.trim().isEmpty()) return;
 
         FileData fileData = TempData.getInstance().getFileData();
@@ -113,7 +113,7 @@ public class TheEngine {
     }
 
 
-    public synchronized List<AlbumSimplified> getAlbums(String artistID) throws CancellationException {
+    public List<AlbumSimplified> getAlbums(String artistID) throws CancellationException {
 
         List<AlbumSimplified> allAlbums = new ArrayList<>();
 
@@ -141,7 +141,7 @@ public class TheEngine {
         return allAlbums;
     }
 
-    public synchronized List<TrackSimplified> getTracks(String albumID) {
+    public List<TrackSimplified> getTracks(String albumID) {
         List<TrackSimplified> allTracks = new ArrayList<>();
 
         try {
@@ -166,7 +166,7 @@ public class TheEngine {
         return allTracks;
     }
 
-    public synchronized Album getAlbum(String albumID) {
+    public Album getAlbum(String albumID) {
         Album album;
         try {
             album = spotifyAPI.getAlbum(albumID).build().execute();
@@ -181,7 +181,7 @@ public class TheEngine {
         return album;
     }
 
-    public synchronized Artist getArtist(String albumID) {
+    public Artist getArtist(String albumID) {
         Artist artist;
         try {
             artist = spotifyAPI.getArtist(albumID).build().execute();
@@ -196,7 +196,7 @@ public class TheEngine {
         return artist;
     }
 
-    public synchronized Artist[] getRelatedArtists(String id) {
+    public Artist[] getRelatedArtists(String id) {
         Artist[] artists;
         try {
             artists = spotifyAPI.getArtistsRelatedArtists(id).build().execute();
@@ -211,7 +211,7 @@ public class TheEngine {
         return artists;
     }
 
-    public synchronized List<Artist> searchArtist(String name) {
+    public List<Artist> searchArtist(String name) {
         List<Artist> artists;
         try {
             artists = new ArrayList<>(List.of(spotifyAPI.searchArtists(name).offset(0).limit(50).build().execute().getItems()));
@@ -226,7 +226,7 @@ public class TheEngine {
         return artists;
     }
 
-    public synchronized AudioFeatures[] getAudioFeatures(List<String> idList) {
+    public AudioFeatures[] getAudioFeatures(List<String> idList) {
         AudioFeatures[] features;
         try {
             features = spotifyAPI.getAudioFeaturesForSeveralTracks(String.join(",", idList)).build().execute();
@@ -241,7 +241,7 @@ public class TheEngine {
         return features;
     }
 
-    public synchronized boolean isFollowed(String id) {
+    public boolean isFollowed(String id) {
         return TempData.getInstance().getFileData().getFollowedArtists().stream().anyMatch(p -> p.getID().equals(id));
     }
 
