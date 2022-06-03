@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -59,6 +60,8 @@ public class ControllerAlbums {
     private ReleasedAlbum currentSelectedAlbum;
     private TrackSimplified currentSelectedTrack;
     private boolean oneArtist;
+    private final Tooltip GTooltipTracklist = new Tooltip();
+    private int hoveredIndexTracklist = -1;
 
     @FXML
     private VBox GMainVBOX, GVboxInfo;
@@ -88,6 +91,7 @@ public class ControllerAlbums {
     private ProgressBar GProgressBar;
     @FXML
     private Label GLabelInfoLength, GLabelInfoArtists, GLabelInfoFeaturing;
+
 
     public void setControllerOutline(ControllerOutline controllerOutline) {
         this.controllerOutline = controllerOutline;
@@ -225,32 +229,54 @@ public class ControllerAlbums {
 
     private void initializeGListTracklist() {
         GListTracklist.setPlaceholder(new Label("Select an album"));
-        GListTracklist.setCellFactory((param) -> new ListCell<>() {
-            @Override
-            protected void updateItem(TrackSimplified item, boolean empty) {
-                super.updateItem(item, empty);
-                if (item == null || empty) {
-                    setText(null);
-                    return;
-                }
-                setText(item.getTrackNumber() + ". " + item.getName());
 
-                if (Arrays.stream(item.getArtists()).anyMatch(p -> p.getId().equals(currentSelectedAlbum.getArtistId()))) {
-                    setStyle("-fx-font-weight: bold;");
-                } else {
-                    setStyle("");
-                }
-
-                setOnMouseClicked(mouseClickedEvent -> {
-                    if (mouseClickedEvent.getButton().equals(MouseButton.PRIMARY) && mouseClickedEvent.getClickCount() == 2) {
-                        playSelected();
+        GListTracklist.setCellFactory(list -> {
+            final ListCell<TrackSimplified> cell = new ListCell<>() {
+                @Override
+                protected void updateItem(TrackSimplified item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (item == null || empty) {
+                        setText(null);
+                        return;
                     }
-                });
-            }
+                    setText(item.getTrackNumber() + ". " + item.getName());
+
+                    if (Arrays.stream(item.getArtists()).anyMatch(p -> p.getId().equals(currentSelectedAlbum.getArtistId()))) {
+                        setStyle("-fx-font-weight: bold;");
+                    } else {
+                        setStyle("");
+                    }
+
+                    setOnMouseClicked(mouseClickedEvent -> {
+                        if (mouseClickedEvent.getButton().equals(MouseButton.PRIMARY) && mouseClickedEvent.getClickCount() == 2) {
+                            playSelected();
+                        }
+                    });
+                }
+            };
+            cell.setOnMouseEntered(event -> hoveredIndexTracklist = cell.getIndex());
+            return cell;
         });
 
+
         GListTracklist.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            ObservableList<TrackSimplified> items = GListTracklist.getItems();
+            if (e.getButton().equals(MouseButton.SECONDARY) && items != null) {
+                TrackSimplified track = items.get(hoveredIndexTracklist);
+                if (track != null) {
+                    GTooltipTracklist.setText(getTooltipTracklistText(track));
+                    GTooltipTracklist.show(GListTracklist, e.getScreenX() + 10, e.getScreenY());
+                }
+            }
             if (e.isSecondaryButtonDown()) e.consume();
+        });
+
+        GListTracklist.addEventFilter(MouseEvent.MOUSE_RELEASED, e -> {
+            if (e.getButton().equals(MouseButton.SECONDARY)) GTooltipTracklist.hide();
+        });
+
+        GListTracklist.addEventFilter(MouseEvent.MOUSE_EXITED, e -> {
+            GTooltipTracklist.hide();
         });
 
         GListTracklist.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -258,6 +284,12 @@ public class ControllerAlbums {
             currentSelectedTrack = newSelection;
             playSelected();
         });
+    }
+
+    private String getTooltipTracklistText(TrackSimplified track) {
+        return track.getName() + "\n" +
+                Utilities.convertMsToDuration(track.getDurationMs()) + "\n" +
+                "Artists: " + Arrays.stream(track.getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(", "));
     }
 
     private void initializeGTitledPaneNewReleases() {
