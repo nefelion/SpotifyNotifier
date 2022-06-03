@@ -285,7 +285,7 @@ public class ControllerAlbums {
     private String getTooltipTracklistText(TrackSimplified track) {
         return track.getName() + "\n" +
                 Utilities.convertMsToDuration(track.getDurationMs()) + "\n" +
-                "Artists: " + Arrays.stream(track.getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(", "));
+                Arrays.stream(track.getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(", "));
     }
 
     private void initializeGTitledPaneNewReleases() {
