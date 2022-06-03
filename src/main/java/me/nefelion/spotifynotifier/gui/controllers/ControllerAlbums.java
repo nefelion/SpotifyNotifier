@@ -257,6 +257,7 @@ public class ControllerAlbums {
             cell.setOnMouseEntered(e -> {
                 hoveredIndexTracklist = cell.getIndex();
                 ObservableList<TrackSimplified> items = GListTracklist.getItems();
+                if (hoveredIndexTracklist >= items.size()) return;
                 TrackSimplified track = items.get(hoveredIndexTracklist);
                 if (track != null) {
                     GTooltipTracklist.setText(getTooltipTracklistText(track));
