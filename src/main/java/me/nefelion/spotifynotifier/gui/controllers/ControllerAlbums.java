@@ -45,6 +45,8 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.*;
@@ -61,6 +63,7 @@ public class ControllerAlbums {
     private TrackSimplified currentSelectedTrack;
     private boolean oneArtist;
     private final Tooltip GTooltipTracklist = new Tooltip();
+    private final ContextMenu GContextMenuTracklist = new ContextMenu();
     private int hoveredIndexTracklist = -1;
 
     @FXML
@@ -258,7 +261,7 @@ public class ControllerAlbums {
                 hoveredIndexTracklist = cell.getIndex();
                 ObservableList<TrackSimplified> items = GListTracklist.getItems();
                 if (hoveredIndexTracklist >= items.size()) return;
-                TrackSimplified track = items.get(hoveredIndexTracklist);
+                TrackSimplified track = getHoveredTrack();
                 if (track != null) {
                     GTooltipTracklist.setText(getTooltipTracklistText(track));
                     GTooltipTracklist.show(GListTracklist, e.getScreenX() + 10, e.getScreenY());
@@ -269,11 +272,44 @@ public class ControllerAlbums {
 
 
         GListTracklist.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
-            if (e.isSecondaryButtonDown()) e.consume();
+            GContextMenuTracklist.hide();
+            if (!e.isSecondaryButtonDown()) return;
+            ObservableList<TrackSimplified> items = GListTracklist.getItems();
+            if (hoveredIndexTracklist >= items.size()) return;
+
+
+            // create and show a context menu over selected track
+            MenuItem menuItemPlay = new MenuItem("Play preview");
+            menuItemPlay.setOnAction(event -> {
+                int preSelected = GListTracklist.getSelectionModel().getSelectedIndex();
+                GListTracklist.getSelectionModel().select(hoveredIndexTracklist);
+                if (preSelected == hoveredIndexTracklist) playSelected();
+            });
+            MenuItem menuItemCopyLink = new MenuItem("Copy Spotify link");
+            menuItemCopyLink.setOnAction(event -> {
+                ClipboardContent content = new ClipboardContent();
+                content.putString("https://open.spotify.com/track/" + getHoveredTrack().getId());
+                Clipboard.getSystemClipboard().setContent(content);
+            });
+            MenuItem menuItemOpenLink = new MenuItem("Show on Spotify");
+            menuItemOpenLink.setOnAction(event -> {
+                String link = "https://open.spotify.com/track/" + getHoveredTrack().getId();
+                try {
+                    Desktop.getDesktop().browse(new URI(link));
+                } catch (IOException | URISyntaxException e1) {
+                    e1.printStackTrace();
+                }
+            });
+            GContextMenuTracklist.getItems().clear();
+            GContextMenuTracklist.getItems().addAll(menuItemPlay, menuItemCopyLink, menuItemOpenLink);
+            GContextMenuTracklist.show(GListTracklist, e.getScreenX(), e.getScreenY());
+
+            e.consume();
         });
 
         GListTracklist.addEventFilter(MouseEvent.MOUSE_EXITED, e -> {
             GTooltipTracklist.hide();
+            //GContextMenuTracklist.hide();
         });
 
         GListTracklist.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -281,6 +317,10 @@ public class ControllerAlbums {
             currentSelectedTrack = newSelection;
             playSelected();
         });
+    }
+
+    private TrackSimplified getHoveredTrack() {
+        return GListTracklist.getItems().get(hoveredIndexTracklist);
     }
 
     private String getTooltipTracklistText(TrackSimplified track) {
