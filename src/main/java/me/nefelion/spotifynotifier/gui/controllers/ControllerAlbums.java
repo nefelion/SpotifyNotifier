@@ -254,25 +254,21 @@ public class ControllerAlbums {
                     });
                 }
             };
-            cell.setOnMouseEntered(event -> hoveredIndexTracklist = cell.getIndex());
-            return cell;
-        });
-
-
-        GListTracklist.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
-            ObservableList<TrackSimplified> items = GListTracklist.getItems();
-            if (e.getButton().equals(MouseButton.SECONDARY) && items != null) {
+            cell.setOnMouseEntered(e -> {
+                hoveredIndexTracklist = cell.getIndex();
+                ObservableList<TrackSimplified> items = GListTracklist.getItems();
                 TrackSimplified track = items.get(hoveredIndexTracklist);
                 if (track != null) {
                     GTooltipTracklist.setText(getTooltipTracklistText(track));
                     GTooltipTracklist.show(GListTracklist, e.getScreenX() + 10, e.getScreenY());
                 }
-            }
-            if (e.isSecondaryButtonDown()) e.consume();
+            });
+            return cell;
         });
 
-        GListTracklist.addEventFilter(MouseEvent.MOUSE_RELEASED, e -> {
-            if (e.getButton().equals(MouseButton.SECONDARY)) GTooltipTracklist.hide();
+
+        GListTracklist.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            if (e.isSecondaryButtonDown()) e.consume();
         });
 
         GListTracklist.addEventFilter(MouseEvent.MOUSE_EXITED, e -> {
