@@ -400,8 +400,9 @@ public class ControllerAlbums {
                 GCoverImageView.setImage(null);
                 GListTracklist.setPlaceholder(new Label("Loading..."));
 
+                ReleasedAlbum selectedAlbum = getSelectedAlbum();
                 GListTracklist.setItems(null);
-                Thread taskThread = new Thread(() -> downloadInfoForAlbum(getSelectedAlbum()));
+                Thread taskThread = new Thread(() -> downloadInfoForAlbum(selectedAlbum));
                 taskThread.setDaemon(true);
                 taskThread.start();
             } else loadInfo();
@@ -474,24 +475,22 @@ public class ControllerAlbums {
 
     }
 
-    private synchronized void downloadInfoForAlbum(ReleasedAlbum releasedAlbum) {
-        GMainVBOX.setCursor(Cursor.WAIT);
+    private void downloadInfoForAlbum(ReleasedAlbum releasedAlbum) {
+        Platform.runLater(() -> GMainVBOX.setCursor(Cursor.WAIT));
         String id = releasedAlbum.getId();
         Album album = TheEngine.getInstance().getAlbum(id);
         List<TrackSimplified> trackList = TheEngine.getInstance().getTracks(album.getId());
-        //AudioFeatures[] features = TheEngine.getInstance().getAudioFeatures(trackList.stream().map(TrackSimplified::getId).collect(Collectors.toList()));
         try {
             URL url = new URL(album.getImages()[1].getUrl());
             InputStream input = url.openStream();
             Platform.runLater(() -> {
                 infoHashMap.put(id, new TempAlbumInfo(album, new Image(input), trackList));
                 if (Objects.equals(getSelectedAlbum().getId(), id)) loadInfo();
-                //downloadInfoForBuffers();
             });
         } catch (IOException e) {
             System.err.println("CAN'T DOWNLOAD COVER");
         }
-        GMainVBOX.setCursor(Cursor.DEFAULT);
+        Platform.runLater(() -> GMainVBOX.setCursor(Cursor.DEFAULT));
     }
 
     private ReleasedAlbum getSelectedAlbum() {
