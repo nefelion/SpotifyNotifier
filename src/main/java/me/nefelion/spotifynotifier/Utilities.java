@@ -9,10 +9,14 @@ import javafx.stage.Window;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Objects;
@@ -20,6 +24,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.function.Predicate;
 
+import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.SECONDS;
 
 public class Utilities {
@@ -160,4 +165,47 @@ public class Utilities {
     public static Predicate<String> haveWordsThatStartWith(final String startsWith) {
         return s -> Arrays.stream(s.split(" ")).anyMatch(p -> p.toLowerCase().startsWith(startsWith.toLowerCase()));
     }
+
+    public static String convertDateToAgo(String str) {
+        LocalDate date = findLocalDate(str);
+        if (date == null) return "-";
+
+        long days = DAYS.between(date, LocalDate.now());
+        if (days > 365) {
+            int years = (int) (days / 365);
+            if (years > 1) return years + " years ago";
+            return "1 year ago";
+        }
+        if (days > 30) {
+            int months = (int) (days / 30);
+            if (months > 1) return months + " months ago";
+            return "1 month ago";
+        }
+        if (days > 0) {
+            if (days > 1) return days + " days ago";
+            return "1 day ago";
+        }
+        if (days == 0) return "Today";
+        if (days == -1) return "Tomorrow";
+        return "In " + (-days) + " days";
+    }
+
+    private static LocalDate findLocalDate(String str) {
+        java.util.List<SimpleDateFormat> knownFormatters = new ArrayList<>(Arrays.asList(
+                new SimpleDateFormat("yyyy-MM-dd"),
+                new SimpleDateFormat("yyyy-MM"),
+                new SimpleDateFormat("yyyy")
+        ));
+
+
+        for (SimpleDateFormat formatter : knownFormatters) {
+            try {
+                return formatter.parse(str).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            } catch (ParseException ignored) {
+            }
+        }
+
+        return null;
+    }
+
 }

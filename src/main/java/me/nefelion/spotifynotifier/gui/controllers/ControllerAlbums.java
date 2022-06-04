@@ -340,6 +340,7 @@ public class ControllerAlbums {
     private void initializeGNewReleasesColumns() {
         GNewReleases_Type.setCellValueFactory(new PropertyValueFactory<>("albumType"));
         GNewReleases_Date.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
+        GNewReleases_Date.setCellFactory(column -> getDateCell());
         GNewReleases_Artist.setCellValueFactory(new PropertyValueFactory<>("artistString"));
         GNewReleases_Release.setCellValueFactory(new PropertyValueFactory<>("albumName"));
     }
@@ -347,8 +348,30 @@ public class ControllerAlbums {
     private void initializeGAllReleasesColumns() {
         GAllReleases_Type.setCellValueFactory(new PropertyValueFactory<>("albumType"));
         GAllReleases_Date.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
+        GAllReleases_Date.setCellFactory(column -> getDateCell());
         GAllReleases_Artist.setCellValueFactory(new PropertyValueFactory<>("artistString"));
         GAllReleases_Release.setCellValueFactory(new PropertyValueFactory<>("albumName"));
+
+    }
+
+    private TableCell<ReleasedAlbum, String> getDateCell() {
+        return new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setTooltip(null);
+                    setText(null);
+                    return;
+                }
+
+                Tooltip tooltip = new Tooltip(Utilities.convertDateToAgo(item));
+                tooltip.setShowDelay(Duration.ZERO);
+                tooltip.setStyle("-fx-text-fill: white");
+                setTooltip(tooltip);
+                setText(item);
+            }
+        };
     }
 
     private void initializeInfoTitledPanes() {
