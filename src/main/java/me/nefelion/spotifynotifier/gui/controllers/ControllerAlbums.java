@@ -72,7 +72,7 @@ public class ControllerAlbums {
     private Accordion GAccordionAlbums, GAccordionTracklist;
     @FXML
     private TitledPane GTitledPaneNewReleases, GTitledPaneAllReleases, GTitledPaneTracklist, GTitledPaneInfo,
-            GTitledPaneInfoArtists, GTitledPaneInfoFeaturing;
+            GTitledPaneInfoAlbum, GTitledPaneInfoDate, GTitledPaneInfoArtists, GTitledPaneInfoFeaturing;
     @FXML
     private TableView<ReleasedAlbum> GTableNewReleases, GTableAllReleases;
     @FXML
@@ -93,7 +93,7 @@ public class ControllerAlbums {
     @FXML
     private ProgressBar GProgressBar;
     @FXML
-    private Label GLabelInfoLength, GLabelInfoArtists, GLabelInfoFeaturing;
+    private Label GLabelInfoAlbum, GLabelInfoDate, GLabelInfoLength, GLabelInfoArtists, GLabelInfoFeaturing;
 
 
     public void setControllerOutline(ControllerOutline controllerOutline) {
@@ -515,8 +515,9 @@ public class ControllerAlbums {
         };
         comparator.thenComparing(ArtistSimplified::getName);
 
-        List<ArtistSimplified> artists = new ArrayList<>(List.of(info.album().getArtists()));
-        List<ArtistSimplified> performers = getPerformers(info.album(), info.trackList());
+        Album album = info.album();
+        List<ArtistSimplified> artists = new ArrayList<>(List.of(album.getArtists()));
+        List<ArtistSimplified> performers = getPerformers(album, info.trackList());
 
         artists.sort(comparator);
         performers.sort(comparator);
@@ -533,6 +534,8 @@ public class ControllerAlbums {
         GTitledPaneInfoFeaturing.setVisible(!performers.isEmpty());
         GTitledPaneInfoFeaturing.setContent(flowPerformers);
 
+        GLabelInfoAlbum.setText(album.getName());
+        GLabelInfoDate.setText(album.getReleaseDate() + " (" + Utilities.convertDateToAgo(album.getReleaseDate()) + ")");
         GLabelInfoLength.setText(length + " (" + tracks + " " + (tracks > 1 ? "tracks" : "track") + ")");
         GLabelInfoArtists.setText(artists.stream().map(ArtistSimplified::getName).collect(Collectors.joining(", ")));
         GLabelInfoFeaturing.setText(performers.stream().map(ArtistSimplified::getName).collect(Collectors.joining(", ")));
