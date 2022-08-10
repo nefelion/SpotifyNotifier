@@ -36,10 +36,7 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.apps.util.UtilShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import me.nefelion.spotifynotifier.records.VBoxStack;
-import se.michaelthelin.spotify.model_objects.specification.Album;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
-import se.michaelthelin.spotify.model_objects.specification.TrackSimplified;
+import se.michaelthelin.spotify.model_objects.specification.*;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -83,7 +80,7 @@ public class ControllerAlbums {
     @FXML
     private ImageView GCoverImageView;
     @FXML
-    private Text GTextCurrentPlaying, GTextVolume, GTextLoadingArtist;
+    private Text GTextVolume, GTextLoadingArtist;
     @FXML
     private Button GButtonStopPlaying, GButtonBack, GButtonRandom;
     @FXML
@@ -93,7 +90,7 @@ public class ControllerAlbums {
     @FXML
     private ProgressBar GProgressBar;
     @FXML
-    private Label GLabelInfoAlbum, GLabelInfoDate, GLabelInfoLength, GLabelInfoArtists, GLabelInfoFeaturing;
+    private Label GLabelCurrentPlaying, GLabelInfoAlbum, GLabelInfoDate, GLabelInfoLength, GLabelInfoArtists, GLabelInfoFeaturing;
 
 
     public void setControllerOutline(ControllerOutline controllerOutline) {
@@ -211,7 +208,7 @@ public class ControllerAlbums {
     }
 
     private void initializeGTextCurrentPlaying() {
-        GTextCurrentPlaying.setVisible(false);
+        GLabelCurrentPlaying.setVisible(false);
     }
 
     private void initializeGSliderVolume() {
@@ -574,8 +571,9 @@ public class ControllerAlbums {
             if (selected == null) return;
             if (selected.getPreviewUrl() == null) {
                 Platform.runLater(() -> {
-                    GTextCurrentPlaying.setText("Spotify blocks this track from being played here.");
-                    GTextCurrentPlaying.setVisible(true);
+                    GLabelCurrentPlaying.setText("Spotify blocks this track from being played here.");
+                    GLabelCurrentPlaying.setVisible(true);
+                    GLabelCurrentPlaying.setTooltip(new Tooltip("Spotify blocks this track from being played here."));
                     GMainVBOX.setCursor(Cursor.DEFAULT);
                 });
                 return;
@@ -597,7 +595,14 @@ public class ControllerAlbums {
         setVolume();
         player.play();
         GMainVBOX.setCursor(Cursor.DEFAULT);
-        GTextCurrentPlaying.setText(currentSelectedTrack.getName());
+        TrackSimplified t = currentSelectedTrack;
+        AlbumSimplified a = currentSelectedAlbum.getAlbum();
+        String artists = Arrays.stream(t.getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(", "));
+
+        GLabelCurrentPlaying.setText(t.getName());
+        Tooltip tooltip = new Tooltip(artists + " \n" + a.getName() + " (" + a.getReleaseDate() + ")" + " \n" + t.getName());
+        tooltip.setShowDelay(Duration.seconds(0));
+        GLabelCurrentPlaying.setTooltip(tooltip);
         setPlayerVisible(true);
     }
 
@@ -609,7 +614,7 @@ public class ControllerAlbums {
     }
 
     private void setPlayerVisible(boolean b) {
-        GTextCurrentPlaying.setVisible(b);
+        GLabelCurrentPlaying.setVisible(b);
         GButtonStopPlaying.setVisible(b);
         GTextVolume.setVisible(b);
         GSliderVolume.setVisible(b);
