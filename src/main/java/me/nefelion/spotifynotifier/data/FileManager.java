@@ -12,7 +12,8 @@ import java.util.HashSet;
 
 public class FileManager {
     private static final String FOLLOWED_DATA_YML = "followedData.yml";
-    private static final String ALBUM_DATA = "album.data";
+    public static final String ALBUM_DATA = "album.data";
+    public static final String REMIND_DATA = "remind.data";
 
     private static Path path;
 
@@ -70,25 +71,11 @@ public class FileManager {
 
     }
 
-
-    public static void createAlbumFile() {
-        File f = new File(path.toString() + "/" + ALBUM_DATA);
-        if (!f.exists()) {
-            try {
-                f.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Couldn't create AlbumData!");
-                System.exit(-1092);
-            }
-        }
-    }
-
-    public static void saveAlbumHashSet(HashSet<String> hashSet) {
-        createFile(ALBUM_DATA);
+    public static void saveHashSet(String fileName, HashSet<String> hashSet) {
+        createFile(fileName);
 
         try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(path.toString() + "/" + ALBUM_DATA));
+            BufferedWriter out = new BufferedWriter(new FileWriter(path.toString() + "/" + fileName));
             for (String s : hashSet) {
                 out.write(s);
                 out.newLine();
@@ -96,33 +83,49 @@ public class FileManager {
             out.close();
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Couldn't save AlbumData!");
+            System.err.println("Couldn't save " + fileName + "!");
             System.exit(-1093);
         }
 
     }
 
-    public static HashSet<String> getAlbumHashSet() {
+    public static HashSet<String> getHashSet(String fileName) {
 
         HashSet<String> hashSet = new HashSet<>();
 
         try {
             String line;
-            BufferedReader in = new BufferedReader(new FileReader(path.toString() + "/" + ALBUM_DATA));
+            BufferedReader in = new BufferedReader(new FileReader(path.toString() + "/" + fileName));
             while ((line = in.readLine()) != null) hashSet.add(line);
             in.close();
         } catch (FileNotFoundException e) {
-            createFile(ALBUM_DATA);
-            saveAlbumHashSet(new HashSet<>());
-            return getAlbumHashSet();
+            createFile(fileName);
+            saveHashSet(fileName, new HashSet<>());
+            return getHashSet(fileName);
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Couldn't save AlbumData!");
+            System.err.println("Couldn't get " + fileName + "!");
             System.exit(-1093);
         }
 
         return hashSet;
     }
 
+    public static boolean addToRemind(String albumID) {
+        HashSet<String> hashSet = getHashSet(REMIND_DATA);
+        if (hashSet.contains(albumID)) return false;
+        hashSet.add(albumID);
+        saveHashSet(REMIND_DATA, hashSet);
+        System.out.println("Added " + albumID + " to remind list.");
+        return true;
+    }
 
+    public static boolean removeFromRemind(String albumID) {
+        HashSet<String> hashSet = getHashSet(REMIND_DATA);
+        if (!hashSet.contains(albumID)) return false;
+        hashSet.remove(albumID);
+        saveHashSet(REMIND_DATA, hashSet);
+        System.out.println("Removed " + albumID + " from remind list.");
+        return true;
+    }
 }

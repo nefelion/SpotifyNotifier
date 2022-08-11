@@ -35,7 +35,7 @@ public class TokenGetter {
             System.out.println("Expires in: " + clientCredentials.getExpiresIn());
             return spotifyApi.getAccessToken();
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            Utilities.showMessageDialog(e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
+            Utilities.showSwingMessageDialog(e.getMessage(), "Error!", JOptionPane.ERROR_MESSAGE);
             System.exit(-1001);
             return null;
         }

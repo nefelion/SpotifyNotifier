@@ -45,11 +45,11 @@ public class TheEngine {
         FileData fileData = TempData.getInstance().getFileData();
         List<FollowedArtist> followedArtists = fileData.getFollowedArtists();
 
-        HashSet<String> hashSet = FileManager.getAlbumHashSet();
+        HashSet<String> hashSet = FileManager.getHashSet(FileManager.ALBUM_DATA);
 
         OptionalInt indexOfExistingID = IntStream.range(0, followedArtists.size()).filter(i -> id.equalsIgnoreCase(followedArtists.get(i).getID())).findFirst();
         if (indexOfExistingID.isPresent()) {
-            Utilities.showMessageDialog(followedArtists.get(indexOfExistingID.getAsInt()).getName() + " is already followed.", "Already followed!", JOptionPane.ERROR_MESSAGE);
+            Utilities.showSwingMessageDialog(followedArtists.get(indexOfExistingID.getAsInt()).getName() + " is already followed.", "Already followed!", JOptionPane.ERROR_MESSAGE);
             System.out.println(followedArtists.get(indexOfExistingID.getAsInt()).getName() + " is already followed.");
             return;
         }
@@ -61,7 +61,7 @@ public class TheEngine {
             for (AlbumSimplified album : getAlbums(id)) hashSet.add(album.getId());
             followedArtists.add(newArtist);
             FileManager.saveFileData(fileData);
-            FileManager.saveAlbumHashSet(hashSet);
+            FileManager.saveHashSet(FileManager.ALBUM_DATA, hashSet);
             String message = "Added: " + artist.getName();
             System.out.println(message);
 
@@ -71,7 +71,7 @@ public class TheEngine {
 
         } catch (SpotifyWebApiException e) {
             System.out.println("followArtistID: Something went wrong!\n" + e.getMessage());
-            Utilities.showMessageDialog(e.getMessage(), "Something went wrong!", JOptionPane.ERROR_MESSAGE);
+            Utilities.showSwingMessageDialog(e.getMessage(), "Something went wrong!", JOptionPane.ERROR_MESSAGE);
         } catch (IOException | ParseException e) {
             if (Utilities.tryAgainMSGBOX("followArtistID: Something went wrong!\n" + e.getMessage())) {
                 followArtistID(id);
@@ -91,7 +91,7 @@ public class TheEngine {
         OptionalInt indexOfExistingID = IntStream.range(0, followedArtists.size()).filter(i -> id.equalsIgnoreCase(followedArtists.get(i).getID())).findFirst();
         if (indexOfExistingID.isEmpty()) {
             System.out.println(id + " is not followed.");
-            Utilities.showMessageDialog(id + " is not followed.", "Something went wrong!", JOptionPane.ERROR_MESSAGE);
+            Utilities.showSwingMessageDialog(id + " is not followed.", "Something went wrong!", JOptionPane.ERROR_MESSAGE);
             return;
         }
         FollowedArtist artistToBeRemoved = followedArtists.get(indexOfExistingID.getAsInt());
@@ -107,7 +107,7 @@ public class TheEngine {
 
         } else {
             System.err.println("Error while removing " + artistToBeRemoved.getID());
-            Utilities.showMessageDialog("Error while removing " + artistToBeRemoved.getID(), "Something went wrong!", JOptionPane.ERROR_MESSAGE);
+            Utilities.showSwingMessageDialog("Error while removing " + artistToBeRemoved.getID(), "Something went wrong!", JOptionPane.ERROR_MESSAGE);
         }
 
     }

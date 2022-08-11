@@ -45,7 +45,7 @@ public class Utilities {
         return str;
     }
 
-    public static void showMessageDialog(String message, String title, int type) {
+    public static void showSwingMessageDialog(String message, String title, int type) {
         JFrame frame = new JFrame();
         frame.setAlwaysOnTop(true);
         new Timer(30000, (evt) -> frame.dispose()).start();
@@ -133,24 +133,28 @@ public class Utilities {
         ButtonType exit = new ButtonType("Exit");
 
         Alert alert = new Alert(Alert.AlertType.ERROR, errMsg, try_again, exit);
-        Window window = alert.getDialogPane().getScene().getWindow();
-        window.setOnCloseRequest(event -> window.hide());
-
-        alert.setTitle("");
-        ((Stage) (alert.getDialogPane().getScene().getWindow())).getIcons()
-                .add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
-        alert.setHeaderText(null);
-        alert.showAndWait();
+        showAlert(alert);
         if (alert.getResult() == exit) System.exit(-1000);
 
         return true;
     }
 
-    public static boolean okUndoMSGBOX(String errMsg) {
+    public static boolean okUndoMSGBOX(String message) {
         ButtonType ok = new ButtonType("Ok");
         ButtonType undo = new ButtonType("Undo");
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, errMsg, ok, undo);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ok, undo);
+        showAlert(alert);
+        return alert.getResult() == undo;
+    }
+
+    public static void okMSGBOX(String message) {
+        ButtonType ok = new ButtonType("Ok");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ok);
+        showAlert(alert);
+    }
+
+    public static void showAlert(Alert alert) {
         Window window = alert.getDialogPane().getScene().getWindow();
         window.setOnCloseRequest(event -> window.hide());
 
@@ -159,7 +163,6 @@ public class Utilities {
                 .add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
         alert.setHeaderText(null);
         alert.showAndWait();
-        return alert.getResult() == undo;
     }
 
     public static Predicate<String> haveWordsThatStartWith(final String startsWith) {

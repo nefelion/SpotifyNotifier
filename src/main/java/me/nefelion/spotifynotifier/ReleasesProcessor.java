@@ -1,10 +1,13 @@
 package me.nefelion.spotifynotifier;
 
+import com.neovisionaries.i18n.CountryCode;
 import javafx.application.Platform;
 import me.nefelion.spotifynotifier.data.FileManager;
+import me.nefelion.spotifynotifier.data.TempData;
 import se.michaelthelin.spotify.enums.AlbumGroup;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -15,18 +18,24 @@ public class ReleasesProcessor {
 
     private final TheEngine theEngine = TheEngine.getInstance();
     private final List<FollowedArtist> artists;
-    private final HashSet<String> savedIDhashSet;
-    private final HashSet<String> loadedIDhashSet = new HashSet<>();
-    private final HashMap<String, ReleasedAlbum> featuringHashMap = new HashMap<>();
-    private final List<ReleasedAlbum> newAlbums = new ArrayList<>();
-    private final List<ReleasedAlbum> allAlbums = new ArrayList<>();
+    private final HashSet<String> savedIDhashSet, loadedIDhashSet, remindIDhashSet;
+    private final HashMap<String, ReleasedAlbum> featuringHashMap;
+    private final List<ReleasedAlbum> newAlbums, allAlbums;
+    private final CountryCode countryCode;
 
     private DoubleConsumer progressConsumer;
     private Consumer<String> currentArtistConsumer, processedArtistsConsumer, releasesConsumer, newReleasesConsumer;
 
     public ReleasesProcessor(List<FollowedArtist> artists) {
         this.artists = artists;
-        savedIDhashSet = new HashSet<>(FileManager.getAlbumHashSet());
+        savedIDhashSet = new HashSet<>(FileManager.getHashSet(FileManager.ALBUM_DATA));
+        remindIDhashSet = FileManager.getHashSet(FileManager.REMIND_DATA);
+
+        newAlbums = new ArrayList<>();
+        allAlbums = new ArrayList<>();
+        featuringHashMap = new HashMap<>();
+        loadedIDhashSet = new HashSet<>();
+        countryCode = FileManager.getFileData().getCountryCode();
     }
 
     public ReleasesProcessor(FollowedArtist... artists) {
@@ -55,12 +64,16 @@ public class ReleasesProcessor {
                 if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON))
                     featuringHashMap.put(album.getId(), new ReleasedAlbum(album, artist));
                 else if (!loadedIDhashSet.contains(album.getId())) {
-                    ReleasedAlbum releasedAlbum = new ReleasedAlbum(album, artist);
-                    if (!savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(artist.getID())) {
+                    boolean isNewAndFollowed = !savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(artist.getID());
+                    boolean isRemind = remindIDhashSet.contains(album.getId()) && Arrays.asList(album.getAvailableMarkets()).contains(countryCode);
+                    if (isRemind) remindIDhashSet.remove(album.getId());
+
+
+                    if (isNewAndFollowed || isRemind) {
                         savedIDhashSet.add(album.getId());
-                        addToNewAlbums(releasedAlbum);
+                        addToNewAlbums(new ReleasedAlbum(album, artist));
                     }
-                    addToAllAlbums(releasedAlbum);
+                    addToAllAlbums(new ReleasedAlbum(album, artist));
                     loadedIDhashSet.add(album.getId());
                 }
             }
@@ -70,11 +83,9 @@ public class ReleasesProcessor {
             if (processedArtistsConsumer != null)
                 Platform.runLater(() -> processedArtistsConsumer.accept(i.intValue() + "/" + artists.size()));
         }
-
-
         loadUniqueFeaturing();
-
-        FileManager.saveAlbumHashSet(savedIDhashSet);
+        FileManager.saveHashSet(FileManager.ALBUM_DATA, savedIDhashSet);
+        FileManager.saveHashSet(FileManager.REMIND_DATA, remindIDhashSet);
     }
 
     private void loadUniqueFeaturing() {

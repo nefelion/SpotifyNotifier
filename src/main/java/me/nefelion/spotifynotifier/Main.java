@@ -43,7 +43,7 @@ public class Main {
 
         String token = tokenGetter.getToken();
         if (token == null) {
-            Utilities.showMessageDialog("Invalid token!", "Error!", JOptionPane.ERROR_MESSAGE);
+            Utilities.showSwingMessageDialog("Invalid token!", "Error!", JOptionPane.ERROR_MESSAGE);
             return;
         }
         SpotifyApi spotifyApi = new SpotifyApi.Builder()
@@ -52,7 +52,7 @@ public class Main {
 
 
         if (!lock()) {
-            Utilities.showMessageDialog("Another instance is running!", "Error!", JOptionPane.ERROR_MESSAGE);
+            Utilities.showSwingMessageDialog("Another instance is running!", "Error!", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -65,7 +65,7 @@ public class Main {
             Application.launch(AppMain.class);
         } else if (subCommands.containsKey(args[0].toLowerCase()))
             subCommands.get(args[0].toLowerCase()).execute(Arrays.copyOfRange(args, 1, args.length));
-        else Utilities.showMessageDialog("Wrong arg '" + args[0] + "'", "Error!", JOptionPane.ERROR_MESSAGE);
+        else Utilities.showSwingMessageDialog("Wrong arg '" + args[0] + "'", "Error!", JOptionPane.ERROR_MESSAGE);
 
     }
 

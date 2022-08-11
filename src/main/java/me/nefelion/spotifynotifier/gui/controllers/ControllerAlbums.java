@@ -32,6 +32,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import me.nefelion.spotifynotifier.*;
+import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.apps.util.UtilShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
@@ -652,6 +653,7 @@ public class ControllerAlbums {
             final MenuItem showReleasesMenuItem = new MenuItem("Show releases by...");
             final MenuItem showSimilarMenuItem = new MenuItem("Show similar artists");
             final MenuItem followUnfollowMenuItem = new MenuItem();
+            final MenuItem remindMenuItem = new MenuItem("Remind");
             showOnSpotifyMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
                 Runtime rt = Runtime.getRuntime();
@@ -676,6 +678,13 @@ public class ControllerAlbums {
                 showReleases(album.getFollowedArtistName(), new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
             });
             showSimilarMenuItem.setOnAction(event -> requestSimilarArtistsView(row.getItem().getArtistId(), row.getItem().getFollowedArtistName()));
+            remindMenuItem.setOnAction(event -> {
+                FileManager.addToRemind(row.getItem().getId());
+
+                String countryName = TempData.getInstance().getFileData().getCountryCode().getName();
+                if (Utilities.okUndoMSGBOX("Reminder added. The album will appear in the 'New Releases' tab when the album is released in " + countryName + "."))
+                    if (FileManager.removeFromRemind(row.getItem().getId())) Utilities.okMSGBOX("Reminder removed.");
+            });
 
             showReleasesMenuItem.setDisable(true);
             contextMenu.getItems().add(showOnSpotifyMenuItem);
@@ -683,6 +692,7 @@ public class ControllerAlbums {
             contextMenu.getItems().add(showReleasesMenuItem);
             contextMenu.getItems().add(showSimilarMenuItem);
             contextMenu.getItems().add(followUnfollowMenuItem);
+            contextMenu.getItems().add(remindMenuItem);
             contextMenu.getItems().forEach(p -> p.setVisible(false));
 
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
