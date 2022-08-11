@@ -22,7 +22,7 @@ public class ControllerOutline {
     @FXML
     private TabPane GTabPane;
     @FXML
-    private AnchorPane GFollowedAnchorPane, GAlbumAnchorPane, GSettingsAnchorPane;
+    private AnchorPane GFollowedAnchorPane, GAlbumAnchorPane;
     @FXML
     private Label GLabelVersionNumber;
     @FXML
@@ -46,7 +46,6 @@ public class ControllerOutline {
     @FXML
     private void initialize() {
         GTabPane.getTabs().get(TAB.ALBUMS.ordinal()).setDisable(true);
-        GTabPane.getTabs().get(TAB.SETTINGS.ordinal()).setDisable(true);
         GLabelVersionNumber.setText(Main.getFullVersion());
 
         GButtonDownloadUpdate.setOnAction(e -> {
@@ -90,11 +89,6 @@ public class ControllerOutline {
         GAlbumAnchorPane.getChildren().add(vbox);
     }
 
-    public void setSettingsVBOX(VBox vbox) {
-        GSettingsAnchorPane.getChildren().clear();
-        GSettingsAnchorPane.getChildren().add(vbox);
-    }
-
     public void selectTab(TAB tab) {
         GTabPane.getSelectionModel().select(tab.ordinal());
     }
@@ -132,8 +126,7 @@ public class ControllerOutline {
 
     public enum TAB {
         FOLLOWED,
-        ALBUMS,
-        SETTINGS
+        ALBUMS
     }
 
 }
