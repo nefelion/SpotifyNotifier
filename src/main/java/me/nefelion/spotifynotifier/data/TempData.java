@@ -4,7 +4,6 @@ public final class TempData {
     private static TempData instance;
     private FileData fileData;
     private double volumeSliderValue = 33;
-    private String typedCountry = "";
 
     private TempData() {
         fileData = new FileData();
@@ -37,11 +36,4 @@ public final class TempData {
         this.volumeSliderValue = volumeSliderValue;
     }
 
-    public String getTypedCountry() {
-        return typedCountry;
-    }
-
-    public void setTypedCountry(String typedCountry) {
-        this.typedCountry = typedCountry;
-    }
 }

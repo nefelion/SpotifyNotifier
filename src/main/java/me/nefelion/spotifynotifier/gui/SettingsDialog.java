@@ -1,13 +1,15 @@
 package me.nefelion.spotifynotifier.gui;
 
 import com.neovisionaries.i18n.CountryCode;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import me.nefelion.spotifynotifier.Main;
+import me.nefelion.spotifynotifier.data.FileData;
+import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
 
 import java.util.Objects;
@@ -15,6 +17,8 @@ import java.util.Objects;
 public class SettingsDialog extends Dialog<ButtonType> {
 
     private ButtonType buttonTypeSave;
+    private TextField textFieldCountryCode;
+    private CheckBox checkBoxIgnoreVarious;
 
     public SettingsDialog() {
         setIcon();
@@ -29,32 +33,36 @@ public class SettingsDialog extends Dialog<ButtonType> {
         VBox vbox = new VBox();
 
         Label labelCountry = new Label("Country:");
-        TextField textFieldCountryCode = new TextField();
+        textFieldCountryCode = new TextField();
         textFieldCountryCode.setText(TempData.getInstance().getFileData().getCountryCode().getName());
-        TempData.getInstance().setTypedCountry(textFieldCountryCode.getText());
         textFieldCountryCode.setPromptText("Country");
         textFieldCountryCode.setPrefWidth(200);
         textFieldCountryCode.setStyle("-fx-background-color: #00FF00; -fx-text-fill: black; -fx-border-color: black;");
-
         textFieldCountryCode.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("[a-zA-Z ]*")) {
                 textFieldCountryCode.setText(newValue.replaceAll("[^a-zA-Z ]", ""));
             }
         });
-
         textFieldCountryCode.setOnKeyTyped(e -> {
             if (CountryCode.findByName(textFieldCountryCode.getText()).isEmpty()) {
                 getDialogPane().lookupButton(buttonTypeSave).setDisable(true);
                 textFieldCountryCode.setStyle("-fx-background-color: #FF0000; -fx-text-fill: black; -fx-border-color: black;");
             } else {
-                TempData.getInstance().setTypedCountry(textFieldCountryCode.getText());
                 getDialogPane().lookupButton(buttonTypeSave).setDisable(false);
                 textFieldCountryCode.setStyle("-fx-background-color: #00FF00; -fx-text-fill: black; -fx-border-color: black;");
             }
         });
 
+        Separator separator = new Separator();
+        separator.setPrefWidth(200);
+        separator.setPrefHeight(10);
+        separator.setOrientation(Orientation.HORIZONTAL);
 
-        vbox.getChildren().addAll(labelCountry, textFieldCountryCode);
+        checkBoxIgnoreVarious = new CheckBox("Ignore 'Various Artists' releases");
+        checkBoxIgnoreVarious.setSelected(TempData.getInstance().getFileData().isIgnoreVariousArtists());
+
+        vbox.getChildren().addAll(new VBox(labelCountry, textFieldCountryCode), separator, checkBoxIgnoreVarious);
+        vbox.setSpacing(15);
         return vbox;
     }
 
@@ -62,6 +70,19 @@ public class SettingsDialog extends Dialog<ButtonType> {
         buttonTypeSave = new ButtonType("SAVE", ButtonBar.ButtonData.OK_DONE);
         ButtonType buttonTypeCancel = new ButtonType("CANCEL", ButtonBar.ButtonData.CANCEL_CLOSE);
         getDialogPane().getButtonTypes().addAll(buttonTypeSave, buttonTypeCancel);
+
+        getDialogPane().lookupButton(buttonTypeSave).addEventFilter(ActionEvent.ACTION, event -> save());
+    }
+
+    private void save() {
+        FileData fd = TempData.getInstance().getFileData();
+
+        if (!CountryCode.findByName(textFieldCountryCode.getText()).isEmpty())
+            fd.setCountryCodeNumeric(CountryCode.findByName(textFieldCountryCode.getText()).get(0).getNumeric());
+
+        fd.setIgnoreVariousArtists(checkBoxIgnoreVarious.isSelected());
+
+        FileManager.saveFileData(fd);
     }
 
     private void setIcon() {

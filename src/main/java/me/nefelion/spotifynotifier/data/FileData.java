@@ -10,11 +10,13 @@ public class FileData {
     private final List<FollowedArtist> followedArtists;
     private String lastChecked;
     private int countryCodeNumeric;
+    private boolean ignoreVariousArtists;
 
     public FileData() {
         this.followedArtists = new LinkedList<>();
         this.lastChecked = "-";
         this.countryCodeNumeric = 840;
+        this.ignoreVariousArtists = false;
     }
 
     public List<FollowedArtist> getFollowedArtists() {
@@ -39,6 +41,14 @@ public class FileData {
 
     public void setCountryCodeNumeric(int countryCodeNumeric) {
         this.countryCodeNumeric = countryCodeNumeric;
+    }
+
+    public boolean isIgnoreVariousArtists() {
+        return ignoreVariousArtists;
+    }
+
+    public void setIgnoreVariousArtists(boolean ignoreVariousArtists) {
+        this.ignoreVariousArtists = ignoreVariousArtists;
     }
 
 }

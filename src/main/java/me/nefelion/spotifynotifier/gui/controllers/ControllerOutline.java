@@ -71,14 +71,7 @@ public class ControllerOutline {
     private void setGButtonSettings() {
         GButtonSettings.setOnAction(e -> {
             Dialog<ButtonType> dialog = new SettingsDialog();
-            ButtonBar.ButtonData result = Objects.requireNonNull(dialog.showAndWait().orElse(null)).getButtonData();
-            if (result == OK_DONE) {
-                String typedCountry = TempData.getInstance().getTypedCountry();
-                System.out.println("saving: " + typedCountry);
-                FileData fd = TempData.getInstance().getFileData();
-                fd.setCountryCodeNumeric(CountryCode.findByName(typedCountry).get(0).getNumeric());
-                FileManager.saveFileData(fd);
-            }
+            dialog.showAndWait();
         });
         Tooltip settings = new Tooltip("Settings");
         settings.setShowDelay(new javafx.util.Duration(0));

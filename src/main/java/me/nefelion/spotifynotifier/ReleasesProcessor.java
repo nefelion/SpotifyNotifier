@@ -3,11 +3,9 @@ package me.nefelion.spotifynotifier;
 import com.neovisionaries.i18n.CountryCode;
 import javafx.application.Platform;
 import me.nefelion.spotifynotifier.data.FileManager;
-import me.nefelion.spotifynotifier.data.TempData;
 import se.michaelthelin.spotify.enums.AlbumGroup;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 
-import java.io.File;
 import java.util.*;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +20,7 @@ public class ReleasesProcessor {
     private final HashMap<String, ReleasedAlbum> featuringHashMap;
     private final List<ReleasedAlbum> newAlbums, allAlbums;
     private final CountryCode countryCode;
+    private final boolean ignoreVarious;
 
     private DoubleConsumer progressConsumer;
     private Consumer<String> currentArtistConsumer, processedArtistsConsumer, releasesConsumer, newReleasesConsumer;
@@ -36,6 +35,7 @@ public class ReleasesProcessor {
         featuringHashMap = new HashMap<>();
         loadedIDhashSet = new HashSet<>();
         countryCode = FileManager.getFileData().getCountryCode();
+        ignoreVarious = FileManager.getFileData().isIgnoreVariousArtists();
     }
 
     public ReleasesProcessor(FollowedArtist... artists) {
@@ -61,21 +61,23 @@ public class ReleasesProcessor {
             }
 
             for (AlbumSimplified album : albums) {
-                if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON))
+                if (loadedIDhashSet.contains(album.getId())) continue;
+                if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON)) {
+                    if (ignoreVarious && album.getArtists()[0].getName().equals("Various Artists")) continue;
                     featuringHashMap.put(album.getId(), new ReleasedAlbum(album, artist));
-                else if (!loadedIDhashSet.contains(album.getId())) {
-                    boolean isNewAndFollowed = !savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(artist.getID());
-                    boolean isRemind = remindIDhashSet.contains(album.getId()) && Arrays.asList(album.getAvailableMarkets()).contains(countryCode);
-                    if (isRemind) remindIDhashSet.remove(album.getId());
-
-
-                    if (isNewAndFollowed || isRemind) {
-                        savedIDhashSet.add(album.getId());
-                        addToNewAlbums(new ReleasedAlbum(album, artist));
-                    }
-                    addToAllAlbums(new ReleasedAlbum(album, artist));
-                    loadedIDhashSet.add(album.getId());
+                    continue;
                 }
+
+                boolean isRemind = remindIDhashSet.contains(album.getId()) && Arrays.asList(album.getAvailableMarkets()).contains(countryCode);
+                if (isRemind) remindIDhashSet.remove(album.getId());
+
+                boolean isNewAndFollowed = !savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(artist.getID());
+                if (isNewAndFollowed || isRemind) {
+                    savedIDhashSet.add(album.getId());
+                    addToNewAlbums(new ReleasedAlbum(album, artist));
+                }
+                addToAllAlbums(new ReleasedAlbum(album, artist));
+                loadedIDhashSet.add(album.getId());
             }
 
             if (progressConsumer != null)
@@ -91,8 +93,9 @@ public class ReleasesProcessor {
     private void loadUniqueFeaturing() {
         for (ReleasedAlbum album : featuringHashMap.values()) {
             if (loadedIDhashSet.contains(album.getId())) continue;
+            boolean isNewAndFollowed = !savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(album.getArtistId());
 
-            if (!savedIDhashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(album.getArtistId())) {
+            if (isNewAndFollowed) {
                 savedIDhashSet.add(album.getId());
                 addToNewAlbums(album);
             }
