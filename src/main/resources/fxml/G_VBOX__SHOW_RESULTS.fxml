@@ -55,18 +55,18 @@
     <children>
         <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="500.0" prefWidth="640.0" VBox.vgrow="ALWAYS">
             <children>
-                <Accordion fx:id="GAccordionAlbums" layoutX="12.0" layoutY="27.0" prefHeight="306.0" prefWidth="618.0">
+                <Accordion fx:id="GAccordionAlbums" layoutX="15.0" layoutY="27.0" prefHeight="306.0" prefWidth="610.0">
                     <panes>
-                        <TitledPane fx:id="GTitledPaneNewReleases" animated="false" expanded="false" prefWidth="653.0" stylesheets="@../css/show_results/new_titled_pane.css" text="New releases">
+                        <TitledPane fx:id="GTitledPaneNewReleases" animated="false" expanded="false" stylesheets="@../css/show_results/new_titled_pane.css" text="New releases">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="255.0" prefWidth="891.0">
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="255.0">
                                     <children>
-                                        <TableView fx:id="GTableNewReleases" prefHeight="257.0" prefWidth="618.0">
+                                        <TableView fx:id="GTableNewReleases" prefHeight="257.0" prefWidth="610.0">
                                             <columns>
                                                 <TableColumn fx:id="GNewReleases_Date" editable="false" prefWidth="70.0" resizable="false" sortable="false" text="Date" />
                                                 <TableColumn fx:id="GNewReleases_Type" editable="false" prefWidth="55.0" resizable="false" sortable="false" style="-fx-highlight-fill: red;" text="Type" />
-                                                <TableColumn fx:id="GNewReleases_Release" editable="false" maxWidth="1.7976931348623157E308" prefWidth="247.0" resizable="false" sortable="false" text="Release" />
-                                                <TableColumn fx:id="GNewReleases_Artist" editable="false" prefWidth="230.0" resizable="false" sortable="false" text="Artist" />
+                                                <TableColumn fx:id="GNewReleases_Release" editable="false" maxWidth="1.7976931348623157E308" prefWidth="245.0" resizable="false" sortable="false" text="Release" />
+                                                <TableColumn fx:id="GNewReleases_Artist" editable="false" prefWidth="225.0" resizable="false" sortable="false" text="Artist" />
                                             </columns>
                                             <stylesheets>
                                                 <URL value="@../css/show_results/tableview.css" />
@@ -81,12 +81,12 @@
                             <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                     <children>
-                                        <TableView fx:id="GTableAllReleases" prefHeight="254.0" prefWidth="618.0">
+                                        <TableView fx:id="GTableAllReleases" prefHeight="254.0" prefWidth="610.0">
                                             <columns>
                                                 <TableColumn fx:id="GAllReleases_Date" editable="false" prefWidth="70.0" resizable="false" sortable="false" text="Date" />
                                                 <TableColumn fx:id="GAllReleases_Type" editable="false" prefWidth="55.0" resizable="false" sortable="false" text="Type" />
-                                                <TableColumn fx:id="GAllReleases_Release" editable="false" maxWidth="1.7976931348623157E308" prefWidth="247.0" resizable="false" sortable="false" text="Release" />
-                                                <TableColumn fx:id="GAllReleases_Artist" editable="false" prefWidth="230.0" resizable="false" sortable="false" text="Artist" />
+                                                <TableColumn fx:id="GAllReleases_Release" editable="false" maxWidth="1.7976931348623157E308" prefWidth="245.0" resizable="false" sortable="false" text="Release" />
+                                                <TableColumn fx:id="GAllReleases_Artist" editable="false" prefWidth="225.0" resizable="false" sortable="false" text="Artist" />
                                             </columns>
                                             <stylesheets>
                                                 <URL value="@../css/show_results/tableview.css" />
@@ -99,9 +99,9 @@
                         </TitledPane>
                     </panes>
                 </Accordion>
-                <ImageView fx:id="GCoverImageView" fitHeight="300.0" fitWidth="300.0" layoutX="14.0" layoutY="381.0" pickOnBounds="true" preserveRatio="true" />
-            <Label fx:id="GLabelCurrentPlaying" layoutX="330.0" layoutY="350.0" text="label-current-playing" textFill="#757575" />
-                <Accordion fx:id="GAccordionTracklist" layoutX="330.0" layoutY="381.0" prefHeight="300.0" prefWidth="300.0">
+                <ImageView fx:id="GCoverImageView" fitHeight="300.0" fitWidth="300.0" layoutX="15.0" layoutY="380.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="GLabelCurrentPlaying" layoutX="325.0" layoutY="350.0" text="label-current-playing" textFill="#757575" />
+                <Accordion fx:id="GAccordionTracklist" layoutX="325.0" layoutY="380.0" prefHeight="300.0" prefWidth="300.0">
                     <panes>
                         <TitledPane fx:id="GTitledPaneTracklist" animated="false" expanded="false" text="Tracklist">
                             <content>
@@ -160,8 +160,8 @@
                     </panes>
                 </Accordion>
                 <Text fx:id="GTextVolume" fill="#8d8d8d" layoutX="571.0" layoutY="352.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Volume" />
-                <Slider fx:id="GSliderVolume" layoutX="552.0" layoutY="358.0" prefHeight="14.0" prefWidth="78.0" value="33.0" />
-                <Button fx:id="GButtonStopPlaying" layoutX="500.0" layoutY="346.0" mnemonicParsing="false" onAction="#onActionGButtonStopPlaying" prefHeight="0.0" prefWidth="41.0" text="Stop" />
+                <Slider fx:id="GSliderVolume" layoutX="547.0" layoutY="358.0" prefHeight="14.0" prefWidth="78.0" value="33.0" />
+                <Button fx:id="GButtonStopPlaying" layoutX="495.0" layoutY="346.0" mnemonicParsing="false" onAction="#onActionGButtonStopPlaying" prefHeight="0.0" prefWidth="41.0" text="Stop" />
                 <HBox alignment="CENTER" layoutX="66.0" layoutY="2.0" opacity="0.8" prefHeight="25.0" prefWidth="511.0" spacing="20.0">
                     <children>
                         <CheckBox fx:id="GCheckboxAlbums" mnemonicParsing="false" onAction="#recalculateFilteredAlbums" selected="true" text="Albums" textFill="#4a4a4a" />
@@ -173,10 +173,10 @@
                         </CheckBox>
                     </children>
                 </HBox>
-                <ProgressBar fx:id="GProgressBar" layoutX="14.0" layoutY="341.0" prefHeight="34.0" prefWidth="300.0" progress="0.0" />
-                <Button fx:id="GButtonBack" layoutX="14.0" layoutY="2.0" mnemonicParsing="false" onAction="#onActionGButtonBack" prefHeight="0.0" prefWidth="41.0" stylesheets="@../css/show_results/back_button.css" text="&lt;" />
-                <Text fx:id="GTextLoadingArtist" layoutX="14.0" layoutY="363.0" strokeType="OUTSIDE" strokeWidth="0.0" text="loading-artist" textAlignment="CENTER" wrappingWidth="300.0" />
-                <Button fx:id="GButtonRandom" layoutX="602.0" layoutY="2.0" mnemonicParsing="false" prefHeight="0.0" prefWidth="87.0" stylesheets="@../css/show_results/back_button.css" text="R" />
+                <ProgressBar fx:id="GProgressBar" layoutX="15.0" layoutY="341.0" prefHeight="34.0" prefWidth="300.0" progress="0.0" />
+                <Button fx:id="GButtonBack" layoutX="15.0" layoutY="2.0" mnemonicParsing="false" onAction="#onActionGButtonBack" prefHeight="0.0" prefWidth="41.0" stylesheets="@../css/show_results/back_button.css" text="&lt;" />
+                <Text fx:id="GTextLoadingArtist" layoutX="15.0" layoutY="363.0" strokeType="OUTSIDE" strokeWidth="0.0" text="loading-artist" textAlignment="CENTER" wrappingWidth="300.0" />
+                <Button fx:id="GButtonRandom" layoutX="600.0" layoutY="2.0" mnemonicParsing="false" stylesheets="@../css/show_results/back_button.css" text="R" />
             </children>
         </AnchorPane>
     </children>

@@ -8,7 +8,6 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import javax.swing.*;
-import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -22,7 +21,6 @@ import java.util.Calendar;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
-import java.util.function.Predicate;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -51,31 +49,6 @@ public class Utilities {
         new Timer(30000, (evt) -> frame.dispose()).start();
         JOptionPane.showMessageDialog(frame, message, "SpotifyNotifier: " + title, type);
         frame.dispose();
-    }
-
-    public static void showTextArea(String title, String... text) {
-        JFrame frame = new JFrame("SpotifyNotifier: " + title);
-        JPanel jPanel = new JPanel();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        for (String str : text) {
-            JTextArea jTextArea = new JTextArea(str.trim());
-            jTextArea.setEditable(false);
-            jPanel.add(jTextArea);
-        }
-        JScrollPane scroll = new JScrollPane(jPanel);
-        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scroll.getVerticalScrollBar().setUnitIncrement(16);
-
-        Dimension d = scroll.getPreferredSize();
-        d.height = 600;
-        d.width += 25;
-        scroll.setPreferredSize(d);
-
-        frame.add(scroll);
-        frame.pack();
-        frame.setAlwaysOnTop(true);
-        frame.setVisible(true);
     }
 
     public static String convertMsToDuration(int ms) {
@@ -163,10 +136,6 @@ public class Utilities {
                 .add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
         alert.setHeaderText(null);
         alert.showAndWait();
-    }
-
-    public static Predicate<String> haveWordsThatStartWith(final String startsWith) {
-        return s -> Arrays.stream(s.split(" ")).anyMatch(p -> p.toLowerCase().startsWith(startsWith.toLowerCase()));
     }
 
     public static String convertDateToAgo(String str) {

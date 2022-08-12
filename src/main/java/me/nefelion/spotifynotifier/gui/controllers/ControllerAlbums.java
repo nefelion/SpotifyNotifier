@@ -682,7 +682,8 @@ public class ControllerAlbums {
                 FileManager.addToRemind(row.getItem().getId());
 
                 String countryName = TempData.getInstance().getFileData().getCountryCode().getName();
-                if (Utilities.okUndoMSGBOX("Reminder added. The album will appear in the 'New Releases' tab when the album is released in " + countryName + "."))
+                if (Utilities.okUndoMSGBOX("Reminder added. The album will appear in the 'New Releases' tab when it is released in " + countryName + "."
+                        + "\n\nTo change the country, go to the 'Settings' (3 dots in the top right corner)."))
                     if (FileManager.removeFromRemind(row.getItem().getId())) Utilities.okMSGBOX("Reminder removed.");
             });
 
@@ -716,7 +717,8 @@ public class ControllerAlbums {
 
     }
 
-    private void getContextMenuLambdaBody(TableRow<ReleasedAlbum> row, MenuItem showReleasesMenuItem, MenuItem followUnfollowMenuItem, ContextMenu contextMenu) {
+    private void getContextMenuLambdaBody(TableRow<ReleasedAlbum> row, MenuItem showReleasesMenuItem, MenuItem
+            followUnfollowMenuItem, ContextMenu contextMenu) {
         ReleasedAlbum album = row.getItem();
         if (album == null) {
             showReleasesMenuItem.setDisable(true);

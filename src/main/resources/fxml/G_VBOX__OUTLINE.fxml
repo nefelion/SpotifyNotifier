@@ -58,8 +58,9 @@
                         </Tab>
                     </tabs>
                 </TabPane>
-                <Label fx:id="GLabelVersionNumber" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="335.0" layoutY="6.0" opacity="0.33" prefHeight="17.0" prefWidth="300.0" text="version-number" textAlignment="RIGHT" />
-                <Button fx:id="GButtonDownloadUpdate" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="520.0" layoutY="2.0" mnemonicParsing="false" text="Download Update!" textAlignment="RIGHT" visible="false" />
+                <Label fx:id="GLabelVersionNumber" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="300.0" layoutY="6.0" opacity="0.33" prefHeight="17.0" prefWidth="300.0" text="version-number" textAlignment="RIGHT" />
+                <Button fx:id="GButtonDownloadUpdate" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="485.0" layoutY="2.0" mnemonicParsing="false" text="Download Update!" textAlignment="RIGHT" visible="false" />
+            <Button fx:id="GButtonSettings" layoutX="610.0" layoutY="2.0" mnemonicParsing="false" text="..." />
             </children>
         </Group>
     </children>

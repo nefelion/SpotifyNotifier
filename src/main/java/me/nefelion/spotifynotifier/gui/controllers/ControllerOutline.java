@@ -1,19 +1,25 @@
 package me.nefelion.spotifynotifier.gui.controllers;
 
+import com.neovisionaries.i18n.CountryCode;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import me.nefelion.spotifynotifier.Main;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
+import me.nefelion.spotifynotifier.data.FileData;
+import me.nefelion.spotifynotifier.data.FileManager;
+import me.nefelion.spotifynotifier.data.TempData;
+import me.nefelion.spotifynotifier.gui.SettingsDialog;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Scanner;
+
+import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
 
 public class ControllerOutline {
 
@@ -26,7 +32,7 @@ public class ControllerOutline {
     @FXML
     private Label GLabelVersionNumber;
     @FXML
-    private Button GButtonDownloadUpdate;
+    private Button GButtonDownloadUpdate, GButtonSettings;
 
     private ControllerAlbums controllerAlbums;
 
@@ -57,15 +63,33 @@ public class ControllerOutline {
                 ex.printStackTrace();
             }
         });
+        setGButtonSettings();
 
         checkForUpdates();
+    }
+
+    private void setGButtonSettings() {
+        GButtonSettings.setOnAction(e -> {
+            Dialog<ButtonType> dialog = new SettingsDialog();
+            ButtonBar.ButtonData result = Objects.requireNonNull(dialog.showAndWait().orElse(null)).getButtonData();
+            if (result == OK_DONE) {
+                String typedCountry = TempData.getInstance().getTypedCountry();
+                System.out.println("saving: " + typedCountry);
+                FileData fd = TempData.getInstance().getFileData();
+                fd.setCountryCodeNumeric(CountryCode.findByName(typedCountry).get(0).getNumeric());
+                FileManager.saveFileData(fd);
+            }
+        });
+        Tooltip settings = new Tooltip("Settings");
+        settings.setShowDelay(new javafx.util.Duration(0));
+        GButtonSettings.setTooltip(settings);
     }
 
     private void checkForUpdates() {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                if (isUpdateAvailable()) Platform.runLater(ControllerOutline.this::setLabelForUpdate);
+                if (isUpdateAvailable()) Platform.runLater(ControllerOutline.this::showUpdateButton);
                 return null;
             }
         };
@@ -111,7 +135,7 @@ public class ControllerOutline {
         return false;
     }
 
-    private void setLabelForUpdate() {
+    private void showUpdateButton() {
         GLabelVersionNumber.setVisible(false);
         GButtonDownloadUpdate.setVisible(true);
     }

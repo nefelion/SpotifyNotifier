@@ -116,7 +116,7 @@ public class FileManager {
         if (hashSet.contains(albumID)) return false;
         hashSet.add(albumID);
         saveHashSet(REMIND_DATA, hashSet);
-        System.out.println("Added " + albumID + " to remind list.");
+        System.out.println("Added " + albumID + " to remind list. (" + hashSet.size() + ")");
         return true;
     }
 
@@ -125,7 +125,7 @@ public class FileManager {
         if (!hashSet.contains(albumID)) return false;
         hashSet.remove(albumID);
         saveHashSet(REMIND_DATA, hashSet);
-        System.out.println("Removed " + albumID + " from remind list.");
+        System.out.println("Removed " + albumID + " from remind list. (" + hashSet.size() + ")");
         return true;
     }
 }
