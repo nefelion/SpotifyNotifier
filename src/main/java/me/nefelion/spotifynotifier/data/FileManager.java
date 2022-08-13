@@ -41,7 +41,6 @@ public class FileManager {
     public static void saveFileData(FileData fd) {
 
         createFile(FOLLOWED_DATA_YML);
-        fd.getFollowedArtists().sort(Comparator.comparing(FollowedArtist::getName));
 
         try (Writer writer = new FileWriter(path.toString() + "/" + FOLLOWED_DATA_YML, StandardCharsets.UTF_8)) {
             new Gson().toJson(fd, writer);

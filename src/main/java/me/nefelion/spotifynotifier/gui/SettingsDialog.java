@@ -45,7 +45,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
         Label labelCountry = new Label("Country:");
         initializeTextFieldCountryCode();
 
-        checkBoxOnlyAvailable = new CheckBox("Show only albums that are already available in my country");
+        checkBoxOnlyAvailable = new CheckBox("Show only albums already available in my country");
         checkBoxOnlyAvailable.setSelected(TempData.getInstance().getFileData().isShowOnlyAvailable());
 
         VBox vBox = new VBox(labelCountry, textFieldCountryCode, checkBoxOnlyAvailable);

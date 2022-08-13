@@ -444,7 +444,8 @@ public class ControllerFollowed {
 
     private void refreshGListFollowedArtists() {
         String search = GTextFieldSearchFollowed.getText().trim();
-        List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists();
+        List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists()
+                .stream().sorted(Comparator.comparing(FollowedArtist::getName)).toList();
         GListFollowed.setItems(FXCollections.observableList(followedArtists
                 .stream()
                 .filter(p -> p.getName().toLowerCase().contains(search.toLowerCase()))
