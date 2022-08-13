@@ -53,6 +53,16 @@ public class SettingsDialog extends Dialog<ButtonType> {
             }
         });
 
+        // add small text for description
+        Label labelCountryDescription = new Label("""
+                Using the 'Remind' function will remind you of an album when it appears in the country you specify here.
+                """);
+        labelCountryDescription.setStyle("-fx-font-size: 10; -fx-text-fill: gray;");
+        labelCountryDescription.setWrapText(true);
+        labelCountryDescription.setPrefWidth(200);
+        labelCountryDescription.setPrefHeight(50);
+
+
         Separator separator = new Separator();
         separator.setPrefWidth(200);
         separator.setPrefHeight(10);
@@ -61,7 +71,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
         checkBoxIgnoreVarious = new CheckBox("Ignore 'Various Artists' releases");
         checkBoxIgnoreVarious.setSelected(TempData.getInstance().getFileData().isIgnoreVariousArtists());
 
-        vbox.getChildren().addAll(new VBox(labelCountry, textFieldCountryCode), separator, checkBoxIgnoreVarious);
+        vbox.getChildren().addAll(new VBox(labelCountry, textFieldCountryCode, labelCountryDescription), separator, checkBoxIgnoreVarious);
         vbox.setSpacing(15);
         return vbox;
     }

@@ -1,5 +1,6 @@
 package me.nefelion.spotifynotifier.gui.controllers;
 
+import com.neovisionaries.i18n.CountryCode;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -688,6 +689,7 @@ public class ControllerAlbums {
             });
 
             showReleasesMenuItem.setDisable(true);
+            remindMenuItem.setDisable(true);
             contextMenu.getItems().add(showOnSpotifyMenuItem);
             contextMenu.getItems().add(copySpotifyLinkMenuItem);
             contextMenu.getItems().add(showReleasesMenuItem);
@@ -726,9 +728,15 @@ public class ControllerAlbums {
             return;
         }
 
+
         showReleasesMenuItem.setDisable(false);
         contextMenu.getItems().forEach(p -> p.setVisible(true));
         showReleasesMenuItem.setOnAction((ev) -> requestPerformersView(album));
+
+        MenuItem remindMenuItem = contextMenu.getItems().get(5);
+        CountryCode countryCode = TempData.getInstance().getFileData().getCountryCode();
+        boolean isAvailableInCountry = Arrays.asList(album.getAlbum().getAvailableMarkets()).contains(countryCode);
+        remindMenuItem.setDisable(isAvailableInCountry);
 
         boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
         followUnfollowMenuItem.setDisable(false);
