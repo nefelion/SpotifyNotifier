@@ -11,12 +11,14 @@ public class FileData {
     private String lastChecked;
     private int countryCodeNumeric;
     private boolean ignoreVariousArtists;
+    private boolean showOnlyAvailable;
 
     public FileData() {
         this.followedArtists = new LinkedList<>();
         this.lastChecked = "-";
         this.countryCodeNumeric = 840;
         this.ignoreVariousArtists = false;
+        this.showOnlyAvailable = false;
     }
 
     public List<FollowedArtist> getFollowedArtists() {
@@ -51,4 +53,11 @@ public class FileData {
         this.ignoreVariousArtists = ignoreVariousArtists;
     }
 
+    public boolean isShowOnlyAvailable() {
+        return showOnlyAvailable;
+    }
+
+    public void setShowOnlyAvailable(boolean showOnlyAvailable) {
+        this.showOnlyAvailable = showOnlyAvailable;
+    }
 }

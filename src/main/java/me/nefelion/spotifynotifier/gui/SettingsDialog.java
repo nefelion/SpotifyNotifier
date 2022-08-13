@@ -18,7 +18,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
 
     private ButtonType buttonTypeSave;
     private TextField textFieldCountryCode;
-    private CheckBox checkBoxIgnoreVarious;
+    private CheckBox checkBoxIgnoreVarious, checkBoxOnlyAvailable;
 
     public SettingsDialog() {
         setIcon();
@@ -26,13 +26,42 @@ public class SettingsDialog extends Dialog<ButtonType> {
         setHeaderText("Settings");
         setContentText("Please choose your settings:");
         setButtons();
-        getDialogPane().setContent(getVBox());
+        getDialogPane().setContent(getMainVBOX());
     }
 
-    private VBox getVBox() {
+    private VBox getMainVBOX() {
         VBox vbox = new VBox();
+        vbox.setSpacing(15);
 
+        checkBoxIgnoreVarious = new CheckBox("Ignore 'Various Artists' releases");
+        checkBoxIgnoreVarious.setSelected(TempData.getInstance().getFileData().isIgnoreVariousArtists());
+
+
+        vbox.getChildren().addAll(getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious);
+        return vbox;
+    }
+
+    private VBox getCountryVBOX() {
         Label labelCountry = new Label("Country:");
+        initializeTextFieldCountryCode();
+
+        checkBoxOnlyAvailable = new CheckBox("Show only albums that are already available in my country");
+        checkBoxOnlyAvailable.setSelected(TempData.getInstance().getFileData().isShowOnlyAvailable());
+
+        VBox vBox = new VBox(labelCountry, textFieldCountryCode, checkBoxOnlyAvailable);
+        vBox.setSpacing(5);
+        return vBox;
+    }
+
+    private static Separator getSeparator() {
+        Separator separator = new Separator();
+        separator.setPrefWidth(200);
+        separator.setPrefHeight(10);
+        separator.setOrientation(Orientation.HORIZONTAL);
+        return separator;
+    }
+
+    private void initializeTextFieldCountryCode() {
         textFieldCountryCode = new TextField();
         textFieldCountryCode.setText(TempData.getInstance().getFileData().getCountryCode().getName());
         textFieldCountryCode.setPromptText("Country");
@@ -52,28 +81,6 @@ public class SettingsDialog extends Dialog<ButtonType> {
                 textFieldCountryCode.setStyle("-fx-background-color: #00FF00; -fx-text-fill: black; -fx-border-color: black;");
             }
         });
-
-        // add small text for description
-        Label labelCountryDescription = new Label("""
-                Using the 'Remind' function will remind you of an album when it appears in the country you specify here.
-                """);
-        labelCountryDescription.setStyle("-fx-font-size: 10; -fx-text-fill: gray;");
-        labelCountryDescription.setWrapText(true);
-        labelCountryDescription.setPrefWidth(200);
-        labelCountryDescription.setPrefHeight(50);
-
-
-        Separator separator = new Separator();
-        separator.setPrefWidth(200);
-        separator.setPrefHeight(10);
-        separator.setOrientation(Orientation.HORIZONTAL);
-
-        checkBoxIgnoreVarious = new CheckBox("Ignore 'Various Artists' releases");
-        checkBoxIgnoreVarious.setSelected(TempData.getInstance().getFileData().isIgnoreVariousArtists());
-
-        vbox.getChildren().addAll(new VBox(labelCountry, textFieldCountryCode, labelCountryDescription), separator, checkBoxIgnoreVarious);
-        vbox.setSpacing(15);
-        return vbox;
     }
 
     private void setButtons() {
@@ -91,6 +98,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
             fd.setCountryCodeNumeric(CountryCode.findByName(textFieldCountryCode.getText()).get(0).getNumeric());
 
         fd.setIgnoreVariousArtists(checkBoxIgnoreVarious.isSelected());
+        fd.setShowOnlyAvailable(checkBoxOnlyAvailable.isSelected());
 
         FileManager.saveFileData(fd);
     }
