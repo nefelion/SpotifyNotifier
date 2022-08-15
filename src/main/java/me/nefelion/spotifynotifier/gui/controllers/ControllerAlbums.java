@@ -60,7 +60,7 @@ public class ControllerAlbums {
     private List<ReleasedAlbum> newAlbums, allAlbums, filteredNewAlbums, filteredAllAlbums;
     private ReleasedAlbum currentSelectedAlbum;
     private TrackSimplified currentSelectedTrack;
-    private boolean oneArtist;
+    private boolean oneArtist, autoPlayback;
     private final Tooltip GTooltipTracklist = new Tooltip();
     private final ContextMenu GContextMenuTracklist = new ContextMenu();
     private int hoveredIndexTracklist = -1;
@@ -170,26 +170,34 @@ public class ControllerAlbums {
     }
 
     private void initializeGButtonRandom() {
-        Tooltip tooltip = new Tooltip("Random release");
+        Tooltip tooltip = new Tooltip("Random release" +
+                "\nRight click for auto playback");
         tooltip.setShowDelay(Duration.seconds(0));
         GButtonRandom.setTooltip(tooltip);
 
-        GButtonRandom.setOnAction(e -> {
-            if (filteredAllAlbums.size() < 2) return;
-            TableView<ReleasedAlbum> GTable;
-
-            if (GTitledPaneNewReleases.isExpanded()) GTable = GTableNewReleases;
-            else if (GTitledPaneAllReleases.isExpanded()) GTable = GTableAllReleases;
-            else return;
-
-            int size = GTable.getItems().size();
-            int randIndex = new Random().nextInt(size);
-            while (GTable.getSelectionModel().getSelectedIndex() == randIndex)
-                randIndex = new Random().nextInt(size);
-
-            GTable.getSelectionModel().select(randIndex);
-            GTable.scrollTo(randIndex);
+        GButtonRandom.setOnMousePressed(event -> {
+            MouseButton button = event.getButton();
+            if (button == MouseButton.PRIMARY) pickRandomAlbum(false);
+            else if (button == MouseButton.SECONDARY) pickRandomAlbum(true);
         });
+    }
+
+    private void pickRandomAlbum(boolean playback) {
+        if (filteredAllAlbums.size() < 2) return;
+        TableView<ReleasedAlbum> GTable;
+
+        if (GTitledPaneNewReleases.isExpanded()) GTable = GTableNewReleases;
+        else if (GTitledPaneAllReleases.isExpanded()) GTable = GTableAllReleases;
+        else return;
+        autoPlayback = playback;
+
+        int size = GTable.getItems().size();
+        int randIndex = new Random().nextInt(size);
+        while (GTable.getSelectionModel().getSelectedIndex() == randIndex)
+            randIndex = new Random().nextInt(size);
+
+        GTable.scrollTo(randIndex);
+        GTable.getSelectionModel().select(randIndex);
     }
 
     private void initializeGButtonBack() {
@@ -485,6 +493,8 @@ public class ControllerAlbums {
         GListTracklist.setItems(FXCollections.observableArrayList(info.trackList()));
         updateInfoTab(info);
         GTitledPaneInfo.setDisable(false);
+        if (autoPlayback) GListTracklist.getSelectionModel().select(0);
+        autoPlayback = false;
     }
 
     private void updateGCoverImageView(TempAlbumInfo info) {
