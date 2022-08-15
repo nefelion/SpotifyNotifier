@@ -19,10 +19,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -230,11 +227,26 @@ public class ControllerAlbums {
     private void initializeGTableNewReleases() {
         addAlbumSelectionListenerFor(GTableNewReleases);
         setTableViewRowFactory(GTableNewReleases);
+        initializeAlbumCopyingFor(GTableNewReleases);
     }
 
     private void initializeGTableAllReleases() {
         addAlbumSelectionListenerFor(GTableAllReleases);
         setTableViewRowFactory(GTableAllReleases);
+        initializeAlbumCopyingFor(GTableAllReleases);
+    }
+
+    private void initializeAlbumCopyingFor(TableView<ReleasedAlbum> GTableAllReleases) {
+        GTableAllReleases.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isControlDown()) {
+                if (event.getCode() == KeyCode.C) {
+                    ReleasedAlbum album = GTableAllReleases.getSelectionModel().getSelectedItem();
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(album.getFollowedArtistName() + " - " + album.getAlbumName());
+                    Clipboard.getSystemClipboard().setContent(content);
+                }
+            }
+        });
     }
 
     private void initializeGListTracklist() {
