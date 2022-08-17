@@ -242,7 +242,7 @@ public class ControllerAlbums {
                 if (event.getCode() == KeyCode.C) {
                     ReleasedAlbum album = GTableAllReleases.getSelectionModel().getSelectedItem();
                     ClipboardContent content = new ClipboardContent();
-                    content.putString(album.getFollowedArtistName() + " - " + album.getAlbumName());
+                    content.putString(album.getFollowedArtistName() + "  " + album.getAlbumName());
                     Clipboard.getSystemClipboard().setContent(content);
                 }
             }
@@ -335,6 +335,17 @@ public class ControllerAlbums {
             if (newSelection == null) return;
             currentSelectedTrack = newSelection;
             playSelected();
+        });
+
+        GListTracklist.addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.isControlDown()) {
+                if (event.getCode() == KeyCode.C) {
+                    TrackSimplified track = GListTracklist.getSelectionModel().getSelectedItem();
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(track.getArtists()[0].getName() + "  " + currentSelectedAlbum.getAlbumName() + "  " + track.getName());
+                    Clipboard.getSystemClipboard().setContent(content);
+                }
+            }
         });
     }
 
