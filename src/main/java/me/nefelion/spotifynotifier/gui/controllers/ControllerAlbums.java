@@ -769,6 +769,7 @@ public class ControllerAlbums {
         MenuItem remindMenuItem = contextMenu.getItems().get(5);
         CountryCode countryCode = TempData.getInstance().getFileData().getCountryCode();
         boolean isAvailableInCountry = Arrays.asList(album.getAlbum().getAvailableMarkets()).contains(countryCode);
+        remindMenuItem.setText(isAvailableInCountry ? "Available" : "Remind");
         remindMenuItem.setDisable(isAvailableInCountry);
 
         boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
