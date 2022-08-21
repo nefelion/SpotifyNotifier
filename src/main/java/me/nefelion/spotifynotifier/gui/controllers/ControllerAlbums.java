@@ -242,7 +242,7 @@ public class ControllerAlbums {
                 if (event.getCode() == KeyCode.C) {
                     ReleasedAlbum album = GTableAllReleases.getSelectionModel().getSelectedItem();
                     ClipboardContent content = new ClipboardContent();
-                    content.putString(album.getFollowedArtistName() + "  " + album.getAlbumName());
+                    content.putString(album.getAlbum().getArtists()[0].getName() + "  " + album.getAlbumName());
                     Clipboard.getSystemClipboard().setContent(content);
                 }
             }
