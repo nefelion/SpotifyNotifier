@@ -418,7 +418,8 @@ public class ControllerAlbums {
             return;
         }
 
-        newAlbums.sort(Comparator.comparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
+        newAlbums.sort(Comparator.comparing(ReleasedAlbum::isReminded, Comparator.reverseOrder())
+                .thenComparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
         this.newAlbums = newAlbums;
         this.filteredNewAlbums = new ArrayList<>(newAlbums);
 
@@ -441,7 +442,8 @@ public class ControllerAlbums {
             return;
         }
 
-        allAlbums.sort(Comparator.comparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
+        allAlbums.sort(Comparator.comparing(ReleasedAlbum::isReminded, Comparator.reverseOrder())
+                .thenComparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
         this.allAlbums = allAlbums;
         this.filteredAllAlbums = new ArrayList<>(allAlbums);
         this.oneArtist = allAlbums.stream().filter(p -> !p.getArtistId().equals(allAlbums.get(0).getArtistId())).findAny().isEmpty();
@@ -674,10 +676,11 @@ public class ControllerAlbums {
                     super.updateItem(item, empty);
                     if (item == null || empty) return;
 
-                    if (item.isFeaturing()) {
-                        if (!getStyleClass().contains("featuring"))
-                            getStyleClass().add("featuring");
-                    } else getStyleClass().remove("featuring");
+                    if (!item.isFeaturing()) getStyleClass().remove("featuring");
+                    else if (!getStyleClass().contains("featuring")) getStyleClass().add("featuring");
+
+                    if (!item.isReminded()) getStyleClass().remove("reminded");
+                    else if (!getStyleClass().contains("reminded")) getStyleClass().add("reminded");
                 }
             };
 
@@ -767,10 +770,15 @@ public class ControllerAlbums {
         showReleasesMenuItem.setOnAction((ev) -> requestPerformersView(album));
 
         MenuItem remindMenuItem = contextMenu.getItems().get(5);
-        CountryCode countryCode = TempData.getInstance().getFileData().getCountryCode();
-        boolean isAvailableInCountry = Arrays.asList(album.getAlbum().getAvailableMarkets()).contains(countryCode);
-        remindMenuItem.setText(isAvailableInCountry ? "Available" : "Remind");
-        remindMenuItem.setDisable(isAvailableInCountry);
+        if (FileManager.getHashSet(FileManager.REMIND_DATA).contains(album.getId())) {
+            remindMenuItem.setText("Reminder added");
+            remindMenuItem.setDisable(true);
+        } else {
+            CountryCode countryCode = TempData.getInstance().getFileData().getCountryCode();
+            boolean isAvailableInCountry = Arrays.asList(album.getAlbum().getAvailableMarkets()).contains(countryCode);
+            remindMenuItem.setText(isAvailableInCountry ? "Available in " + countryCode.getAlpha2() : "Remind");
+            remindMenuItem.setDisable(isAvailableInCountry);
+        }
 
         boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
         followUnfollowMenuItem.setDisable(false);

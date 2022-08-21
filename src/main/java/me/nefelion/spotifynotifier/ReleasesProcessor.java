@@ -70,22 +70,23 @@ public class ReleasesProcessor {
                 return;
             }
 
-            for (AlbumSimplified album : albums) {
-                if (isAlreadyLoaded(album)) continue;
-                if (showOnlyAvailable && !isAvailable(album)) continue;
-                if (isFeaturing(album)) {
-                    if (ignoreVarious && isVariousArtists(album)) continue;
-                    addToFeaturing(artist, album);
+            for (AlbumSimplified a : albums) {
+                if (isAlreadyLoaded(a)) continue;
+                if (showOnlyAvailable && !isAvailable(a)) continue;
+                if (isFeaturing(a)) {
+                    if (ignoreVarious && isVariousArtists(a)) continue;
+                    addToFeaturing(artist, a);
                     continue;
                 }
+                boolean isRemind = isOnRemindList(a) && isAvailable(a);
+                if (isRemind) remindIDhashSet.remove(a.getId());
+                ReleasedAlbum album = new ReleasedAlbum(a, artist);
+                album.setReminded(isRemind);
 
-                boolean isRemind = isOnRemindList(album) && isAvailable(album);
-                if (isRemind) remindIDhashSet.remove(album.getId());
-
-                boolean isNewAndFollowed = isNew(album) && isFollowed(artist.getID());
-                if (isNewAndFollowed || isRemind) addToNewAlbums(new ReleasedAlbum(album, artist));
-                addToAllAlbums(new ReleasedAlbum(album, artist));
-                markAsLoaded(album);
+                boolean isNewAndFollowed = isNew(a) && isFollowed(artist.getID());
+                if (isNewAndFollowed || isRemind) addToNewAlbums(album);
+                addToAllAlbums(album);
+                markAsLoaded(a);
             }
 
             if (progressConsumer != null)

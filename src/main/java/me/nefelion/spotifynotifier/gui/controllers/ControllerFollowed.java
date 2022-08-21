@@ -456,6 +456,7 @@ public class ControllerFollowed {
                 : "Nothing matches a search for '" + search + "'");
 
         refreshGLabelNumberOfArtists(followedArtists.size());
+        GButtonCheckReleases.setDisable(followedArtists.isEmpty());
     }
 
     private void updateGListSearchSpotifyArtistsWith(List<Artist> list) {

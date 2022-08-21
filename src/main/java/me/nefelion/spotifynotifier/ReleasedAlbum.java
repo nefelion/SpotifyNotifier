@@ -17,6 +17,7 @@ public class ReleasedAlbum {
     private final String albumType;
     private final String releaseDate;
     private final boolean featuring;
+    private boolean reminded = false;
 
 
     public ReleasedAlbum(AlbumSimplified album, FollowedArtist artist) {
@@ -87,5 +88,13 @@ public class ReleasedAlbum {
 
     public AlbumSimplified getAlbum() {
         return album;
+    }
+
+    public boolean isReminded() {
+        return reminded;
+    }
+
+    public void setReminded(boolean reminded) {
+        this.reminded = reminded;
     }
 }

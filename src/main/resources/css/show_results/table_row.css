@@ -7,6 +7,11 @@
     -fx-font-style: italic;
 }
 
+.reminded.table-row-cell .text {
+    -fx-fill: green;
+    -fx-font-weight: bold;
+}
+
 .table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected .text,
 .featuring.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected .text {
     -fx-fill: white;
