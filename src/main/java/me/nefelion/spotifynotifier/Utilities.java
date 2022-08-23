@@ -81,9 +81,18 @@ public class Utilities {
         }
 
         long seconds = SECONDS.between(date, LocalDateTime.now());
-        if (seconds > 3600 * 24) return seconds / 3600 * 24 + " days ago";
-        if (seconds > 3600) return seconds / 3600 + " hours ago";
-        if (seconds > 60) return seconds / 60 + " minutes ago";
+        if (seconds > (3600 * 24)) {
+            long days = seconds / (3600 * 24);
+            return days + (days > 1 ? " days" : " day") + " ago";
+        }
+        if (seconds > 3600) {
+            long hours = seconds / 3600;
+            return hours + (hours > 1 ? " hours" : " hour") + " ago";
+        }
+        if (seconds > 60) {
+            long minutes = seconds / 60;
+            return minutes + (minutes > 1 ? " minutes" : " minute") + " ago";
+        }
 
         return "< minute ago";
     }
