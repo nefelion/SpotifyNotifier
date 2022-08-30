@@ -10,10 +10,9 @@ import static java.time.temporal.ChronoUnit.DAYS;
 
 public class ReleasedAlbum {
     private final AlbumSimplified album;
+    private final FollowedArtist followedArtist;
     private final String id;
     private final String albumName;
-    private final String followedArtistName;
-    private final String artistId;
     private final String albumType;
     private final String releaseDate;
     private final boolean featuring;
@@ -24,15 +23,10 @@ public class ReleasedAlbum {
         this.album = album;
         this.id = album.getId();
         this.albumName = album.getName();
-        this.followedArtistName = artist.getName();
-        this.artistId = artist.getID();
+        this.followedArtist = artist;
         this.albumType = album.getAlbumType().toString();
         this.releaseDate = album.getReleaseDate();
         this.featuring = album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON);
-    }
-
-    public String getArtistId() {
-        return artistId;
     }
 
     public String getId() {
@@ -45,8 +39,8 @@ public class ReleasedAlbum {
 
     public String getArtistString() {
         return (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON) ?
-                album.getArtists()[0].getName() + (album.getArtists().length == 1 ? " " : " ... ") + "(feat. " + followedArtistName + ")"
-                : followedArtistName + (album.getArtists().length == 1 ? "" : " ..."));
+                album.getArtists()[0].getName() + (album.getArtists().length == 1 ? " " : " ... ") + "(feat. " + followedArtist.getName() + ")"
+                : followedArtist.getName() + (album.getArtists().length == 1 ? "" : " ..."));
     }
 
     public String getAlbumType() {
@@ -65,8 +59,8 @@ public class ReleasedAlbum {
         return featuring;
     }
 
-    public String getFollowedArtistName() {
-        return followedArtistName;
+    public FollowedArtist getFollowedArtist() {
+        return followedArtist;
     }
 
     @Override

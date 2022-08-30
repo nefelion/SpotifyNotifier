@@ -102,7 +102,7 @@ public class ReleasesProcessor {
     private void loadUniqueFeaturing() {
         for (ReleasedAlbum album : featuringHashMap.values()) {
             if (loadedIDhashSet.contains(album.getId())) continue;
-            boolean isNewAndFollowed = !fileHashSet.contains(album.getId()) && isFollowed(album.getArtistId());
+            boolean isNewAndFollowed = !fileHashSet.contains(album.getId()) && isFollowed(album.getFollowedArtist().getID());
 
             if (isNewAndFollowed) {
                 fileHashSet.add(album.getId());

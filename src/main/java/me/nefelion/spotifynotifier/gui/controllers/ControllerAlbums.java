@@ -263,7 +263,7 @@ public class ControllerAlbums {
                     }
                     setText(item.getTrackNumber() + ". " + item.getName());
 
-                    if (Arrays.stream(item.getArtists()).anyMatch(p -> p.getId().equals(currentSelectedAlbum.getArtistId()))) {
+                    if (Arrays.stream(item.getArtists()).anyMatch(p -> p.getId().equals(currentSelectedAlbum.getFollowedArtist().getID()))) {
                         setStyle("-fx-font-weight: bold;");
                     } else {
                         setStyle("");
@@ -372,6 +372,7 @@ public class ControllerAlbums {
         GNewReleases_Date.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
         GNewReleases_Date.setCellFactory(column -> getDateCell());
         GNewReleases_Artist.setCellValueFactory(new PropertyValueFactory<>("artistString"));
+        GNewReleases_Artist.setCellFactory(column -> getArtistCell());
         GNewReleases_Release.setCellValueFactory(new PropertyValueFactory<>("albumName"));
     }
 
@@ -380,6 +381,7 @@ public class ControllerAlbums {
         GAllReleases_Date.setCellValueFactory(new PropertyValueFactory<>("releaseDate"));
         GAllReleases_Date.setCellFactory(column -> getDateCell());
         GAllReleases_Artist.setCellValueFactory(new PropertyValueFactory<>("artistString"));
+        GAllReleases_Artist.setCellFactory(column -> getArtistCell());
         GAllReleases_Release.setCellValueFactory(new PropertyValueFactory<>("albumName"));
 
     }
@@ -399,6 +401,32 @@ public class ControllerAlbums {
                 tooltip.setShowDelay(Duration.ZERO);
                 tooltip.setStyle("-fx-text-fill: white");
                 setTooltip(tooltip);
+                setText(item);
+            }
+        };
+    }
+
+    private TableCell<ReleasedAlbum, String> getArtistCell() {
+        return new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setTooltip(null);
+                    setText(null);
+                    return;
+                }
+
+                setOnMouseClicked((MouseEvent event) -> {
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        if (event.getClickCount() == 2) {
+                            if (oneArtist) return;
+                            ReleasedAlbum releasedAlbum = getTableView().getItems().get(getIndex());
+                            showReleases(releasedAlbum.getFollowedArtist().getName(), releasedAlbum.getFollowedArtist());
+                        }
+                    }
+                });
+
                 setText(item);
             }
         };
@@ -446,7 +474,7 @@ public class ControllerAlbums {
                 .thenComparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
         this.allAlbums = allAlbums;
         this.filteredAllAlbums = new ArrayList<>(allAlbums);
-        this.oneArtist = allAlbums.stream().filter(p -> !p.getArtistId().equals(allAlbums.get(0).getArtistId())).findAny().isEmpty();
+        this.oneArtist = allAlbums.stream().filter(p -> !p.getFollowedArtist().getID().equals(allAlbums.get(0).getFollowedArtist().getID())).findAny().isEmpty();
 
         refreshReleases("All releases", filteredAllAlbums, GTitledPaneAllReleases, GTableAllReleases);
 
@@ -712,9 +740,9 @@ public class ControllerAlbums {
             });
             showReleasesMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
-                showReleases(album.getFollowedArtistName(), new FollowedArtist(album.getFollowedArtistName(), album.getArtistId()));
+                showReleases(album.getFollowedArtist().getName(), new FollowedArtist(album.getFollowedArtist().getName(), album.getFollowedArtist().getID()));
             });
-            showSimilarMenuItem.setOnAction(event -> requestSimilarArtistsView(row.getItem().getArtistId(), row.getItem().getFollowedArtistName()));
+            showSimilarMenuItem.setOnAction(event -> requestSimilarArtistsView(row.getItem().getFollowedArtist().getID(), row.getItem().getFollowedArtist().getName()));
             remindMenuItem.setOnAction(event -> {
                 FileManager.addToRemind(row.getItem().getId());
 
@@ -780,12 +808,12 @@ public class ControllerAlbums {
             remindMenuItem.setDisable(isAvailableInCountry);
         }
 
-        boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getArtistId());
+        boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getFollowedArtist().getID());
         followUnfollowMenuItem.setDisable(false);
-        followUnfollowMenuItem.setText((isArtistFollowed ? "Unfollow " : "Follow ") + album.getFollowedArtistName());
+        followUnfollowMenuItem.setText((isArtistFollowed ? "Unfollow " : "Follow ") + album.getFollowedArtist().getName());
         followUnfollowMenuItem.setOnAction((ev) -> {
-            if (isArtistFollowed) TheEngine.getInstance().unfollowArtistID(album.getArtistId());
-            else TheEngine.getInstance().followArtistID(album.getArtistId());
+            if (isArtistFollowed) TheEngine.getInstance().unfollowArtistID(album.getFollowedArtist().getID());
+            else TheEngine.getInstance().followArtistID(album.getFollowedArtist().getID());
         });
     }
 
@@ -827,7 +855,7 @@ public class ControllerAlbums {
         task.setOnSucceeded(e -> {
             List<FollowedArtist> artistsAndPerformers = getArtistsAndPerformers(infoHashMap.get(album.getId()).trackList())
                     .stream().map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList());
-            artistsAndPerformers.removeIf(p -> oneArtist && p.getID().equals(allAlbums.get(0).getArtistId()));
+            artistsAndPerformers.removeIf(p -> oneArtist && p.getID().equals(allAlbums.get(0).getFollowedArtist().getID()));
             showModalWindowWithArtistsToPick(artistsAndPerformers, "Pick an artist");
         });
         Thread thread = new Thread(task);
