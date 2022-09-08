@@ -310,6 +310,16 @@ public class ControllerAlbums {
                 content.putString("https://open.spotify.com/track/" + getHoveredTrack().getId());
                 Clipboard.getSystemClipboard().setContent(content);
             });
+            MenuItem menuItemCopyPreviewLink = new MenuItem("Copy direct preview link");
+            menuItemCopyPreviewLink.setOnAction(event -> {
+                String previewUrl = getHoveredTrack().getPreviewUrl();
+                if (previewUrl != null) {
+                    previewUrl = previewUrl.substring(0, previewUrl.indexOf("?"));
+                    ClipboardContent content = new ClipboardContent();
+                    content.putString(previewUrl);
+                    Clipboard.getSystemClipboard().setContent(content);
+                } else Utilities.okMSGBOX("No preview available for this track");
+            });
             MenuItem menuItemOpenLink = new MenuItem("Show on Spotify");
             menuItemOpenLink.setOnAction(event -> {
                 String link = "https://open.spotify.com/track/" + getHoveredTrack().getId();
@@ -320,7 +330,7 @@ public class ControllerAlbums {
                 }
             });
             GContextMenuTracklist.getItems().clear();
-            GContextMenuTracklist.getItems().addAll(menuItemPlay, menuItemCopyLink, menuItemOpenLink);
+            GContextMenuTracklist.getItems().addAll(menuItemPlay, menuItemCopyLink, menuItemCopyPreviewLink, menuItemOpenLink);
             GContextMenuTracklist.show(GListTracklist, e.getScreenX(), e.getScreenY());
 
             e.consume();
