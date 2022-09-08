@@ -37,13 +37,12 @@ public class Main {
         // initialize singleton ram
         TempData.getInstance().setFileData(FileManager.getFileData());
 
-        ClientManager cm = new ClientManager();
-
         if (!lock()) {
             Utilities.showSwingMessageDialog("Another instance is running!", "Error!", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
+        ClientManager cm = new ClientManager();
         TheEngine.getInstance().setSpotifyAPI(cm.getSpotifyApi());
 
         loadSubcommands();

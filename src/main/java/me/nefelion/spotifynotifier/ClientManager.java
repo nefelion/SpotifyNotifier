@@ -111,8 +111,7 @@ public class ClientManager {
 
     private void checkCredentials() {
         spotifyApi = new SpotifyApi.Builder()
-                .setClientId(clientId)
-                .setClientSecret(clientSecret)
+                .setAccessToken(getToken())
                 .build();
 
         if (getToken() == null) System.exit(100000);
