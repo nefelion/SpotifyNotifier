@@ -920,7 +920,7 @@ public class ControllerAlbums {
         for (ArtistSimplified artist : notFollowed) {
             if (artists >= 5) break;
             artists++;
-            sb.append(artist.getName()).append(artists == allArtists - 1 ? " and " : ", ");
+            sb.append(artist.getName()).append((artists == allArtists - 1 && artists < 5) ? " and " : ", ");
         }
 
         sb.delete(sb.length() - 2, sb.length());
