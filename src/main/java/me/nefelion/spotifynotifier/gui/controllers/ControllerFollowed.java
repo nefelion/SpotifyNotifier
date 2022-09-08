@@ -33,6 +33,7 @@ public class ControllerFollowed {
     private double maxGListSpotifyPopularity = Double.MAX_VALUE;
     private Task<Void> task;
     private Timer elapsed;
+    private boolean processing = false;
 
     @FXML
     private VBox GMainVBOX, GVboxInfo;
@@ -152,6 +153,7 @@ public class ControllerFollowed {
     }
 
     private void startLoadingAlbums(List<FollowedArtist> list, boolean updateLastChecked) {
+        processing = true;
         resetInfoBoard();
         GButtonCheckReleases.setDisable(true);
         GVboxInfo.setVisible(true);
@@ -182,6 +184,7 @@ public class ControllerFollowed {
             @Override
             public Void call() {
                 processor.process();
+                processing = false;
                 return null;
             }
         };
@@ -456,7 +459,7 @@ public class ControllerFollowed {
                 : "Nothing matches a search for '" + search + "'");
 
         refreshGLabelNumberOfArtists(followedArtists.size());
-        GButtonCheckReleases.setDisable(followedArtists.isEmpty());
+        if (!processing) GButtonCheckReleases.setDisable(followedArtists.isEmpty());
     }
 
     private void updateGListSearchSpotifyArtistsWith(List<Artist> list) {
