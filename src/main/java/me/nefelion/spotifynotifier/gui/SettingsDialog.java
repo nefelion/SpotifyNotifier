@@ -3,10 +3,12 @@ package me.nefelion.spotifynotifier.gui;
 import com.neovisionaries.i18n.CountryCode;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import me.nefelion.spotifynotifier.ClientManager;
 import me.nefelion.spotifynotifier.Main;
 import me.nefelion.spotifynotifier.data.FileData;
 import me.nefelion.spotifynotifier.data.FileManager;
@@ -37,8 +39,21 @@ public class SettingsDialog extends Dialog<ButtonType> {
         checkBoxIgnoreVarious.setSelected(TempData.getInstance().getFileData().isIgnoreVariousArtists());
 
 
-        vbox.getChildren().addAll(getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious);
+        vbox.getChildren().addAll(getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious, getSeparator(),
+                getButtonResetCredentials());
         return vbox;
+    }
+
+    private Button getButtonResetCredentials() {
+        Button button = new Button("Reset credentials and exit");
+        button.setOnAction(this::resetCredentials);
+        button.setStyle("-fx-text-fill: red;");
+        return button;
+    }
+
+    private void resetCredentials(ActionEvent actionEvent) {
+        ClientManager.resetCredentials();
+        System.exit(0);
     }
 
     private VBox getCountryVBOX() {

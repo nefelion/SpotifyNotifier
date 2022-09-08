@@ -8,14 +8,15 @@ import java.util.List;
 
 public class FileData {
     private final List<FollowedArtist> followedArtists;
-    private String lastChecked;
+    private String lastChecked, clientId, clientSecret;
     private int countryCodeNumeric;
-    private boolean ignoreVariousArtists;
-    private boolean showOnlyAvailable;
+    private boolean ignoreVariousArtists, showOnlyAvailable;
 
     public FileData() {
         this.followedArtists = new LinkedList<>();
         this.lastChecked = "-";
+        this.clientId = "-";
+        this.clientSecret = "-";
         this.countryCodeNumeric = 840;
         this.ignoreVariousArtists = false;
         this.showOnlyAvailable = false;
@@ -60,4 +61,21 @@ public class FileData {
     public void setShowOnlyAvailable(boolean showOnlyAvailable) {
         this.showOnlyAvailable = showOnlyAvailable;
     }
+
+    public String getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
+    }
+
 }

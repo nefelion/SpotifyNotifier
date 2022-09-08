@@ -37,26 +37,14 @@ public class Main {
         // initialize singleton ram
         TempData.getInstance().setFileData(FileManager.getFileData());
 
-        // :)
-        //TokenGetter tokenGetter = new TokenGetter("d31c4bbf7a6c41e4b1ce6c47656de668", "c1f3be4db5104a54bc2fac060fdbdf14");
-        TokenGetter tokenGetter = new TokenGetter("44d4e6f2c0ec49ccba1af136cfc57389", "dab320e0e78a464aa773cf3983732049");
-
-        String token = tokenGetter.getToken();
-        if (token == null) {
-            Utilities.showSwingMessageDialog("Invalid token!", "Error!", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        SpotifyApi spotifyApi = new SpotifyApi.Builder()
-                .setAccessToken(token)
-                .build();
-
+        ClientManager cm = new ClientManager();
 
         if (!lock()) {
             Utilities.showSwingMessageDialog("Another instance is running!", "Error!", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        TheEngine.getInstance().setSpotifyAPI(spotifyApi);
+        TheEngine.getInstance().setSpotifyAPI(cm.getSpotifyApi());
 
         loadSubcommands();
 
