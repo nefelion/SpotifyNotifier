@@ -44,9 +44,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -386,8 +383,8 @@ public class ControllerAlbums {
         MenuItem menuCreateDiscordTomorrowMessage = new MenuItem("Create discord message for tomorrow's releases only (" + tomorrowReleases + ")");
 
         menuCreateDiscordMessage.setOnAction(event -> copyDiscordMessageForAllNewReleases());
-        menuCreateDiscordTodayMessage.setOnAction(event -> copyDiscordMessageForNewReleases("Today's", Utilities.getTodayDate()));
-        menuCreateDiscordTomorrowMessage.setOnAction(event -> copyDiscordMessageForNewReleases("Tomorrow's", Utilities.getTomorrowDate()));
+        menuCreateDiscordTodayMessage.setOnAction(event -> copyDiscordMessageForReleases("Today's", Utilities.getTodayDate()));
+        menuCreateDiscordTomorrowMessage.setOnAction(event -> copyDiscordMessageForReleases("Tomorrow's", Utilities.getTomorrowDate()));
 
         GContextMenuNewReleases.getItems().clear();
         GContextMenuNewReleases.getItems().addAll(menuCreateDiscordMessage);
@@ -397,6 +394,28 @@ public class ControllerAlbums {
         GTitledPaneNewReleases.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
             if (!e.isSecondaryButtonDown()) return;
             GContextMenuNewReleases.show(GTitledPaneNewReleases, e.getScreenX(), e.getScreenY());
+            e.consume();
+        });
+    }
+
+
+    private void initializeRightClickForAllReleases() {
+        if (todayReleases == 0 && tomorrowReleases == 0) return;
+
+        ContextMenu GContextMenuAllReleases = new ContextMenu();
+        MenuItem menuCreateDiscordTodayMessage = new MenuItem("Create discord message for today's releases only (" + todayReleases + ")");
+        MenuItem menuCreateDiscordTomorrowMessage = new MenuItem("Create discord message for tomorrow's releases only (" + tomorrowReleases + ")");
+
+        menuCreateDiscordTodayMessage.setOnAction(event -> copyDiscordMessageForReleases("Today's", Utilities.getTodayDate()));
+        menuCreateDiscordTomorrowMessage.setOnAction(event -> copyDiscordMessageForReleases("Tomorrow's", Utilities.getTomorrowDate()));
+
+        GContextMenuAllReleases.getItems().clear();
+        if (todayReleases > 0) GContextMenuAllReleases.getItems().add(menuCreateDiscordTodayMessage);
+        if (tomorrowReleases > 0) GContextMenuAllReleases.getItems().add(menuCreateDiscordTomorrowMessage);
+
+        GTitledPaneAllReleases.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+            if (!e.isSecondaryButtonDown()) return;
+            GContextMenuAllReleases.show(GTitledPaneAllReleases, e.getScreenX(), e.getScreenY());
             e.consume();
         });
     }
@@ -484,10 +503,6 @@ public class ControllerAlbums {
             return;
         }
 
-        todayReleases = newAlbums.stream().filter(releasedAlbum -> releasedAlbum.getReleaseDate().equals(Utilities.getTodayDate())).toList().size();
-        tomorrowReleases = newAlbums.stream().filter(releasedAlbum -> releasedAlbum.getReleaseDate().equals(Utilities.getTomorrowDate())).toList().size();
-        initializeRightClickForNewReleases();
-
         newAlbums.sort(Comparator.comparing(ReleasedAlbum::isReminded, Comparator.reverseOrder())
                 .thenComparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
         this.newAlbums = newAlbums;
@@ -505,6 +520,11 @@ public class ControllerAlbums {
 
     public void setAllAlbums(List<ReleasedAlbum> allAlbums) {
         initializeCheckboxesFor(allAlbums);
+
+        todayReleases = allAlbums.stream().filter(releasedAlbum -> releasedAlbum.getReleaseDate().equals(Utilities.getTodayDate())).toList().size();
+        tomorrowReleases = allAlbums.stream().filter(releasedAlbum -> releasedAlbum.getReleaseDate().equals(Utilities.getTomorrowDate())).toList().size();
+        initializeRightClickForAllReleases();
+        initializeRightClickForNewReleases();
 
         if (allAlbums.isEmpty()) {
             GTitledPaneTracklist.setDisable(true);
@@ -891,11 +911,11 @@ public class ControllerAlbums {
         Clipboard.getSystemClipboard().setContent(content);
     }
 
-    private void copyDiscordMessageForNewReleases(String todaytomorrow, String date) {
+    private void copyDiscordMessageForReleases(String todaytomorrow, String date) {
         ClipboardContent content = new ClipboardContent();
         StringBuilder sb = new StringBuilder(todaytomorrow + " (" + date + ") new releases:\n\n");
 
-        for (ReleasedAlbum album : GTableNewReleases.getItems().stream().filter(p -> p.getReleaseDate().equals(date)).toList()) {
+        for (ReleasedAlbum album : GTableAllReleases.getItems().stream().filter(p -> p.getReleaseDate().equals(date)).toList()) {
             String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
             sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle).append(" by ").append(getFormattedArtists(album)).append("\n> ")
                     .append(album.getLink()).append("\n\n");
