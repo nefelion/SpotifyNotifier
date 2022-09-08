@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -15,10 +16,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
@@ -171,7 +169,7 @@ public class Utilities {
         return "In " + (-days) + " days";
     }
 
-    private static LocalDate findLocalDate(String str) {
+    public static LocalDate findLocalDate(String str) {
         java.util.List<SimpleDateFormat> knownFormatters = new ArrayList<>(Arrays.asList(
                 new SimpleDateFormat("yyyy-MM-dd"),
                 new SimpleDateFormat("yyyy-MM"),
@@ -189,4 +187,16 @@ public class Utilities {
         return null;
     }
 
+    public static String getTodayDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar c = Calendar.getInstance();
+        return sdf.format(c.getTime());
+    }
+
+    public static String getTomorrowDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.DATE, 1);
+        return sdf.format(c.getTime());
+    }
 }

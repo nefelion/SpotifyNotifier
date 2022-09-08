@@ -44,6 +44,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -60,7 +63,7 @@ public class ControllerAlbums {
     private boolean oneArtist, autoPlayback;
     private final Tooltip GTooltipTracklist = new Tooltip();
     private final ContextMenu GContextMenuTracklist = new ContextMenu();
-    private int hoveredIndexTracklist = -1;
+    private int hoveredIndexTracklist = -1, todayReleases, tomorrowReleases;
 
     @FXML
     private VBox GMainVBOX, GVboxInfo;
@@ -244,6 +247,9 @@ public class ControllerAlbums {
                     ClipboardContent content = new ClipboardContent();
                     content.putString(album.getAlbum().getArtists()[0].getName() + "  " + album.getAlbumName());
                     Clipboard.getSystemClipboard().setContent(content);
+                } else if (event.getCode() == KeyCode.D) {
+                    ReleasedAlbum album = GTableAllReleases.getSelectionModel().getSelectedItem();
+                    copyDiscordMessage(album);
                 }
             }
         });
@@ -373,6 +379,28 @@ public class ControllerAlbums {
         GTitledPaneNewReleases.setDisable(true);
     }
 
+    private void initializeRightClickForNewReleases() {
+        ContextMenu GContextMenuNewReleases = new ContextMenu();
+        MenuItem menuCreateDiscordMessage = new MenuItem("Create discord message for all new releases");
+        MenuItem menuCreateDiscordTodayMessage = new MenuItem("Create discord message for today's releases only (" + todayReleases + ")");
+        MenuItem menuCreateDiscordTomorrowMessage = new MenuItem("Create discord message for tomorrow's releases only (" + tomorrowReleases + ")");
+
+        menuCreateDiscordMessage.setOnAction(event -> copyDiscordMessageForAllNewReleases());
+        menuCreateDiscordTodayMessage.setOnAction(event -> copyDiscordMessageForNewReleases("Today's", Utilities.getTodayDate()));
+        menuCreateDiscordTomorrowMessage.setOnAction(event -> copyDiscordMessageForNewReleases("Tomorrow's", Utilities.getTomorrowDate()));
+
+        GContextMenuNewReleases.getItems().clear();
+        GContextMenuNewReleases.getItems().addAll(menuCreateDiscordMessage);
+        if (todayReleases > 0) GContextMenuNewReleases.getItems().add(menuCreateDiscordTodayMessage);
+        if (tomorrowReleases > 0) GContextMenuNewReleases.getItems().add(menuCreateDiscordTomorrowMessage);
+
+        GTitledPaneNewReleases.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+            if (!e.isSecondaryButtonDown()) return;
+            GContextMenuNewReleases.show(GTitledPaneNewReleases, e.getScreenX(), e.getScreenY());
+            e.consume();
+        });
+    }
+
     private void initializeGTitledPaneAllReleases() {
         GTitledPaneAllReleases.setDisable(true);
     }
@@ -455,6 +483,10 @@ public class ControllerAlbums {
             GTitledPaneNewReleases.getStylesheets().clear();
             return;
         }
+
+        todayReleases = newAlbums.stream().filter(releasedAlbum -> releasedAlbum.getReleaseDate().equals(Utilities.getTodayDate())).toList().size();
+        tomorrowReleases = newAlbums.stream().filter(releasedAlbum -> releasedAlbum.getReleaseDate().equals(Utilities.getTomorrowDate())).toList().size();
+        initializeRightClickForNewReleases();
 
         newAlbums.sort(Comparator.comparing(ReleasedAlbum::isReminded, Comparator.reverseOrder())
                 .thenComparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
@@ -727,6 +759,7 @@ public class ControllerAlbums {
             final MenuItem copySpotifyLinkMenuItem = new MenuItem("Copy Spotify link");
             final MenuItem showReleasesMenuItem = new MenuItem("Show releases by...");
             final MenuItem showSimilarMenuItem = new MenuItem("Show similar artists");
+            final MenuItem discordMessageMenuItem = new MenuItem("Copy Discord message (CTRL+D)");
             final MenuItem followUnfollowMenuItem = new MenuItem();
             final MenuItem remindMenuItem = new MenuItem("Remind");
             showOnSpotifyMenuItem.setOnAction(event -> {
@@ -761,6 +794,10 @@ public class ControllerAlbums {
                         + "\n\nTo change the country, go to the 'Settings' (3 dots in the top right corner)."))
                     if (FileManager.removeFromRemind(row.getItem().getId())) Utilities.okMSGBOX("Reminder removed.");
             });
+            discordMessageMenuItem.setOnAction(event -> {
+                ReleasedAlbum album = row.getItem();
+                copyDiscordMessage(album);
+            });
 
             showReleasesMenuItem.setDisable(true);
             remindMenuItem.setDisable(true);
@@ -768,8 +805,9 @@ public class ControllerAlbums {
             contextMenu.getItems().add(copySpotifyLinkMenuItem);
             contextMenu.getItems().add(showReleasesMenuItem);
             contextMenu.getItems().add(showSimilarMenuItem);
+            contextMenu.getItems().add(discordMessageMenuItem);
             contextMenu.getItems().add(followUnfollowMenuItem);
-            contextMenu.getItems().add(remindMenuItem);
+            contextMenu.getItems().add(remindMenuItem); // oznacz nizej ktory to index!!
             contextMenu.getItems().forEach(p -> p.setVisible(false));
 
             // Set context menu on row, but use a binding to make it only show for non-empty rows:
@@ -807,7 +845,7 @@ public class ControllerAlbums {
         contextMenu.getItems().forEach(p -> p.setVisible(true));
         showReleasesMenuItem.setOnAction((ev) -> requestPerformersView(album));
 
-        MenuItem remindMenuItem = contextMenu.getItems().get(5);
+        MenuItem remindMenuItem = contextMenu.getItems().get(6);
         if (FileManager.getHashSet(FileManager.REMIND_DATA).contains(album.getId())) {
             remindMenuItem.setText("Reminder added");
             remindMenuItem.setDisable(true);
@@ -825,6 +863,72 @@ public class ControllerAlbums {
             if (isArtistFollowed) TheEngine.getInstance().unfollowArtistID(album.getFollowedArtist().getID());
             else TheEngine.getInstance().followArtistID(album.getFollowedArtist().getID());
         });
+    }
+
+    private static void copyDiscordMessage(ReleasedAlbum album) {
+        ClipboardContent content = new ClipboardContent();
+
+        String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
+        content.putString("> **" + album.getAlbumName() + "**" + qsingle + " by " + getFormattedArtists(album) + "\n" +
+                "> Release date: " + album.getReleaseDate() + "\n> " +
+                album.getLink() + "\n");
+
+        Clipboard.getSystemClipboard().setContent(content);
+    }
+
+    private void copyDiscordMessageForAllNewReleases() {
+        ClipboardContent content = new ClipboardContent();
+        StringBuilder sb = new StringBuilder();
+
+        for (ReleasedAlbum album : GTableNewReleases.getItems()) {
+            String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
+            sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle).append(" by ").append(getFormattedArtists(album)).append("\n")
+                    .append("> Release date: ").append(album.getReleaseDate()).append("\n> ")
+                    .append(album.getLink()).append("\n\n");
+        }
+
+        content.putString(sb.toString());
+        Clipboard.getSystemClipboard().setContent(content);
+    }
+
+    private void copyDiscordMessageForNewReleases(String todaytomorrow, String date) {
+        ClipboardContent content = new ClipboardContent();
+        StringBuilder sb = new StringBuilder(todaytomorrow + " (" + date + ") new releases:\n\n");
+
+        for (ReleasedAlbum album : GTableNewReleases.getItems().stream().filter(p -> p.getReleaseDate().equals(date)).toList()) {
+            String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
+            sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle).append(" by ").append(getFormattedArtists(album)).append("\n> ")
+                    .append(album.getLink()).append("\n\n");
+        }
+
+        content.putString(sb.toString());
+        Clipboard.getSystemClipboard().setContent(content);
+    }
+
+    private static String getFormattedArtists(ReleasedAlbum album) {
+        StringBuilder sb = new StringBuilder();
+        int artists = 0;
+        int allArtists = album.getAlbum().getArtists().length;
+
+        ArtistSimplified[] followed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> TheEngine.getInstance().isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
+        ArtistSimplified[] notFollowed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> !TheEngine.getInstance().isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
+        for (ArtistSimplified artist : followed) {
+            artists++;
+            sb.append("**").append(artist.getName()).append("**").append(artists == allArtists - 1 ? " and " : ", ");
+        }
+
+        for (ArtistSimplified artist : notFollowed) {
+            if (artists >= 5) break;
+            artists++;
+            sb.append(artist.getName()).append(artists == allArtists - 1 ? " and " : ", ");
+        }
+
+        sb.delete(sb.length() - 2, sb.length());
+
+        if (artists < album.getAlbum().getArtists().length)
+            sb.append("... (and ").append(album.getAlbum().getArtists().length - artists).append(" more)");
+
+        return sb.toString();
     }
 
     private void requestSimilarArtistsView(String id, String name) {
