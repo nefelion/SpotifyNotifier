@@ -16,11 +16,12 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.controllers.ControllerProgress;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class UtilAlbums {
 
     public static void process(Stage primaryStage, boolean newOnly, boolean quiet) throws IOException {
-        ReleasesProcessor processor = new ReleasesProcessor(TempData.getInstance().getFileData().getFollowedArtists());
+        ReleasesProcessor processor = new ReleasesProcessor(new ArrayList<>(TempData.getInstance().getFileData().getFollowedArtists()));
 
 
         FXMLLoader progressLoader = new FXMLLoader(UtilAlbums.class.getResource("/fxml/G_VBOX__PROGRESS.fxml"));

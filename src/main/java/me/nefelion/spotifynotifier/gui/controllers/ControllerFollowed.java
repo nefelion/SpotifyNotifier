@@ -149,7 +149,7 @@ public class ControllerFollowed {
 
     @FXML
     private void onActionCheckReleases(ActionEvent actionEvent) {
-        startLoadingAlbums(TempData.getInstance().getFileData().getFollowedArtists(), true);
+        startLoadingAlbums(new ArrayList<>(TempData.getInstance().getFileData().getFollowedArtists()), true);
     }
 
     private void startLoadingAlbums(List<FollowedArtist> list, boolean updateLastChecked) {
