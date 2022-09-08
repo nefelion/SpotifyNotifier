@@ -378,7 +378,8 @@ public class ControllerAlbums {
 
     private void initializeRightClickForNewReleases() {
         ContextMenu GContextMenuNewReleases = new ContextMenu();
-        MenuItem menuCreateDiscordMessage = new MenuItem("Create discord message for all new releases");
+        int size = newAlbums == null ? 0 : newAlbums.size();
+        MenuItem menuCreateDiscordMessage = new MenuItem("Create discord message for all new releases (" + size + ")");
         MenuItem menuCreateDiscordTodayMessage = new MenuItem("Create discord message for today's releases only (" + todayReleases + ")");
         MenuItem menuCreateDiscordTomorrowMessage = new MenuItem("Create discord message for tomorrow's releases only (" + tomorrowReleases + ")");
 
@@ -397,7 +398,6 @@ public class ControllerAlbums {
             e.consume();
         });
     }
-
 
     private void initializeRightClickForAllReleases() {
         if (todayReleases == 0 && tomorrowReleases == 0) return;
@@ -889,8 +889,9 @@ public class ControllerAlbums {
         ClipboardContent content = new ClipboardContent();
 
         String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
-        content.putString("> **" + album.getAlbumName() + "**" + qsingle + " by " + getFormattedArtists(album) + "\n" +
-                "> Release date: " + album.getReleaseDate() + "\n> " +
+        content.putString("> **" + album.getAlbumName() + "**" + qsingle + "\n" +
+                "> by " + getFormattedArtists(album) + "\n" +
+                "> " + album.getReleaseDate() + "\n> " +
                 album.getLink() + "\n");
 
         Clipboard.getSystemClipboard().setContent(content);
@@ -902,9 +903,10 @@ public class ControllerAlbums {
 
         for (ReleasedAlbum album : GTableNewReleases.getItems()) {
             String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
-            sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle).append(" by ").append(getFormattedArtists(album)).append("\n")
-                    .append("> Release date: ").append(album.getReleaseDate()).append("\n> ")
-                    .append(album.getLink()).append("\n\n");
+            sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle)
+                    .append("\n> by ").append(getFormattedArtists(album))
+                    .append("\n> Release date: ").append(album.getReleaseDate())
+                    .append("\n> ").append(album.getLink()).append("\n\n");
         }
 
         content.putString(sb.toString());
@@ -917,8 +919,9 @@ public class ControllerAlbums {
 
         for (ReleasedAlbum album : GTableAllReleases.getItems().stream().filter(p -> p.getReleaseDate().equals(date)).toList()) {
             String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
-            sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle).append(" by ").append(getFormattedArtists(album)).append("\n> ")
-                    .append(album.getLink()).append("\n\n");
+            sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle)
+                    .append("\n> by ").append(getFormattedArtists(album))
+                    .append("\n> ").append(album.getLink()).append("\n\n");
         }
 
         content.putString(sb.toString());
