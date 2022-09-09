@@ -431,6 +431,7 @@ public class ControllerAlbums {
         GNewReleases_Artist.setCellValueFactory(new PropertyValueFactory<>("artistString"));
         GNewReleases_Artist.setCellFactory(column -> getArtistCell());
         GNewReleases_Release.setCellValueFactory(new PropertyValueFactory<>("albumName"));
+        GNewReleases_Release.setCellFactory(column -> getAlbumCell());
     }
 
     private void initializeGAllReleasesColumns() {
@@ -440,7 +441,7 @@ public class ControllerAlbums {
         GAllReleases_Artist.setCellValueFactory(new PropertyValueFactory<>("artistString"));
         GAllReleases_Artist.setCellFactory(column -> getArtistCell());
         GAllReleases_Release.setCellValueFactory(new PropertyValueFactory<>("albumName"));
-
+        GAllReleases_Release.setCellFactory(column -> getAlbumCell());
     }
 
     private TableCell<ReleasedAlbum, String> getDateCell() {
@@ -458,6 +459,34 @@ public class ControllerAlbums {
                 tooltip.setShowDelay(Duration.ZERO);
                 tooltip.setStyle("-fx-text-fill: white");
                 setTooltip(tooltip);
+                setText(item);
+            }
+        };
+    }
+
+    private TableCell<ReleasedAlbum, String> getAlbumCell() {
+        return new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setTooltip(null);
+                    setText(null);
+                    return;
+                }
+
+                setOnMouseClicked((MouseEvent event) -> {
+                    if (event.getButton() == MouseButton.PRIMARY) {
+                        if (event.getClickCount() == 2) {
+                            if (GListTracklist.getItems() == null) autoPlayback = true;
+                            else {
+                                autoPlayback = false;
+                                GListTracklist.getSelectionModel().select(0);
+                            }
+                        }
+                    }
+                });
+
                 setText(item);
             }
         };
