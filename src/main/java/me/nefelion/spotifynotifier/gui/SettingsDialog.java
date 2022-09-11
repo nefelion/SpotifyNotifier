@@ -3,7 +3,6 @@ package me.nefelion.spotifynotifier.gui;
 import com.neovisionaries.i18n.CountryCode;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;

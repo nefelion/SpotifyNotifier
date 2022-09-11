@@ -32,6 +32,7 @@ import javafx.util.Duration;
 import me.nefelion.spotifynotifier.*;
 import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
+import me.nefelion.spotifynotifier.gui.AlbumInfoDialog;
 import me.nefelion.spotifynotifier.gui.apps.util.UtilShowAlbums;
 import me.nefelion.spotifynotifier.records.TempAlbumInfo;
 import me.nefelion.spotifynotifier.records.VBoxStack;
@@ -811,6 +812,7 @@ public class ControllerAlbums {
             final MenuItem discordMessageMenuItem = new MenuItem("Copy Discord message (CTRL+D)");
             final MenuItem followUnfollowMenuItem = new MenuItem();
             final MenuItem remindMenuItem = new MenuItem("Remind");
+            final MenuItem moreInfoMenuItem = new MenuItem("More info");
             showOnSpotifyMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
                 Runtime rt = Runtime.getRuntime();
@@ -835,6 +837,10 @@ public class ControllerAlbums {
                 showReleases(album.getFollowedArtist().getName(), new FollowedArtist(album.getFollowedArtist().getName(), album.getFollowedArtist().getID()));
             });
             showSimilarMenuItem.setOnAction(event -> requestSimilarArtistsView(row.getItem().getFollowedArtist().getID(), row.getItem().getFollowedArtist().getName()));
+            discordMessageMenuItem.setOnAction(event -> {
+                ReleasedAlbum album = row.getItem();
+                copyDiscordMessage(album);
+            });
             remindMenuItem.setOnAction(event -> {
                 FileManager.addToRemind(row.getItem().getId());
 
@@ -843,9 +849,10 @@ public class ControllerAlbums {
                         + "\n\nTo change the country, go to the 'Settings' (3 dots in the top right corner)."))
                     if (FileManager.removeFromRemind(row.getItem().getId())) Utilities.okMSGBOX("Reminder removed.");
             });
-            discordMessageMenuItem.setOnAction(event -> {
+            moreInfoMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
-                copyDiscordMessage(album);
+                AlbumInfoDialog albumInfoDialog = new AlbumInfoDialog(album.getAlbum());
+                albumInfoDialog.showAndWait();
             });
 
             showReleasesMenuItem.setDisable(true);
@@ -857,6 +864,7 @@ public class ControllerAlbums {
             contextMenu.getItems().add(discordMessageMenuItem);
             contextMenu.getItems().add(followUnfollowMenuItem);
             contextMenu.getItems().add(remindMenuItem); // oznacz nizej ktory to index!!
+            contextMenu.getItems().add(moreInfoMenuItem);
             contextMenu.getItems().forEach(p -> p.setVisible(false));
 
             // Set context menu on row, but use a binding to make it only show for non-empty rows:

@@ -5,7 +5,6 @@ import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.apps.AppMain;
 import me.nefelion.spotifynotifier.subcommands.*;
-import se.michaelthelin.spotify.SpotifyApi;
 
 import javax.swing.*;
 import java.io.File;

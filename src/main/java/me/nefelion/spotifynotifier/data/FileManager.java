@@ -1,12 +1,10 @@
 package me.nefelion.spotifynotifier.data;
 
 import com.google.gson.Gson;
-import me.nefelion.spotifynotifier.FollowedArtist;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.HashSet;
 
 

@@ -1,6 +1,5 @@
 package me.nefelion.spotifynotifier.gui.controllers;
 
-import com.neovisionaries.i18n.CountryCode;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -9,17 +8,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import me.nefelion.spotifynotifier.Main;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
-import me.nefelion.spotifynotifier.data.FileData;
-import me.nefelion.spotifynotifier.data.FileManager;
-import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.SettingsDialog;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Objects;
 import java.util.Scanner;
-
-import static javafx.scene.control.ButtonBar.ButtonData.OK_DONE;
 
 public class ControllerOutline {
 
