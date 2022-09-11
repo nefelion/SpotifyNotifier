@@ -523,6 +523,27 @@ public class ControllerAlbums {
         GTitledPaneInfo.setDisable(true);
         GTitledPaneInfoArtists.managedProperty().bind(GTitledPaneInfoArtists.visibleProperty());
         GTitledPaneInfoFeaturing.managedProperty().bind(GTitledPaneInfoFeaturing.visibleProperty());
+        addRightClickCopyForFeaturing();
+    }
+
+    private void addRightClickCopyForFeaturing() {
+        ContextMenu GContextMenuInfoFeaturing = new ContextMenu();
+        MenuItem copyFeaturingMenuItem = new MenuItem("Copy");
+        copyFeaturingMenuItem.setOnAction(event -> {
+            String artists = GLabelInfoFeaturing.getText();
+            if (artists == null || artists.isEmpty()) return;
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putString(artists);
+            clipboard.setContent(content);
+        });
+        GContextMenuInfoFeaturing.getItems().clear();
+        GContextMenuInfoFeaturing.getItems().add(copyFeaturingMenuItem);
+        GTitledPaneInfoFeaturing.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+            if (!e.isSecondaryButtonDown()) return;
+            GContextMenuInfoFeaturing.show(GTitledPaneInfoFeaturing, e.getScreenX(), e.getScreenY());
+            e.consume();
+        });
     }
 
 
