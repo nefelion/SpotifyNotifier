@@ -99,8 +99,8 @@ public class ClientManager {
     }
 
     private void useDefault() {
-        clientId = "d31c4bbf7a6c41e4b1ce6c47656de668";
-        clientSecret = "c1f3be4db5104a54bc2fac060fdbdf14";
+        clientId = "7902dbb8d6d94e8c9e0670b8f3d1d86e";
+        clientSecret = "501b92fa45fd4c05a441c4c581a9f490";
     }
 
     private void saveCredentials() {
