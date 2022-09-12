@@ -110,12 +110,13 @@ public class ClientManager {
     }
 
     private void checkCredentials() {
-        spotifyApi = new SpotifyApi.Builder()
-                .setAccessToken(getToken())
-                .build();
-
-        if (getToken() == null) System.exit(100000);
-        else good = true;
+        String t = getToken();
+        if (t != null) {
+            spotifyApi = new SpotifyApi.Builder()
+                    .setAccessToken(t)
+                    .build();
+            good = true;
+        } else System.exit(100000);
     }
 
     private String getToken() {
