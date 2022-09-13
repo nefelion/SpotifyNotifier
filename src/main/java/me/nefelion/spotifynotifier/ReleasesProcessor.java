@@ -20,7 +20,7 @@ public class ReleasesProcessor {
     private final HashMap<String, ReleasedAlbum> featuringHashMap;
     private final List<ReleasedAlbum> newAlbums, allAlbums;
     private final CountryCode countryCode;
-    private final boolean ignoreVarious, showOnlyAvailable;
+    private final boolean ignoreVarious, showOnlyAvailable, ignoreNotWorldwide;
 
     private DoubleConsumer progressConsumer;
     private Consumer<String> currentArtistConsumer, processedArtistsConsumer, releasesConsumer, newReleasesConsumer;
@@ -37,6 +37,7 @@ public class ReleasesProcessor {
         countryCode = FileManager.getFileData().getCountryCode();
         ignoreVarious = FileManager.getFileData().isIgnoreVariousArtists();
         showOnlyAvailable = FileManager.getFileData().isShowOnlyAvailable();
+        ignoreNotWorldwide = FileManager.getFileData().isIgnoreNotWorldwide();
     }
 
     public ReleasesProcessor(FollowedArtist... artists) {
@@ -73,6 +74,7 @@ public class ReleasesProcessor {
             for (AlbumSimplified a : albums) {
                 if (isAlreadyLoaded(a)) continue;
                 if (showOnlyAvailable && !isAvailable(a)) continue;
+                if (ignoreNotWorldwide && !isWorldwide(a)) continue;
                 if (isFeaturing(a)) {
                     if (ignoreVarious && isVariousArtists(a)) continue;
                     addToFeaturing(artist, a);
@@ -128,7 +130,7 @@ public class ReleasesProcessor {
         boolean isRemind = isOnRemindList(a) && isAvailable(a);
         if (isRemind) remindIDhashSet.remove(a.getId());
         album.setReminded(isRemind);
-        album.setAvailableEverywhere(isAvailableEverywere(a));
+        album.setAvailableEverywhere(isWorldwide(a));
         return album;
     }
 
@@ -158,7 +160,7 @@ public class ReleasesProcessor {
         return this;
     }
 
-    private static boolean isAvailableEverywere(AlbumSimplified a) {
+    private boolean isWorldwide(AlbumSimplified a) {
         List<CountryCode> countryCodes = Arrays.asList(a.getAvailableMarkets());
         return countryCodes.contains(CountryCode.getByCode(776)) && countryCodes.contains(CountryCode.getByCode(882));
     }

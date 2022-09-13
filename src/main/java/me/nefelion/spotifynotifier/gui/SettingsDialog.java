@@ -19,7 +19,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
 
     private ButtonType buttonTypeSave;
     private TextField textFieldCountryCode;
-    private CheckBox checkBoxIgnoreVarious, checkBoxOnlyAvailable;
+    private CheckBox checkBoxIgnoreVarious, checkBoxOnlyAvailable, checkBoxIgnoreNotWorldwide;
 
     public SettingsDialog() {
         setIcon();
@@ -37,8 +37,12 @@ public class SettingsDialog extends Dialog<ButtonType> {
         checkBoxIgnoreVarious = new CheckBox("Ignore 'Various Artists' releases");
         checkBoxIgnoreVarious.setSelected(TempData.getInstance().getFileData().isIgnoreVariousArtists());
 
+        checkBoxIgnoreNotWorldwide = new CheckBox("Ignore not worldwide releases");
+        checkBoxIgnoreNotWorldwide.setSelected(TempData.getInstance().getFileData().isIgnoreNotWorldwide());
 
-        vbox.getChildren().addAll(getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious, getSeparator(),
+        vbox.getChildren().addAll(
+                getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious, checkBoxIgnoreNotWorldwide,
+                getSeparator(),
                 getButtonResetCredentials());
         return vbox;
     }
@@ -113,6 +117,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
 
         fd.setIgnoreVariousArtists(checkBoxIgnoreVarious.isSelected());
         fd.setShowOnlyAvailable(checkBoxOnlyAvailable.isSelected());
+        fd.setIgnoreNotWorldwide(checkBoxIgnoreNotWorldwide.isSelected());
 
         FileManager.saveFileData(fd);
     }

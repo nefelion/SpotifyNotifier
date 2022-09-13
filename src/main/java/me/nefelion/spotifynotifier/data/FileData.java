@@ -10,7 +10,7 @@ public class FileData {
     private final List<FollowedArtist> followedArtists;
     private String lastChecked, clientId, clientSecret;
     private int countryCodeNumeric;
-    private boolean ignoreVariousArtists, showOnlyAvailable;
+    private boolean ignoreVariousArtists, showOnlyAvailable, ignoreNotWorldwide;
 
     public FileData() {
         this.followedArtists = new LinkedList<>();
@@ -20,6 +20,7 @@ public class FileData {
         this.countryCodeNumeric = 840;
         this.ignoreVariousArtists = false;
         this.showOnlyAvailable = false;
+        this.ignoreNotWorldwide = false;
     }
 
     public List<FollowedArtist> getFollowedArtists() {
@@ -78,4 +79,11 @@ public class FileData {
         this.clientSecret = clientSecret;
     }
 
+    public boolean isIgnoreNotWorldwide() {
+        return ignoreNotWorldwide;
+    }
+
+    public void setIgnoreNotWorldwide(boolean ignoreNotWorldwide) {
+        this.ignoreNotWorldwide = ignoreNotWorldwide;
+    }
 }
