@@ -151,16 +151,14 @@ public class ControllerAlbums {
 
     private void recalculateFilteredAlbums(List<ReleasedAlbum> filteredAlbums, List<ReleasedAlbum> albums) {
         filteredAlbums.clear();
-        for (ReleasedAlbum album : albums) {
-            if (!GCheckboxNotWorldwide.isSelected() && !album.isAvailableEverywhere()) continue;
-            if (album.isFeaturing()) {
-                if (!GCheckboxFeaturing.isSelected()) continue;
-            } else {
-                if (!GCheckboxAlbums.isSelected() && album.getAlbumType().equalsIgnoreCase("ALBUM")) continue;
-                if (!GCheckboxSingles.isSelected() && album.getAlbumType().equalsIgnoreCase("SINGLE")) continue;
-            }
-            filteredAlbums.add(album);
-        }
+        for (ReleasedAlbum album : albums) if (!skipAlbum(album)) filteredAlbums.add(album);
+    }
+
+    private boolean skipAlbum(ReleasedAlbum album) {
+        return (!GCheckboxNotWorldwide.isSelected() && !album.isAvailableEverywhere()) ||
+                (album.isFeaturing() && !GCheckboxFeaturing.isSelected()) ||
+                (!GCheckboxAlbums.isSelected() && album.getAlbumType().equalsIgnoreCase("ALBUM")) ||
+                (!GCheckboxSingles.isSelected() && album.getAlbumType().equalsIgnoreCase("SINGLE"));
     }
 
     private void refreshReleases(String albumType, List<ReleasedAlbum> filteredAlbums, TitledPane gTitledPaneReleases, TableView<ReleasedAlbum> gTableReleases) {
