@@ -2,11 +2,10 @@ package me.nefelion.spotifynotifier.gui;
 
 import com.neovisionaries.i18n.CountryCode;
 import javafx.geometry.Orientation;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Separator;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import me.nefelion.spotifynotifier.Main;
@@ -45,10 +44,26 @@ public class AlbumInfoDialog extends Dialog<String> {
     private ScrollPane getAvailableMarketsScrollPane() {
         ScrollPane scrollPane = new ScrollPane();
         Label albumNameTextField = new Label();
-        albumNameTextField.setText(String.join("\n", Arrays.stream(album.getAvailableMarkets()).map(CountryCode::getAlpha2).toArray(String[]::new)));
+        String[] markets = Arrays.stream(album.getAvailableMarkets()).map(CountryCode::getName).sorted().toArray(String[]::new);
+        albumNameTextField.setText(String.join("\n", markets));
         scrollPane.setContent(albumNameTextField);
         scrollPane.setPrefViewportHeight(100);
         scrollPane.setPrefViewportWidth(200);
+
+        // add right click menu
+        albumNameTextField.setOnContextMenuRequested(event -> {
+            ContextMenu contextMenu = new ContextMenu();
+            MenuItem copyMenuItem = new MenuItem("Copy");
+            copyMenuItem.setOnAction(event1 -> {
+                Clipboard clipboard = Clipboard.getSystemClipboard();
+                ClipboardContent content = new ClipboardContent();
+                content.putString(albumNameTextField.getText());
+                clipboard.setContent(content);
+            });
+            contextMenu.getItems().add(copyMenuItem);
+            contextMenu.show(albumNameTextField, event.getScreenX(), event.getScreenY());
+        });
+
         return scrollPane;
     }
 
