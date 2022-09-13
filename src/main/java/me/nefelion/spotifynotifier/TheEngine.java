@@ -241,7 +241,7 @@ public class TheEngine {
         return features;
     }
 
-    public boolean isFollowed(String id) {
+    public static boolean isFollowed(String id) {
         return TempData.getInstance().getFileData().getFollowedArtists().stream().anyMatch(p -> p.getID().equals(id));
     }
 

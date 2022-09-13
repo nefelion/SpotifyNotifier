@@ -505,15 +505,30 @@ public class ControllerAlbums {
                     return;
                 }
 
+                ReleasedAlbum releasedAlbum = getTableView().getItems().get(getIndex());
+
                 setOnMouseClicked((MouseEvent event) -> {
                     if (event.getButton() == MouseButton.PRIMARY) {
                         if (event.getClickCount() == 2) {
                             if (oneArtist) return;
-                            ReleasedAlbum releasedAlbum = getTableView().getItems().get(getIndex());
                             showReleases(releasedAlbum.getFollowedArtist().getName(), releasedAlbum.getFollowedArtist());
                         }
                     }
                 });
+
+
+                ArtistSimplified[] artists = releasedAlbum.getAlbum().getArtists();
+                if (artists.length > 1) {
+                    Comparator<ArtistSimplified> followedComparator =
+                            (p, q) -> Boolean.compare(TheEngine.isFollowed(q.getId()), TheEngine.isFollowed(p.getId()));
+                    Tooltip tooltip = new Tooltip(Arrays.stream(artists)
+                            .sorted(followedComparator.thenComparing(ArtistSimplified::getName))
+                            .map(ArtistSimplified::getName)
+                            .collect(Collectors.joining("\n")));
+                    tooltip.setShowDelay(Duration.ZERO);
+                    tooltip.setStyle("-fx-text-fill: white");
+                    setTooltip(tooltip);
+                }
 
                 setText(item);
             }
