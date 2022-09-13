@@ -17,6 +17,7 @@ public class ReleasedAlbum {
     private final String releaseDate;
     private final boolean featuring;
     private boolean reminded = false;
+    private boolean availableEverywhere = false;
 
 
     public ReleasedAlbum(AlbumSimplified album, FollowedArtist artist) {
@@ -91,4 +92,13 @@ public class ReleasedAlbum {
     public void setReminded(boolean reminded) {
         this.reminded = reminded;
     }
+
+    public boolean isAvailableEverywhere() {
+        return availableEverywhere;
+    }
+
+    public void setAvailableEverywhere(boolean availableEverywhere) {
+        this.availableEverywhere = availableEverywhere;
+    }
+
 }

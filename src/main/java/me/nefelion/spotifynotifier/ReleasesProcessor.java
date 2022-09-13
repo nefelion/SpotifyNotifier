@@ -78,14 +78,8 @@ public class ReleasesProcessor {
                     addToFeaturing(artist, a);
                     continue;
                 }
-                boolean isRemind = isOnRemindList(a) && isAvailable(a);
-                if (isRemind) remindIDhashSet.remove(a.getId());
-                ReleasedAlbum album = new ReleasedAlbum(a, artist);
-                album.setReminded(isRemind);
 
-                boolean isNewAndFollowed = isNew(a) && isFollowed(artist.getID());
-                if (isNewAndFollowed || isRemind) addToNewAlbums(album);
-                addToAllAlbums(album);
+                addToNewOrAllOnly(getProcessedReleasedAlbum(a, artist));
                 markAsLoaded(a);
             }
 
@@ -102,15 +96,15 @@ public class ReleasesProcessor {
     private void loadUniqueFeaturing() {
         for (ReleasedAlbum album : featuringHashMap.values()) {
             if (loadedIDhashSet.contains(album.getId())) continue;
-            boolean isNewAndFollowed = !fileHashSet.contains(album.getId()) && isFollowed(album.getFollowedArtist().getID());
 
-            if (isNewAndFollowed) {
-                fileHashSet.add(album.getId());
-                addToNewAlbums(album);
-            }
-            addToAllAlbums(album);
+            addToNewOrAllOnly(album);
             loadedIDhashSet.add(album.getId());
         }
+    }
+
+    private void addToNewOrAllOnly(ReleasedAlbum album) {
+        if (isNewAndFollowed(album) || album.isReminded()) addToNewAlbums(album);
+        addToAllAlbums(album);
     }
 
     private void addToAllAlbums(ReleasedAlbum releasedAlbum) {
@@ -122,6 +116,20 @@ public class ReleasesProcessor {
         fileHashSet.add(releasedAlbum.getId());
         newAlbums.add(releasedAlbum);
         if (newReleasesConsumer != null) Platform.runLater(() -> newReleasesConsumer.accept(newAlbums.size() + ""));
+    }
+
+    private void addToFeaturing(FollowedArtist artist, AlbumSimplified album) {
+        featuringHashMap.put(album.getId(), getProcessedReleasedAlbum(album, artist));
+    }
+
+
+    private ReleasedAlbum getProcessedReleasedAlbum(AlbumSimplified a, FollowedArtist artist) {
+        ReleasedAlbum album = new ReleasedAlbum(a, artist);
+        boolean isRemind = isOnRemindList(a) && isAvailable(a);
+        if (isRemind) remindIDhashSet.remove(a.getId());
+        album.setReminded(isRemind);
+        album.setAvailableEverywhere(isAvailableEverywere(a));
+        return album;
     }
 
 
@@ -150,6 +158,10 @@ public class ReleasesProcessor {
         return this;
     }
 
+    private static boolean isAvailableEverywere(AlbumSimplified a) {
+        List<CountryCode> countryCodes = Arrays.asList(a.getAvailableMarkets());
+        return countryCodes.contains(CountryCode.getByCode(776)) && countryCodes.contains(CountryCode.getByCode(882));
+    }
 
     private boolean isAvailable(AlbumSimplified album) {
         return album.getAvailableMarkets().length > 0 && Arrays.asList(album.getAvailableMarkets()).contains(countryCode);
@@ -167,20 +179,13 @@ public class ReleasesProcessor {
         return loadedIDhashSet.contains(album.getId());
     }
 
-    private void addToFeaturing(FollowedArtist artist, AlbumSimplified album) {
-        featuringHashMap.put(album.getId(), new ReleasedAlbum(album, artist));
-    }
-
     private void markAsLoaded(AlbumSimplified album) {
         loadedIDhashSet.add(album.getId());
     }
 
-    private static boolean isFollowed(String artistID) {
-        return TheEngine.getInstance().isFollowed(artistID);
-    }
 
-    private boolean isNew(AlbumSimplified album) {
-        return !fileHashSet.contains(album.getId());
+    private boolean isNewAndFollowed(ReleasedAlbum album) {
+        return !fileHashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(album.getFollowedArtist().getID());
     }
 
     private boolean isOnRemindList(AlbumSimplified album) {

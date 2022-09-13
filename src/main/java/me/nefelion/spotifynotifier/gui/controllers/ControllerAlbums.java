@@ -86,7 +86,7 @@ public class ControllerAlbums {
     @FXML
     private Slider GSliderVolume;
     @FXML
-    private CheckBox GCheckboxAlbums, GCheckboxSingles, GCheckboxFeaturing;
+    private CheckBox GCheckboxAlbums, GCheckboxSingles, GCheckboxFeaturing, GCheckboxNotWorldwide;
     @FXML
     private ProgressBar GProgressBar;
     @FXML
@@ -152,6 +152,7 @@ public class ControllerAlbums {
     private void recalculateFilteredAlbums(List<ReleasedAlbum> filteredAlbums, List<ReleasedAlbum> albums) {
         filteredAlbums.clear();
         for (ReleasedAlbum album : albums) {
+            if (!GCheckboxNotWorldwide.isSelected() && !album.isAvailableEverywhere()) continue;
             if (album.isFeaturing()) {
                 if (!GCheckboxFeaturing.isSelected()) continue;
             } else {
@@ -604,19 +605,23 @@ public class ControllerAlbums {
         long numberOfAlbums = albums.stream().filter(p -> p.getAlbumType().equalsIgnoreCase("ALBUM") && !p.isFeaturing()).count();
         long numberOfSingles = albums.stream().filter(p -> p.getAlbumType().equalsIgnoreCase("SINGLE") && !p.isFeaturing()).count();
         long numberOfFeaturing = albums.stream().filter(ReleasedAlbum::isFeaturing).count();
+        long numberOfNotWorldwide = albums.stream().filter(p -> !p.isAvailableEverywhere()).count();
 
         GCheckboxAlbums.setText("Albums (" + numberOfAlbums + ")");
         GCheckboxSingles.setText("Singles (" + numberOfSingles + ")");
         GCheckboxFeaturing.setText("Featuring (" + numberOfFeaturing + ")");
+        GCheckboxNotWorldwide.setText("Not worldwide (" + numberOfNotWorldwide + ")");
 
-        GCheckboxAlbums.setSelected(numberOfAlbums != 0);
-        GCheckboxAlbums.setDisable(numberOfAlbums == 0);
-        GCheckboxSingles.setSelected(numberOfSingles != 0);
-        GCheckboxSingles.setDisable(numberOfSingles == 0);
-        GCheckboxFeaturing.setSelected(numberOfFeaturing != 0);
-        GCheckboxFeaturing.setDisable(numberOfFeaturing == 0);
+        configCheckboxBasedOnNumbers(GCheckboxAlbums, numberOfAlbums);
+        configCheckboxBasedOnNumbers(GCheckboxSingles, numberOfSingles);
+        configCheckboxBasedOnNumbers(GCheckboxFeaturing, numberOfFeaturing);
+        configCheckboxBasedOnNumbers(GCheckboxNotWorldwide, numberOfNotWorldwide);
     }
 
+    private void configCheckboxBasedOnNumbers(CheckBox checkbox, long number) {
+        checkbox.setSelected(number != 0);
+        checkbox.setDisable(number == 0);
+    }
 
     private void addAlbumSelectionListenerFor(TableView<ReleasedAlbum> gTable) {
         gTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
