@@ -100,7 +100,7 @@
                     </panes>
                 </Accordion>
                 <ImageView fx:id="GCoverImageView" fitHeight="300.0" fitWidth="300.0" layoutX="15.0" layoutY="380.0" pickOnBounds="true" preserveRatio="true" />
-            <Label fx:id="GLabelCurrentPlaying" layoutX="325.0" layoutY="350.0" text="label-current-playing" textFill="#757575" />
+            <Label fx:id="GLabelCurrentPlaying" layoutX="325.0" layoutY="350.0" maxWidth="167.0" prefHeight="17.0" prefWidth="167.0" text="label-current-playing" textFill="#757575" />
                 <Accordion fx:id="GAccordionTracklist" layoutX="325.0" layoutY="380.0" prefHeight="300.0" prefWidth="300.0">
                     <panes>
                         <TitledPane fx:id="GTitledPaneTracklist" animated="false" expanded="false" text="Tracklist">

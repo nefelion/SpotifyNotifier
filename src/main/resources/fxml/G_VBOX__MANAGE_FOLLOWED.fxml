@@ -128,6 +128,5 @@
             <Label fx:id="GLabelNewReleasesHour" alignment="CENTER" contentDisplay="CENTER" layoutX="345.0" layoutY="361.0" prefHeight="36.0" prefWidth="275.0" text="new-releases-hour" textAlignment="CENTER" />
             </children>
         </AnchorPane>
-      <Label text="Label" />
     </children>
 </VBox>

@@ -121,6 +121,7 @@ public class ControllerAlbums {
         initializeGButtonRandom();
 
         initializeInfoTitledPanes();
+        initializeGTitledPaneTracklist();
     }
 
     @FXML
@@ -299,6 +300,7 @@ public class ControllerAlbums {
             GContextMenuTracklist.hide();
             if (!e.isSecondaryButtonDown()) return;
             ObservableList<TrackSimplified> items = GListTracklist.getItems();
+            if (items == null) return;
             if (hoveredIndexTracklist >= items.size()) return;
 
 
@@ -361,6 +363,20 @@ public class ControllerAlbums {
                     Clipboard.getSystemClipboard().setContent(content);
                 }
             }
+        });
+    }
+
+    private void initializeGTitledPaneTracklist() {
+        ContextMenu contextMenu = new ContextMenu();
+        GTitledPaneTracklist.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+            if (!e.isSecondaryButtonDown()) return;
+            if (!infoHashMap.containsKey(currentSelectedAlbum.getId())) return;
+
+            MenuItem menuItem = new MenuItem("Copy tracklist");
+            menuItem.setOnAction(event1 -> copyTracklist(infoHashMap.get(currentSelectedAlbum.getId())));
+            contextMenu.getItems().clear();
+            contextMenu.getItems().add(menuItem);
+            contextMenu.show(GTitledPaneTracklist, e.getScreenX(), e.getScreenY());
         });
     }
 
@@ -1007,6 +1023,26 @@ public class ControllerAlbums {
         Clipboard.getSystemClipboard().setContent(content);
     }
 
+    private void copyTracklist(TempAlbumInfo info) {
+        ClipboardContent content = new ClipboardContent();
+        StringBuilder sb = new StringBuilder();
+
+        for (TrackSimplified track : info.trackList()) {
+            List<ArtistSimplified> performers = getPerformers(info.album(), track);
+
+            sb.append(track.getTrackNumber()).append(". ")
+                    .append(track.getName())
+                    .append(" (").append(Utilities.convertMsToDuration(track.getDurationMs())).append(")")
+                    .append(performers.isEmpty() ? "" : performers.stream().map(ArtistSimplified::getName)
+                            .collect(Collectors.joining(", ", " [", "]")))
+                    .append("\n");
+        }
+
+        content.putString(sb.toString());
+        Clipboard.getSystemClipboard().setContent(content);
+        System.out.println(sb);
+    }
+
     private static String getFormattedArtists(ReleasedAlbum album) {
         StringBuilder sb = new StringBuilder();
         int artists = 0;
@@ -1188,6 +1224,16 @@ public class ControllerAlbums {
 
         return performers;
     }
+
+    private List<ArtistSimplified> getPerformers(Album album, TrackSimplified track) {
+        HashSet<String> artistSet = Arrays.stream(album.getArtists()).map(ArtistSimplified::getId).collect(Collectors.toCollection(HashSet::new));
+
+        List<ArtistSimplified> performers = new ArrayList<>(List.of(track.getArtists()));
+        performers.removeIf(p -> artistSet.contains(p.getId()));
+
+        return performers;
+    }
+
 
     private List<ArtistSimplified> getArtistsAndPerformers(List<TrackSimplified> tracklist) {
         List<ArtistSimplified> artistsAndPerformers = new LinkedList<>();
