@@ -372,10 +372,12 @@ public class ControllerAlbums {
             if (!e.isSecondaryButtonDown()) return;
             if (!infoHashMap.containsKey(currentSelectedAlbum.getId())) return;
 
-            MenuItem menuItem = new MenuItem("Copy tracklist");
-            menuItem.setOnAction(event1 -> copyTracklist(infoHashMap.get(currentSelectedAlbum.getId())));
+            MenuItem menuCopyTracklist = new MenuItem("Copy tracklist");
+            menuCopyTracklist.setOnAction(event1 -> copyTracklist(infoHashMap.get(currentSelectedAlbum.getId())));
+            MenuItem menuCopyPreviews = new MenuItem("Copy links to previews");
+            menuCopyPreviews.setOnAction(event1 -> copyPreviews(infoHashMap.get(currentSelectedAlbum.getId())));
             contextMenu.getItems().clear();
-            contextMenu.getItems().add(menuItem);
+            contextMenu.getItems().addAll(menuCopyTracklist, menuCopyPreviews);
             contextMenu.show(GTitledPaneTracklist, e.getScreenX(), e.getScreenY());
         });
     }
@@ -787,7 +789,9 @@ public class ControllerAlbums {
                 Platform.runLater(() -> {
                     GLabelCurrentPlaying.setText("Spotify blocks this track from being played here.");
                     GLabelCurrentPlaying.setVisible(true);
-                    GLabelCurrentPlaying.setTooltip(new Tooltip("Spotify blocks this track from being played here."));
+                    Tooltip tooltip = new Tooltip("Spotify blocks this track from being played here.");
+                    tooltip.setShowDelay(Duration.ZERO);
+                    GLabelCurrentPlaying.setTooltip(tooltip);
                     GMainVBOX.setCursor(Cursor.DEFAULT);
                 });
                 return;
@@ -1040,8 +1044,31 @@ public class ControllerAlbums {
 
         content.putString(sb.toString());
         Clipboard.getSystemClipboard().setContent(content);
-        System.out.println(sb);
     }
+
+    private void copyPreviews(TempAlbumInfo info) {
+        ClipboardContent content = new ClipboardContent();
+        StringBuilder sb = new StringBuilder();
+
+        for (TrackSimplified track : info.trackList()) {
+            List<ArtistSimplified> performers = getPerformers(info.album(), track);
+
+            String previewUrl = track.getPreviewUrl();
+            if (previewUrl != null && previewUrl.contains("?"))
+                previewUrl = previewUrl.substring(0, previewUrl.indexOf("?"));
+
+            sb.append(track.getTrackNumber()).append(". ")
+                    .append(track.getName())
+                    .append(" (").append(Utilities.convertMsToDuration(track.getDurationMs())).append(")")
+                    .append(performers.isEmpty() ? "" : performers.stream().map(ArtistSimplified::getName)
+                            .collect(Collectors.joining(", ", " [", "]")))
+                    .append("\n").append(previewUrl).append("\n\n");
+        }
+
+        content.putString(sb.toString());
+        Clipboard.getSystemClipboard().setContent(content);
+    }
+
 
     private static String getFormattedArtists(ReleasedAlbum album) {
         StringBuilder sb = new StringBuilder();
