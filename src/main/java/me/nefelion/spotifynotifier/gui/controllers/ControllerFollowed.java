@@ -45,7 +45,7 @@ public class ControllerFollowed {
     private TextField GTextFieldSearchFollowed, GTextFieldSearchSpotify;
     @FXML
     private Label GLabelCurrentArtist, GLabelProcessedArtists, GLabelLoadedReleases, GLabelNewReleases, GLabelPercentage,
-            GLabelLastChecked, GLabelTimeElapsed, GLabelNumberOfArtists;
+            GLabelLastChecked, GLabelTimeElapsed, GLabelNumberOfArtists, GLabelNewReleasesHour;
     @FXML
     private ProgressBar GProgressBar;
     @FXML
@@ -75,8 +75,27 @@ public class ControllerFollowed {
         initializeGTextFieldSearchFollowed();
         initializeGTextFieldSearchSpotify();
         initializeGButtonCheckReleases();
+        initializeGLabelNewReleasesHour();
 
         startRefreshingTimer();
+    }
+
+    private void initializeGLabelNewReleasesHour() {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Pacific/Tongatapu"));
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        long timestamp = calendar.getTimeInMillis();
+        calendar.setTimeZone(TimeZone.getDefault());
+        calendar.setTimeInMillis(timestamp);
+
+        String time = String.format("%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+        String time12 = String.format("%02d:%02d %s",
+                calendar.get(Calendar.HOUR) == 0 ? 12 : calendar.get(Calendar.HOUR),
+                calendar.get(Calendar.MINUTE),
+                calendar.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM");
+        GLabelNewReleasesHour.setText("Tomorrow's albums appear at " + time + " (" + time12 + ")");
     }
 
     private void initializeGButtonCheckReleases() {
@@ -132,6 +151,7 @@ public class ControllerFollowed {
                 Platform.runLater(() -> {
                     refreshGLabelLastChecked();
                     refreshGListFollowedArtists();
+
                 });
             }
         }, 0, 1000);
