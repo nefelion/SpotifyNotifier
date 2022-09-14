@@ -96,6 +96,7 @@ public class ControllerFollowed {
                 calendar.get(Calendar.MINUTE),
                 calendar.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM");
         GLabelNewReleasesHour.setText("Tomorrow's albums appear at " + time + " (" + time12 + ")");
+        GLabelNewReleasesHour.setStyle("-fx-font-style: italic; -fx-opacity: 0.4;");
     }
 
     private void initializeGButtonCheckReleases() {
