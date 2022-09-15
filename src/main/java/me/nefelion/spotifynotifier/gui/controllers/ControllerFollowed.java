@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -411,6 +412,16 @@ public class ControllerFollowed {
 
     private void initializeGTextFieldSearchFollowed() {
         GTextFieldSearchFollowed.focusedProperty().addListener(getFocusChangeListener(GTextFieldSearchFollowed));
+
+        GTextFieldSearchFollowed.setOnKeyPressed(ke -> {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
+                if (GListFollowed.getItems().size() == 1) {
+                    FollowedArtist artist = GListFollowed.getItems().get(0);
+                    showFollowedArtistReleases(artist);
+                }
+            }
+        });
+
     }
 
     private void initializeGVboxInfo() {
@@ -473,9 +484,15 @@ public class ControllerFollowed {
         String search = GTextFieldSearchFollowed.getText().trim();
         List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists()
                 .stream().sorted(Comparator.comparing(FollowedArtist::getName)).toList();
+
+        String s = search.toLowerCase();
+        Comparator<FollowedArtist> startWithComparator =
+                (p, q) -> Boolean.compare(q.getName().toLowerCase().startsWith(s), p.getName().toLowerCase().startsWith(s));
+
         GListFollowed.setItems(FXCollections.observableList(followedArtists
                 .stream()
-                .filter(p -> p.getName().toLowerCase().contains(search.toLowerCase()))
+                .filter(p -> p.getName().toLowerCase().contains(s) || areFirstLetters(p.getName(), s))
+                .sorted(startWithComparator.thenComparing(FollowedArtist::getName))
                 .collect(Collectors.toList())));
 
         placeholderLabelGListFollowed.setText(followedArtists.isEmpty()
@@ -484,6 +501,12 @@ public class ControllerFollowed {
 
         refreshGLabelNumberOfArtists(followedArtists.size());
         if (!processing) GButtonCheckReleases.setDisable(followedArtists.isEmpty());
+    }
+
+    private boolean areFirstLetters(String p, String search) {
+        String firstLetters = Arrays.stream(p.split(" ")).map(s -> s.substring(0, 1)).collect(Collectors.joining());
+
+        return firstLetters.toLowerCase().startsWith(search.toLowerCase());
     }
 
     private void updateGListSearchSpotifyArtistsWith(List<Artist> list) {

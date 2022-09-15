@@ -723,8 +723,7 @@ public class ControllerAlbums {
 
     private void updateInfoTab(TempAlbumInfo info) {
         Comparator<ArtistSimplified> comparator = (o1, o2) -> {
-            TheEngine instance = TheEngine.getInstance();
-            return (instance.isFollowed(o2.getId()) ? 1 : 0) - (instance.isFollowed(o1.getId()) ? 1 : 0);
+            return (TheEngine.isFollowed(o2.getId()) ? 1 : 0) - (TheEngine.isFollowed(o1.getId()) ? 1 : 0);
         };
         comparator.thenComparing(ArtistSimplified::getName);
 
@@ -974,7 +973,7 @@ public class ControllerAlbums {
             remindMenuItem.setDisable(isAvailableInCountry);
         }
 
-        boolean isArtistFollowed = TheEngine.getInstance().isFollowed(album.getFollowedArtist().getID());
+        boolean isArtistFollowed = TheEngine.isFollowed(album.getFollowedArtist().getID());
         followUnfollowMenuItem.setDisable(false);
         followUnfollowMenuItem.setText((isArtistFollowed ? "Unfollow " : "Follow ") + album.getFollowedArtist().getName());
         followUnfollowMenuItem.setOnAction((ev) -> {
@@ -1013,8 +1012,7 @@ public class ControllerAlbums {
 
     private void copyDiscordMessageForReleases(String todaytomorrow, String date) {
         ClipboardContent content = new ClipboardContent();
-        StringBuilder sb = new StringBuilder("~~**-------------------------------------------------------**~~\n" +
-                todaytomorrow + " (" + date + ") new releases:\n\n");
+        StringBuilder sb = new StringBuilder(todaytomorrow + " (" + date + ") new releases:\n\n");
 
         for (ReleasedAlbum album : GTableAllReleases.getItems().stream().filter(p -> p.getReleaseDate().equals(date)).toList()) {
             String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
@@ -1075,8 +1073,8 @@ public class ControllerAlbums {
         int artists = 0;
         int allArtists = album.getAlbum().getArtists().length;
 
-        ArtistSimplified[] followed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> TheEngine.getInstance().isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
-        ArtistSimplified[] notFollowed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> !TheEngine.getInstance().isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
+        ArtistSimplified[] followed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> TheEngine.isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
+        ArtistSimplified[] notFollowed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> !TheEngine.isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
         for (ArtistSimplified artist : followed) {
             artists++;
             sb.append("**").append(artist.getName()).append("**").append(artists == allArtists - 1 ? " and " : ", ");
@@ -1117,7 +1115,7 @@ public class ControllerAlbums {
     }
 
     private void showSimilarArtists(String name, List<FollowedArtist> similarArtists) {
-        similarArtists.removeIf(p -> TheEngine.getInstance().isFollowed(p.getID()));
+        similarArtists.removeIf(p -> TheEngine.isFollowed(p.getID()));
         String title = "Artists similar to " + name;
         showModalWindowWithArtistsToPick(similarArtists, title);
     }
@@ -1278,10 +1276,9 @@ public class ControllerAlbums {
         flow.setMaxWidth(270);
         if (artists.isEmpty()) return flow;
 
-        TheEngine engine = TheEngine.getInstance();
         for (ArtistSimplified a : artists) {
             Text text = new Text(a.getName());
-            if (engine.isFollowed(a.getId())) text.setStyle("-fx-font-weight: bold");
+            if (TheEngine.isFollowed(a.getId())) text.setStyle("-fx-font-weight: bold");
             flow.getChildren().addAll(text, new Text(", "));
         }
         flow.getChildren().remove(flow.getChildren().size() - 1);
