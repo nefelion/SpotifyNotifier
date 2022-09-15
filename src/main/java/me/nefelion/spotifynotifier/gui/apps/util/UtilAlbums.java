@@ -8,6 +8,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import me.nefelion.spotifynotifier.FollowedArtist;
 import me.nefelion.spotifynotifier.ReleasesProcessor;
 import me.nefelion.spotifynotifier.Utilities;
 import me.nefelion.spotifynotifier.data.FileData;
@@ -17,11 +18,15 @@ import me.nefelion.spotifynotifier.gui.controllers.ControllerProgress;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class UtilAlbums {
 
     public static void process(Stage primaryStage, boolean newOnly, boolean quiet) throws IOException {
-        ReleasesProcessor processor = new ReleasesProcessor(new ArrayList<>(TempData.getInstance().getFileData().getFollowedArtists()));
+        List<FollowedArtist> artists = new ArrayList<>(TempData.getInstance().getFileData().getFollowedArtists().stream()
+                .sorted(Comparator.comparing(FollowedArtist::getName)).toList());
+        ReleasesProcessor processor = new ReleasesProcessor(artists);
 
 
         FXMLLoader progressLoader = new FXMLLoader(UtilAlbums.class.getResource("/fxml/G_VBOX__PROGRESS.fxml"));
