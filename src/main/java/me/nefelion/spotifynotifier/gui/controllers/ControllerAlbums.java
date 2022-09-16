@@ -480,6 +480,12 @@ public class ControllerAlbums {
                 tooltip.setStyle("-fx-text-fill: white");
                 setTooltip(tooltip);
                 setText(item);
+
+                // if release date of item above is the same, remove the date
+                if (getIndex() > 0) {
+                    ReleasedAlbum previousItem = getTableView().getItems().get(getIndex() - 1);
+                    if (previousItem.getReleaseDate().equals(item)) setText(null);
+                }
             }
         };
     }
@@ -861,6 +867,17 @@ public class ControllerAlbums {
 
                     if (!item.isReminded()) getStyleClass().remove("reminded");
                     else if (!getStyleClass().contains("reminded")) getStyleClass().add("reminded");
+
+                    // if next item has other date, add a separator
+                    int nextIndex = getTableView().getItems().indexOf(item) + 1;
+                    int size = getTableView().getItems().size();
+                    if (nextIndex < size) {
+                        ReleasedAlbum nextItem = getTableView().getItems().get(nextIndex);
+                        if (!item.getReleaseDate().equals(nextItem.getReleaseDate())) {
+                            if (!getStyleClass().contains("line")) getStyleClass().add("line");
+                        } else getStyleClass().remove("line");
+                    } else getStyleClass().remove("line");
+
                 }
             };
 

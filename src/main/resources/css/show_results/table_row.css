@@ -16,3 +16,8 @@
 .featuring.table-view:focused > .virtual-flow > .clipped-container > .sheet > .table-row-cell:filled:selected .text {
     -fx-fill: white;
 }
+
+.line.table-row-cell {
+    -fx-border-color: rgba(0, 0, 0, 0.15);
+    -fx-border-width: 0 0 1 0;
+}
