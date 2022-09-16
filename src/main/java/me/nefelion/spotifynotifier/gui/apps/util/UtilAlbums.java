@@ -43,6 +43,9 @@ public class UtilAlbums {
             progressStage.show();
         }
 
+        // set background color to green
+
+
         Task<Boolean> task = new Task<>() {
             @Override
             public Boolean call() {

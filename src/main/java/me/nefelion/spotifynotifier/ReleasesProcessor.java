@@ -23,7 +23,8 @@ public class ReleasesProcessor {
     private final boolean ignoreVarious, showOnlyAvailable, ignoreNotWorldwide;
 
     private DoubleConsumer progressConsumer;
-    private Consumer<String> currentArtistConsumer, processedArtistsConsumer, releasesConsumer, newReleasesConsumer;
+    private Consumer<String> currentArtistConsumer, processedArtistsConsumer, releasesConsumer;
+    private Consumer<Integer> newReleasesConsumer;
 
     public ReleasesProcessor(List<FollowedArtist> artists) {
         this.artists = artists;
@@ -117,7 +118,7 @@ public class ReleasesProcessor {
     private void addToNewAlbums(ReleasedAlbum releasedAlbum) {
         fileHashSet.add(releasedAlbum.getId());
         newAlbums.add(releasedAlbum);
-        if (newReleasesConsumer != null) Platform.runLater(() -> newReleasesConsumer.accept(newAlbums.size() + ""));
+        if (newReleasesConsumer != null) Platform.runLater(() -> newReleasesConsumer.accept(newAlbums.size()));
     }
 
     private void addToFeaturing(FollowedArtist artist, AlbumSimplified album) {
@@ -145,7 +146,7 @@ public class ReleasesProcessor {
         return this;
     }
 
-    public ReleasesProcessor setNewReleasesConsumer(Consumer<String> newReleasesConsumer) {
+    public ReleasesProcessor setNewReleasesConsumer(Consumer<Integer> newReleasesConsumer) {
         this.newReleasesConsumer = newReleasesConsumer;
         return this;
     }
@@ -187,7 +188,7 @@ public class ReleasesProcessor {
 
 
     private boolean isNewAndFollowed(ReleasedAlbum album) {
-        return !fileHashSet.contains(album.getId()) && TheEngine.getInstance().isFollowed(album.getFollowedArtist().getID());
+        return !fileHashSet.contains(album.getId()) && TheEngine.isFollowed(album.getFollowedArtist().getID());
     }
 
     private boolean isOnRemindList(AlbumSimplified album) {

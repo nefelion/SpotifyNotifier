@@ -9,6 +9,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
@@ -21,8 +25,10 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.LoadingDialog;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ControllerFollowed {
@@ -191,7 +197,7 @@ public class ControllerFollowed {
                 .setCurrentArtistConsumer(GLabelCurrentArtist::setText)
                 .setProcessedArtistsConsumer(GLabelProcessedArtists::setText)
                 .setReleasesConsumer(GLabelLoadedReleases::setText)
-                .setNewReleasesConsumer(GLabelNewReleases::setText);
+                .setNewReleasesConsumer(this::setNewReleasesText);
 
         final long startMs = System.currentTimeMillis();
         elapsed = new Timer(true);
@@ -236,6 +242,16 @@ public class ControllerFollowed {
         thread.setDaemon(true);
         thread.start();
     }
+
+    private void setNewReleasesText(int var) {
+        if (GLabelNewReleases.getText().equals("0") && var > 0) {
+            GVboxInfo.setStyle("-fx-background-color: " + HIGHLIGHTED_CONTROL_INNER_BACKGROUND + ";");
+            Toolkit.getDefaultToolkit().beep();
+        }
+
+        GLabelNewReleases.setText(String.valueOf(var));
+    }
+
 
     @FXML
     private void onActionGButtonAbort(ActionEvent actionEvent) {
@@ -347,7 +363,7 @@ public class ControllerFollowed {
                         setText(item.getName());
                         StringBuilder style = new StringBuilder();
 
-                        if (TheEngine.getInstance().isFollowed(item.getId())) {
+                        if (TheEngine.isFollowed(item.getId())) {
                             style.append("-fx-control-inner-background: " + HIGHLIGHTED_CONTROL_INNER_BACKGROUND + ";");
                         } else {
                             style.append("-fx-control-inner-background: " + DEFAULT_CONTROL_INNER_BACKGROUND + ";");
@@ -527,6 +543,7 @@ public class ControllerFollowed {
         GLabelNewReleases.setText("0");
         if (elapsed != null) elapsed.cancel();
         GLabelTimeElapsed.setText("0:00");
+        GVboxInfo.setStyle("");
     }
 
     private void showReleases(String title, ReleasesProcessor processor) {
