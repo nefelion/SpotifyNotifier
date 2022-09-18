@@ -475,11 +475,11 @@ public class ControllerAlbums {
                     return;
                 }
 
-                Tooltip tooltip = new Tooltip(Utilities.convertDateToAgo(item));
+                Tooltip tooltip = new Tooltip(item);
                 tooltip.setShowDelay(Duration.ZERO);
                 tooltip.setStyle("-fx-text-fill: white");
                 setTooltip(tooltip);
-                setText(item);
+                setText(Utilities.convertDateToAgo(item));
 
                 // if release date of item above is the same, remove the date
                 if (getIndex() > 0) {
