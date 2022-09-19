@@ -552,7 +552,8 @@ public class ControllerAlbums {
                     tooltip.setShowDelay(Duration.ZERO);
                     tooltip.setStyle("-fx-text-fill: white");
                     setTooltip(tooltip);
-                }
+                } else setTooltip(null);
+
 
                 setText(item);
             }
