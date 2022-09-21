@@ -475,11 +475,19 @@ public class ControllerAlbums {
                     return;
                 }
 
-                Tooltip tooltip = new Tooltip(item);
+                Tooltip tooltip;
+                String ago = Utilities.convertDateToAgo(item);
+                if (Utilities.convertDateToDaysAgo(item) > 30) {
+                    tooltip = new Tooltip(ago);
+                    setText(item);
+                } else {
+                    tooltip = new Tooltip(item);
+                    setText(ago);
+                }
+
                 tooltip.setShowDelay(Duration.ZERO);
                 tooltip.setStyle("-fx-text-fill: white");
                 setTooltip(tooltip);
-                setText(Utilities.convertDateToAgo(item));
 
                 // if release date of item above is the same, remove the date
                 if (getIndex() > 0) {

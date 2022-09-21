@@ -171,6 +171,13 @@ public class Utilities {
         return "In " + (-days) + " days";
     }
 
+    public static int convertDateToDaysAgo(String str) {
+        LocalDate date = findLocalDate(str);
+        if (date == null) return -9999;
+
+        return (int) DAYS.between(date, LocalDate.now());
+    }
+
     public static LocalDate findLocalDate(String str) {
         java.util.List<SimpleDateFormat> knownFormatters = new ArrayList<>(Arrays.asList(
                 new SimpleDateFormat("yyyy-MM-dd"),
