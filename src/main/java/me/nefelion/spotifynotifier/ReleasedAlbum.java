@@ -52,6 +52,12 @@ public class ReleasedAlbum {
         return releaseDate;
     }
 
+    public String getExtendedReleaseDate() {
+        if (releaseDate.equals(Utilities.getTomorrowDate())) return releaseDate + " (Tomorrow)";
+        else if (releaseDate.equals(Utilities.getTodayDate())) return releaseDate + " (Today)";
+        else return releaseDate;
+    }
+
     public String getLink() {
         return "https://open.spotify.com/album/" + getId();
     }

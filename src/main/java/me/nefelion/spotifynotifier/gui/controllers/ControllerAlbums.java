@@ -1014,7 +1014,7 @@ public class ControllerAlbums {
         String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
         content.putString("> **" + album.getAlbumName() + "**" + qsingle + "\n" +
                 "> by " + getFormattedArtists(album) + "\n" +
-                "> " + album.getReleaseDate() + "\n> " +
+                "> " + album.getExtendedReleaseDate() + "\n> " +
                 album.getLink() + "\n");
 
         Clipboard.getSystemClipboard().setContent(content);
@@ -1028,7 +1028,7 @@ public class ControllerAlbums {
             String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
             sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle)
                     .append("\n> by ").append(getFormattedArtists(album))
-                    .append("\n> Release date: ").append(album.getReleaseDate())
+                    .append("\n> Release date: ").append(album.getExtendedReleaseDate())
                     .append("\n> ").append(album.getLink()).append("\n\n");
         }
 
