@@ -8,11 +8,13 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
@@ -27,8 +29,8 @@ import se.michaelthelin.spotify.model_objects.specification.Artist;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ControllerFollowed {
@@ -359,6 +361,7 @@ public class ControllerFollowed {
                     if (item == null || empty) {
                         setText(null);
                         setStyle("-fx-control-inner-background: " + DEFAULT_CONTROL_INNER_BACKGROUND + ";");
+                        setTooltip(null);
                     } else {
                         setText(item.getName());
                         StringBuilder style = new StringBuilder();
@@ -373,6 +376,34 @@ public class ControllerFollowed {
                         style.append("-fx-text-fill: " + "rgba(0,0,0,").append(vis).append(");");
 
                         setStyle(style.toString());
+
+                        Tooltip tooltip = new Tooltip("...");
+                        tooltip.setShowDelay(Duration.ZERO);
+                        Task<Void> task = new Task<>() {
+                            @Override
+                            protected Void call() {
+
+                                try {
+                                    ImageView node = new ImageView(new Image(item.getImages()[1].getUrl()));
+                                    node.setFitHeight(160);
+                                    node.setPreserveRatio(true);
+                                    Platform.runLater(() -> {
+                                        tooltip.setGraphic(node);
+                                        tooltip.setText("");
+                                    });
+                                } catch (Exception e) {
+                                    Platform.runLater(() -> tooltip.setText("No image available"));
+                                }
+
+                                return null;
+                            }
+                        };
+                        Thread thread = new Thread(task);
+                        thread.setDaemon(true);
+                        thread.start();
+
+                        setTooltip(tooltip);
+
                     }
 
                 }
