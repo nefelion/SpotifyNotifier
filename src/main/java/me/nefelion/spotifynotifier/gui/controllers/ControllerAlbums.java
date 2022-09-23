@@ -451,7 +451,7 @@ public class ControllerAlbums {
         GNewReleases_Artist.setCellValueFactory(new PropertyValueFactory<>("artistString"));
         GNewReleases_Artist.setCellFactory(column -> getArtistCell());
         GNewReleases_Release.setCellValueFactory(new PropertyValueFactory<>("albumName"));
-        GNewReleases_Release.setCellFactory(column -> getAlbumCell());
+        GNewReleases_Release.setCellFactory(column -> getAlbumCell(column));
     }
 
     private void initializeGAllReleasesColumns() {
@@ -461,7 +461,7 @@ public class ControllerAlbums {
         GAllReleases_Artist.setCellValueFactory(new PropertyValueFactory<>("artistString"));
         GAllReleases_Artist.setCellFactory(column -> getArtistCell());
         GAllReleases_Release.setCellValueFactory(new PropertyValueFactory<>("albumName"));
-        GAllReleases_Release.setCellFactory(column -> getAlbumCell());
+        GAllReleases_Release.setCellFactory(this::getAlbumCell);
     }
 
     private TableCell<ReleasedAlbum, String> getDateCell() {
@@ -498,15 +498,28 @@ public class ControllerAlbums {
         };
     }
 
-    private TableCell<ReleasedAlbum, String> getAlbumCell() {
+    private TableCell<ReleasedAlbum, String> getAlbumCell(TableColumn<ReleasedAlbum, String> column) {
         return new TableCell<>() {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
                 if (item == null || empty) {
-                    setTooltip(null);
                     setText(null);
                     return;
+                }
+
+                if (column.getWidth() < new Text(item + "  ").getLayoutBounds().getWidth()) {
+                    tooltipProperty().bind(Bindings.when(Bindings.or(emptyProperty(), itemProperty().isNull()))
+                            .then((Tooltip) null)
+                            .otherwise(new Tooltip(item) {
+                                {
+                                    setStyle("-fx-text-fill: white");
+                                    setShowDelay(Duration.ZERO);
+                                }
+                            }));
+                } else {
+                    tooltipProperty().bind(Bindings.when(Bindings.or(emptyProperty(), itemProperty().isNull()))
+                            .then((Tooltip) null).otherwise((Tooltip) null));
                 }
 
                 setOnMouseClicked((MouseEvent event) -> {
@@ -520,6 +533,7 @@ public class ControllerAlbums {
                         }
                     }
                 });
+
 
                 setText(item);
             }
