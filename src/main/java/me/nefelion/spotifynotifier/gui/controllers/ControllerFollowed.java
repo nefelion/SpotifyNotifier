@@ -120,6 +120,32 @@ public class ControllerFollowed {
         Tooltip tooltip = new Tooltip("Right-click for more options");
         tooltip.setShowDelay(Duration.ZERO);
         GButtonCheckReleases.setTooltip(tooltip);
+
+
+        String defaultStyle = """
+                -fx-background-color:
+                        linear-gradient(#f0ff35,#a9ff00),
+                        radial-gradient(center 50% -40%, radius 200%, #b8ee36 45%, #80c800 50%);
+                -fx-background-radius: 6,5;
+                -fx-background-insets: 0,1;
+                -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 5, 0.0, 0, 1);
+                -fx-text-fill: #395306;
+                """;
+
+        String highlightedStyle = """
+                -fx-background-color:
+                        linear-gradient(#a9ff00,#f0ff35),
+                        radial-gradient(center 50% -40%, radius 200%, #80c800 45%, #b8ee36 50%);
+                -fx-background-radius: 6,5;
+                -fx-background-insets: 0,1;
+                -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 5, 0.0, 0, 1);
+                -fx-text-fill: #395306;
+                """;
+
+
+        GButtonCheckReleases.setStyle(defaultStyle);
+        GButtonCheckReleases.setOnMouseEntered(event -> GButtonCheckReleases.setStyle(highlightedStyle));
+        GButtonCheckReleases.setOnMouseExited(event -> GButtonCheckReleases.setStyle(defaultStyle));
     }
 
     private void explore() {
@@ -458,6 +484,8 @@ public class ControllerFollowed {
     }
 
     private void initializeGTextFieldSearchFollowed() {
+        GTextFieldSearchFollowed.setDisable(TempData.getInstance().getFileData().getFollowedArtists().isEmpty());
+
         GTextFieldSearchFollowed.focusedProperty().addListener(getFocusChangeListener(GTextFieldSearchFollowed));
 
         GTextFieldSearchFollowed.setOnKeyPressed(ke -> {
@@ -500,10 +528,12 @@ public class ControllerFollowed {
     }
 
     private void refreshGLabelLastChecked() {
-        GLabelLastChecked.setText("Last checked: " + Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked()));
+        String timeAgo = Utilities.getTimeAgo(TempData.getInstance().getFileData().getLastChecked());
+        GLabelLastChecked.setText(timeAgo.equals("-") ? "" : "Last checked: " + timeAgo);
     }
 
     private void refreshGLabelNumberOfArtists(int size) {
+        GTextFieldSearchFollowed.setDisable(size == 0);
         GLabelNumberOfArtists.setText("" + (size > 0 ? size : ""));
     }
 
