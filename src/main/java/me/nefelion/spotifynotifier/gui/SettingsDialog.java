@@ -57,11 +57,12 @@ public class SettingsDialog extends Dialog<ButtonType> {
         Tooltip tooltip = new Tooltip("""
                 How deep should the explore algorithm go?
                 1 = only artists similar to followed artists
-                2 = artists similar to artists similar to followed artists
+                2 = also artists similar to artists similar to followed artists
                 """);
         tooltip.setShowDelay(javafx.util.Duration.ZERO);
+        tooltip.setStyle("-fx-font-size: 14px;");
 
-        Label label = new Label("Explore iterations:");
+        Label label = new Label("Explore depth:");
         label.setTooltip(tooltip);
         label.setWrapText(true);
 
@@ -82,6 +83,12 @@ public class SettingsDialog extends Dialog<ButtonType> {
         Button button = new Button("Reset credentials and exit");
         button.setOnAction(this::resetCredentials);
         button.setStyle("-fx-text-fill: red;");
+
+
+        Tooltip tooltip = new Tooltip("This option will delete your token details from the application and you will have to re-enter them.");
+        tooltip.setShowDelay(javafx.util.Duration.ZERO);
+        tooltip.setStyle("-fx-font-size: 14px; -fx-text-fill: red;");
+        button.setTooltip(tooltip);
         return button;
     }
 
@@ -94,11 +101,20 @@ public class SettingsDialog extends Dialog<ButtonType> {
         Label labelCountry = new Label("Country:");
         initializeTextFieldCountryCode();
 
-        checkBoxOnlyAvailable = new CheckBox("Show only albums already available in my country");
+        checkBoxOnlyAvailable = new CheckBox("Show only albums already available in this country");
         checkBoxOnlyAvailable.setSelected(TempData.getInstance().getFileData().isShowOnlyAvailable());
 
         VBox vBox = new VBox(labelCountry, textFieldCountryCode, checkBoxOnlyAvailable);
         vBox.setSpacing(5);
+
+        Tooltip tooltip = new Tooltip("""
+                Setting a country affects the Reminder functionality.
+                With Reminder, you can select an album and it will reappear in New Releases when it is available in that country.
+                """);
+        tooltip.setShowDelay(javafx.util.Duration.ZERO);
+        tooltip.setStyle("-fx-font-size: 14px;");
+        Tooltip.install(vBox, tooltip);
+
         return vBox;
     }
 

@@ -107,4 +107,11 @@ public class ReleasedAlbum {
         this.availableEverywhere = availableEverywhere;
     }
 
+    public boolean isTomorrow() {
+        return releaseDate.equals(Utilities.getTomorrowDate());
+    }
+
+    public boolean isToday() {
+        return releaseDate.equals(Utilities.getTodayDate());
+    }
 }

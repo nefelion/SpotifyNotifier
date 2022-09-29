@@ -8,10 +8,7 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -27,9 +24,7 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.LoadingDialog;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
-import java.awt.*;
 import java.io.IOException;
-import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,7 +49,8 @@ public class ControllerFollowed {
     private TextField GTextFieldSearchFollowed, GTextFieldSearchSpotify;
     @FXML
     private Label GLabelCurrentArtist, GLabelProcessedArtists, GLabelLoadedReleases, GLabelNewReleases, GLabelPercentage,
-            GLabelLastChecked, GLabelTimeElapsed, GLabelNumberOfArtists, GLabelNewReleasesHour;
+            GLabelLastChecked, GLabelTimeElapsed, GLabelNumberOfArtists, GLabelNewReleasesHour, GLabelToday, GLabelTomorrow,
+            GLabelLoadedReleasesP, GLabelNewReleasesP, GLabelTodayP, GLabelTomorrowP;
     @FXML
     private ProgressBar GProgressBar;
     @FXML
@@ -111,14 +107,19 @@ public class ControllerFollowed {
     private void initializeGButtonCheckReleases() {
         GButtonCheckReleases.setOnMousePressed(event -> {
             if (event.isSecondaryButtonDown()) {
-                MenuItem explore1 = new MenuItem("Explore");
+                CustomMenuItem explore1 = new CustomMenuItem(new Label("Explore"));
                 explore1.setOnAction(event1 -> explore());
+                Tooltip tooltip = new Tooltip("The Explore functionality shows all the albums of all the artists who are similar to the artists you follow.");
+                tooltip.setShowDelay(Duration.ZERO);
+                tooltip.setStyle("-fx-font-size: 14px;");
+                Tooltip.install(explore1.getContent(), tooltip);
                 GButtonCheckReleases.setContextMenu(new ContextMenu(explore1));
             }
         });
 
         Tooltip tooltip = new Tooltip("Right-click for more options");
         tooltip.setShowDelay(Duration.ZERO);
+        tooltip.setStyle("-fx-font-size: 14px;");
         GButtonCheckReleases.setTooltip(tooltip);
 
 
@@ -225,9 +226,12 @@ public class ControllerFollowed {
                     GProgressBar.setProgress(var);
                 })
                 .setCurrentArtistConsumer(GLabelCurrentArtist::setText)
-                .setProcessedArtistsConsumer(GLabelProcessedArtists::setText)
-                .setReleasesConsumer(GLabelLoadedReleases::setText)
-                .setNewReleasesConsumer(this::setNewReleasesText);
+                .setProcessedArtistsConsumer(art -> GLabelProcessedArtists.setText(art + " / " + list.size()))
+                .setLoadedReleasesConsumer(n -> setLoadedReleasesText(n, GLabelLoadedReleasesP, GLabelLoadedReleases))
+                .setNewReleasesConsumer(n -> setLoadedReleasesText(n, GLabelNewReleasesP, GLabelNewReleases))
+                .setTodayReleasesConsumer(n -> setLoadedReleasesText(n, GLabelTodayP, GLabelToday))
+                .setTomorrowReleasesConsumer(n -> setLoadedReleasesText(n, GLabelTomorrowP, GLabelTomorrow));
+
 
         final long startMs = System.currentTimeMillis();
         elapsed = new Timer(true);
@@ -273,15 +277,13 @@ public class ControllerFollowed {
         thread.start();
     }
 
-    private void setNewReleasesText(int var) {
-        if (GLabelNewReleases.getText().equals("0") && var > 0) {
-            GVboxInfo.setStyle("-fx-background-color: " + HIGHLIGHTED_CONTROL_INNER_BACKGROUND + ";");
-            Toolkit.getDefaultToolkit().beep();
+    private void setLoadedReleasesText(Integer integer, Label glabelP, Label glabel) {
+        if (glabel.getText().equals("0") && integer > 0) {
+            glabelP.setOpacity(1);
+            glabel.setOpacity(1);
         }
-
-        GLabelNewReleases.setText(String.valueOf(var));
+        glabel.setText(integer + "");
     }
-
 
     @FXML
     private void onActionGButtonAbort(ActionEvent actionEvent) {
@@ -604,9 +606,21 @@ public class ControllerFollowed {
         GLabelProcessedArtists.setText("0");
         GLabelLoadedReleases.setText("0");
         GLabelNewReleases.setText("0");
+        GLabelToday.setText("0");
+        GLabelTomorrow.setText("0");
         if (elapsed != null) elapsed.cancel();
         GLabelTimeElapsed.setText("0:00");
         GVboxInfo.setStyle("");
+
+
+        setOpacity(0.5, GLabelToday, GLabelTodayP,
+                GLabelTomorrow, GLabelTomorrowP,
+                GLabelNewReleases, GLabelNewReleasesP,
+                GLabelLoadedReleases, GLabelLoadedReleasesP);
+    }
+
+    private void setOpacity(Double opacity, Node... node) {
+        for (Node n : node) n.setOpacity(opacity);
     }
 
     private void showReleases(String title, ReleasesProcessor processor) {

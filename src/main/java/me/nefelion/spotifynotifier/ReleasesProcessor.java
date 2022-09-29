@@ -23,8 +23,10 @@ public class ReleasesProcessor {
     private final boolean ignoreVarious, showOnlyAvailable, ignoreNotWorldwide;
 
     private DoubleConsumer progressConsumer;
-    private Consumer<String> currentArtistConsumer, processedArtistsConsumer, releasesConsumer;
-    private Consumer<Integer> newReleasesConsumer;
+    private Consumer<String> currentArtistConsumer;
+    private Consumer<Integer> loadedReleasesConsumer, processedArtistsConsumer, newReleasesConsumer,
+            todayReleasesConsumer, tomorrowReleasesConsumer;
+    private int today = 0, tomorrow = 0;
 
     public ReleasesProcessor(List<FollowedArtist> artists) {
         this.artists = artists;
@@ -56,7 +58,7 @@ public class ReleasesProcessor {
 
     public void process() {
         if (processedArtistsConsumer != null)
-            Platform.runLater(() -> processedArtistsConsumer.accept(0 + "/" + artists.size()));
+            Platform.runLater(() -> processedArtistsConsumer.accept(0));
 
         AtomicInteger i = new AtomicInteger();
 
@@ -89,7 +91,7 @@ public class ReleasesProcessor {
             if (progressConsumer != null)
                 Platform.runLater(() -> progressConsumer.accept((double) (i.incrementAndGet()) / artists.size()));
             if (processedArtistsConsumer != null)
-                Platform.runLater(() -> processedArtistsConsumer.accept(i.intValue() + "/" + artists.size()));
+                Platform.runLater(() -> processedArtistsConsumer.accept(i.intValue()));
         }
         loadUniqueFeaturing();
         FileManager.saveHashSet(FileManager.ALBUM_DATA, fileHashSet);
@@ -112,7 +114,11 @@ public class ReleasesProcessor {
 
     private void addToAllAlbums(ReleasedAlbum releasedAlbum) {
         allAlbums.add(releasedAlbum);
-        if (releasesConsumer != null) Platform.runLater(() -> releasesConsumer.accept(allAlbums.size() + ""));
+        if (loadedReleasesConsumer != null) Platform.runLater(() -> loadedReleasesConsumer.accept(allAlbums.size()));
+        if (todayReleasesConsumer != null && releasedAlbum.isToday())
+            Platform.runLater(() -> todayReleasesConsumer.accept(++today));
+        if (tomorrowReleasesConsumer != null && releasedAlbum.isTomorrow())
+            Platform.runLater(() -> tomorrowReleasesConsumer.accept(++tomorrow));
     }
 
     private void addToNewAlbums(ReleasedAlbum releasedAlbum) {
@@ -136,13 +142,13 @@ public class ReleasesProcessor {
     }
 
 
-    public ReleasesProcessor setProcessedArtistsConsumer(Consumer<String> processedArtistsConsumer) {
+    public ReleasesProcessor setProcessedArtistsConsumer(Consumer<Integer> processedArtistsConsumer) {
         this.processedArtistsConsumer = processedArtistsConsumer;
         return this;
     }
 
-    public ReleasesProcessor setReleasesConsumer(Consumer<String> releasesConsumer) {
-        this.releasesConsumer = releasesConsumer;
+    public ReleasesProcessor setLoadedReleasesConsumer(Consumer<Integer> loadedReleasesConsumer) {
+        this.loadedReleasesConsumer = loadedReleasesConsumer;
         return this;
     }
 
@@ -158,6 +164,16 @@ public class ReleasesProcessor {
 
     public ReleasesProcessor setCurrentArtistConsumer(Consumer<String> currentArtistConsumer) {
         this.currentArtistConsumer = currentArtistConsumer;
+        return this;
+    }
+
+    public ReleasesProcessor setTodayReleasesConsumer(Consumer<Integer> todayReleasesConsumer) {
+        this.todayReleasesConsumer = todayReleasesConsumer;
+        return this;
+    }
+
+    public ReleasesProcessor setTomorrowReleasesConsumer(Consumer<Integer> tomorrowReleasesConsumer) {
+        this.tomorrowReleasesConsumer = tomorrowReleasesConsumer;
         return this;
     }
 
@@ -194,4 +210,5 @@ public class ReleasesProcessor {
     private boolean isOnRemindList(AlbumSimplified album) {
         return remindIDhashSet.contains(album.getId());
     }
+
 }

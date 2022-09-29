@@ -54,7 +54,7 @@
                 <Separator layoutX="308.0" layoutY="63.0" orientation="VERTICAL" prefHeight="590.0" prefWidth="25.0" />
                 <ListView fx:id="GListFollowed" layoutX="20.0" layoutY="103.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="550.0" prefWidth="275.0" />
                 <ListView fx:id="GListSpotify" layoutX="345.0" layoutY="103.0" prefHeight="225.0" prefWidth="275.0" />
-                <Group layoutX="345.0" layoutY="407.0">
+                <Group layoutX="345.0" layoutY="384.0">
                     <children>
                         <TitledPane collapsible="false" prefHeight="246.0" prefWidth="275.0">
                             <content>
@@ -81,8 +81,10 @@
                                                         <Label text="Current artist" />
                                                         <Separator prefWidth="200.0" />
                                                         <Label text="Processed artists" />
-                                                        <Label text="Loaded releases" />
-                                                        <Label text="New releases" />
+                                                        <Label fx:id="GLabelLoadedReleasesP" opacity="0.5" text="Loaded releases" />
+                                                        <Label fx:id="GLabelNewReleasesP" opacity="0.5" text="New releases" />
+                                          <Label fx:id="GLabelTodayP" layoutX="10.0" layoutY="84.0" opacity="0.5" text="Today" />
+                                          <Label fx:id="GLabelTomorrowP" layoutX="10.0" layoutY="106.0" opacity="0.5" text="Tomorrow" />
                                                         <Separator layoutX="10.0" layoutY="27.0" prefWidth="200.0" />
                                                         <Label layoutX="10.0" layoutY="10.0" text="Time elapsed" />
                                                     </children>
@@ -92,8 +94,10 @@
                                                         <Label fx:id="GLabelCurrentArtist" text="Loading..." />
                                                         <Separator prefWidth="200.0" />
                                                         <Label fx:id="GLabelProcessedArtists" nodeOrientation="LEFT_TO_RIGHT" text="0/0" />
-                                                        <Label fx:id="GLabelLoadedReleases" text="0" />
-                                                        <Label fx:id="GLabelNewReleases" text="0" />
+                                                        <Label fx:id="GLabelLoadedReleases" opacity="0.5" text="0" />
+                                                        <Label fx:id="GLabelNewReleases" opacity="0.5" text="0" />
+                                          <Label fx:id="GLabelToday" layoutX="129.0" layoutY="84.0" opacity="0.5" text="0" />
+                                          <Label fx:id="GLabelTomorrow" layoutX="129.0" layoutY="106.0" opacity="0.5" text="0" />
                                                         <Separator layoutX="10.0" layoutY="27.0" prefWidth="200.0" />
                                                         <Label fx:id="GLabelTimeElapsed" layoutX="62.0" layoutY="10.0" text="0:00" />
                                                     </children>
@@ -125,7 +129,7 @@
                 <Button layoutX="568.0" layoutY="63.0" mnemonicParsing="false" onAction="#onActionTextFieldSearchSpotify" text="Search" />
                 <Separator layoutX="345.0" layoutY="345.0" prefHeight="11.0" prefWidth="275.0" />
                 <Label fx:id="GLabelNumberOfArtists" alignment="CENTER" contentDisplay="RIGHT" layoutX="132.0" layoutY="45.0" opacity="0.33" prefHeight="17.0" prefWidth="52.0" text="artist-size" textAlignment="CENTER" />
-            <Label fx:id="GLabelNewReleasesHour" alignment="CENTER" contentDisplay="CENTER" layoutX="345.0" layoutY="361.0" prefHeight="36.0" prefWidth="275.0" text="new-releases-hour" textAlignment="CENTER" />
+            <Label fx:id="GLabelNewReleasesHour" alignment="CENTER" contentDisplay="CENTER" layoutX="345.0" layoutY="358.0" prefHeight="11.0" prefWidth="275.0" text="new-releases-hour" textAlignment="CENTER" />
             </children>
         </AnchorPane>
     </children>
