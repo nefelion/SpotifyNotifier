@@ -20,6 +20,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
     private ButtonType buttonTypeSave;
     private TextField textFieldCountryCode;
     private CheckBox checkBoxIgnoreVarious, checkBoxOnlyAvailable, checkBoxIgnoreNotWorldwide;
+    private Slider sliderExploreIterations;
 
     public SettingsDialog() {
         setIcon();
@@ -43,7 +44,38 @@ public class SettingsDialog extends Dialog<ButtonType> {
         vbox.getChildren().addAll(
                 getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious, checkBoxIgnoreNotWorldwide,
                 getSeparator(),
+                getExploreIterationsVBOX(),
+                getSeparator(),
                 getButtonResetCredentials());
+        return vbox;
+    }
+
+    private VBox getExploreIterationsVBOX() {
+        VBox vbox = new VBox();
+        vbox.setSpacing(5);
+
+        Tooltip tooltip = new Tooltip("""
+                How deep should the explore algorithm go?
+                1 = only artists similar to followed artists
+                2 = artists similar to artists similar to followed artists
+                3 = artists similar to artists similar to artists similar to followed artists
+                """);
+        tooltip.setShowDelay(javafx.util.Duration.ZERO);
+
+        Label label = new Label("Explore iterations:");
+        label.setTooltip(tooltip);
+        label.setWrapText(true);
+
+        sliderExploreIterations = new Slider(1, 3, TempData.getInstance().getFileData().getExploreIterations());
+        sliderExploreIterations.setShowTickLabels(true);
+        sliderExploreIterations.setShowTickMarks(true);
+        sliderExploreIterations.setMajorTickUnit(1);
+        sliderExploreIterations.setMinorTickCount(0);
+        sliderExploreIterations.setBlockIncrement(1);
+        sliderExploreIterations.setSnapToTicks(true);
+        sliderExploreIterations.setTooltip(tooltip);
+
+        vbox.getChildren().addAll(label, sliderExploreIterations);
         return vbox;
     }
 
@@ -118,6 +150,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
         fd.setIgnoreVariousArtists(checkBoxIgnoreVarious.isSelected());
         fd.setShowOnlyAvailable(checkBoxOnlyAvailable.isSelected());
         fd.setIgnoreNotWorldwide(checkBoxIgnoreNotWorldwide.isSelected());
+        fd.setExploreIterations((int) sliderExploreIterations.getValue());
 
         FileManager.saveFileData(fd);
     }

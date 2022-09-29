@@ -155,6 +155,7 @@ public class ControllerFollowed {
         dialog.setProgressText("Loaded artists: 0");
 
         ExploreProcessor processor = new ExploreProcessor()
+                .setIterations(TempData.getInstance().getFileData().getExploreIterations())
                 .setArtistCountConsumer(count -> dialog.setProgressText("Loaded artists: " + count))
                 .setProgressConsumer(dialog::setProgress);
 

@@ -12,42 +12,51 @@ import java.util.function.Consumer;
 public class ExploreProcessor {
 
     private final List<Artist> outputArtists = new ArrayList<>();
+    private final List<FollowedArtist> followedArtists;
+    private final HashSet<String> processedArtists = new HashSet<>();
     private Consumer<String> currentArtistConsumer;
     private Consumer<Integer> artistCountConsumer;
     private Consumer<Double> progressConsumer;
+    private int currentArtist;
+    private int iterations;
+
 
     public ExploreProcessor() {
+        iterations = 1;
+        followedArtists = TempData.getInstance().getFileData().getFollowedArtists();
     }
 
     public void process() {
-        TheEngine instance = TheEngine.getInstance();
-
-        List<FollowedArtist> followedArtists = TempData.getInstance().getFileData().getFollowedArtists();
-        HashSet<String> processedArtists = new HashSet<>();
-
-        int totalFollowedArtists = followedArtists.size();
         int currentFollowedArtist = 0;
-        int currentArtist = 0;
+        currentArtist = 0;
 
         for (FollowedArtist followedArtist : followedArtists) {
-            ++currentFollowedArtist;
+            extracted(followedArtist.getID(), iterations);
 
-            for (Artist artist : instance.getRelatedArtists(followedArtist.getID())) {
-                String artistName = artist.getName();
-                String id = artist.getId();
-
-                if (processedArtists.contains(id)) continue;
-                if (instance.isFollowed(id)) continue;
-
-                processedArtists.add(id);
-                outputArtists.add(artist);
-
-                acceptArtistConsumer(artistName);
-                acceptCountConsumer(++currentArtist);
-                acceptProgress(currentFollowedArtist, totalFollowedArtists);
-            }
+            acceptProgress(++currentFollowedArtist, followedArtists.size());
         }
+
         outputArtists.sort(Comparator.comparing(Artist::getName));
+    }
+
+
+    private void extracted(String artistID, int iterations) {
+        if (iterations == 0) return;
+
+        List<String> tempIDs = new ArrayList<>();
+        for (Artist artist : TheEngine.getInstance().getRelatedArtists(artistID)) {
+            String id = artist.getId();
+
+            if (processedArtists.contains(id)) continue;
+            if (TheEngine.isFollowed(id)) continue;
+
+            processedArtists.add(id);
+            outputArtists.add(artist);
+            incrementArtistsCountConsumer();
+            tempIDs.add(id);
+        }
+
+        for (String id : tempIDs) extracted(id, iterations - 1);
     }
 
     private void acceptProgress(int currentArtist, int totalArtists) {
@@ -57,6 +66,10 @@ public class ExploreProcessor {
 
     private void acceptCountConsumer(int currentArtist) {
         artistCountConsumer.accept(currentArtist);
+    }
+
+    private void incrementArtistsCountConsumer() {
+        artistCountConsumer.accept(++currentArtist);
     }
 
     private void acceptArtistConsumer(String artistName) {
@@ -80,6 +93,11 @@ public class ExploreProcessor {
 
     public ExploreProcessor setProgressConsumer(Consumer<Double> progressConsumer) {
         this.progressConsumer = progressConsumer;
+        return this;
+    }
+
+    public ExploreProcessor setIterations(int iterations) {
+        this.iterations = iterations;
         return this;
     }
 
