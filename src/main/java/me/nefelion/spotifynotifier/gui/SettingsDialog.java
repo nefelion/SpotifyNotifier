@@ -58,7 +58,6 @@ public class SettingsDialog extends Dialog<ButtonType> {
                 How deep should the explore algorithm go?
                 1 = only artists similar to followed artists
                 2 = artists similar to artists similar to followed artists
-                3 = artists similar to artists similar to artists similar to followed artists
                 """);
         tooltip.setShowDelay(javafx.util.Duration.ZERO);
 
@@ -66,7 +65,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
         label.setTooltip(tooltip);
         label.setWrapText(true);
 
-        sliderExploreIterations = new Slider(1, 3, TempData.getInstance().getFileData().getExploreIterations());
+        sliderExploreIterations = new Slider(1, 2, TempData.getInstance().getFileData().getExploreIterations());
         sliderExploreIterations.setShowTickLabels(true);
         sliderExploreIterations.setShowTickMarks(true);
         sliderExploreIterations.setMajorTickUnit(1);

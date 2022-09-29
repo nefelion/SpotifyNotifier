@@ -150,12 +150,13 @@ public class ControllerFollowed {
 
     private void explore() {
         LoadingDialog dialog = new LoadingDialog();
-        dialog.setTitle("Explore");
+        int iterations = TempData.getInstance().getFileData().getExploreIterations();
+        dialog.setTitle("Explore, " + (iterations == 1 ? "1 iteration" : iterations + " iterations"));
         dialog.setHeaderText("Loading similar artists to explore...");
         dialog.setProgressText("Loaded artists: 0");
 
         ExploreProcessor processor = new ExploreProcessor()
-                .setIterations(TempData.getInstance().getFileData().getExploreIterations())
+                .setIterations(iterations)
                 .setArtistCountConsumer(count -> dialog.setProgressText("Loaded artists: " + count))
                 .setProgressConsumer(dialog::setProgress);
 
