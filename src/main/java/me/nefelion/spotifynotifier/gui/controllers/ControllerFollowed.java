@@ -33,7 +33,7 @@ public class ControllerFollowed {
     private static final String HIGHLIGHTED_CONTROL_INNER_BACKGROUND = "derive(palegreen, 50%)";
     private final Label placeholderLabelGListFollowed, placeholderLabelGListSpotify;
     private ControllerOutline controllerOutline;
-    private String lastSearch = "";
+    private String lastSearch = "", newCoverUrl = "", todayCoverUrl = "", tomorrowCoverUrl = "";
     private double maxGListSpotifyPopularity = Double.MAX_VALUE;
     private Task<Void> task;
     private Timer elapsed;
@@ -55,6 +55,8 @@ public class ControllerFollowed {
     private ProgressBar GProgressBar;
     @FXML
     private Button GButtonCheckReleases, GButtonAbort;
+    @FXML
+    private ImageView GImageViewCover;
 
 
     public ControllerFollowed() {
@@ -84,6 +86,205 @@ public class ControllerFollowed {
 
         startRefreshingTimer();
     }
+
+    private void startRefreshingTimer() {
+        Timer timer = new Timer(true);
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    refreshGLabelLastChecked();
+                    refreshGListFollowedArtists();
+                    refreshCoverImages(GLabelNewReleasesP, newCoverUrl);
+                    refreshCoverImages(GLabelTodayP, todayCoverUrl);
+                    refreshCoverImages(GLabelTomorrowP, tomorrowCoverUrl);
+                });
+            }
+        }, 0, 1000);
+    }
+
+    private void explore() {
+        LoadingDialog dialog = new LoadingDialog();
+        int iterations = TempData.getInstance().getFileData().getExploreIterations();
+        dialog.setTitle("Explore, " + (iterations == 1 ? "1 iteration" : iterations + " iterations"));
+        dialog.setHeaderText("Loading similar artists to explore...");
+        dialog.setProgressText("Loaded artists: 0");
+
+        ExploreProcessor processor = new ExploreProcessor()
+                .setIterations(iterations)
+                .setArtistCountConsumer(count -> dialog.setProgressText("Loaded artists: " + count))
+                .setProgressConsumer(dialog::setProgress);
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                processor.process();
+                return null;
+            }
+        };
+        task.setOnSucceeded((e) -> {
+            dialog.close();
+            startLoadingAlbums(processor.getOutputArtists().stream()
+                    .map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList()), false);
+        });
+        dialog.setCancelListener(task::cancel);
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+
+        dialog.showAndWait();
+    }
+
+    @FXML
+    private void onKeyTypedSearchFollowed(KeyEvent keyEvent) {
+        refreshGListFollowedArtists();
+    }
+
+    @FXML
+    private void onActionTextFieldSearchSpotify(ActionEvent actionEvent) {
+        searchSpotify();
+    }
+
+    @FXML
+    private void onActionCheckReleases(ActionEvent actionEvent) {
+        List<FollowedArtist> artists = new ArrayList<>(TempData.getInstance().getFileData().getFollowedArtists().stream()
+                .sorted(Comparator.comparing(FollowedArtist::getName)).toList());
+
+        startLoadingAlbums(artists, true);
+    }
+
+    private void startLoadingAlbums(List<FollowedArtist> list, boolean updateLastChecked) {
+        processing = true;
+        resetInfoBoard();
+        GButtonCheckReleases.setDisable(true);
+        GVboxInfo.setVisible(true);
+
+        ReleasesProcessor processor = new ReleasesProcessor(list);
+        processor.progressConsumer((var) -> {
+                    GLabelPercentage.setText((int) (var * 100) + "%");
+                    GProgressBar.setProgress(var);
+                })
+                .currentArtistConsumer(GLabelCurrentArtist::setText)
+                .processedArtistsNumberConsumer(art -> GLabelProcessedArtists.setText(art + " / " + list.size()))
+                .loadedReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelLoadedReleasesP, GLabelLoadedReleases))
+                .newReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelNewReleasesP, GLabelNewReleases))
+                .todayReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelTodayP, GLabelToday))
+                .tomorrowReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelTomorrowP, GLabelTomorrow))
+                .newReleaseConsumer(r -> {
+                    addReleaseToLabel(r, GLabelNewReleasesP);
+                    try {
+                        newCoverUrl = r.getAlbum().getImages()[1].getUrl();
+                    } catch (Exception ignored) {
+                    }
+                })
+                .todayReleaseConsumer(r -> {
+                    addReleaseToLabel(r, GLabelTodayP);
+                    try {
+                        todayCoverUrl = r.getAlbum().getImages()[1].getUrl();
+                    } catch (Exception ignored) {
+                    }
+                })
+                .tomorrowReleaseConsumer(r -> {
+                    addReleaseToLabel(r, GLabelTomorrowP);
+                    try {
+                        tomorrowCoverUrl = r.getAlbum().getImages()[1].getUrl();
+                    } catch (Exception ignored) {
+                    }
+                });
+
+
+        final long startMs = System.currentTimeMillis();
+        elapsed = new Timer(true);
+        elapsed.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() ->
+                        GLabelTimeElapsed.setText(Utilities.convertMsToDuration((int) (System.currentTimeMillis() - startMs)))
+                );
+            }
+        }, 0, 1000);
+
+
+        task = new Task<>() {
+            @Override
+            public Void call() {
+                processor.process();
+                processing = false;
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            GButtonCheckReleases.setDisable(false);
+            if (updateLastChecked) {
+                FileData fileData = TempData.getInstance().getFileData();
+                fileData.setLastChecked(Utilities.now());
+                FileManager.saveFileData(fileData);
+            }
+            showReleases("Releases", processor);
+
+            resetInfoBoard();
+            GVboxInfo.setVisible(false);
+            refreshGLabelLastChecked();
+        });
+        task.setOnCancelled(e -> {
+            GVboxInfo.setVisible(false);
+            GButtonCheckReleases.setDisable(false);
+            resetInfoBoard();
+        });
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+
+    private void refreshCoverImages(Label gLabel, String coverUrl) {
+        Tooltip tooltip = gLabel.getTooltip();
+        if (coverUrl != null && !coverUrl.isEmpty() && tooltip != null) {
+            ImageView node = new ImageView(new Image(coverUrl));
+            tooltip.setGraphic(node);
+            coverUrl = null;
+        }
+    }
+
+
+    private void addReleaseToLabel(ReleasedAlbum r, Label gLabel) {
+        Platform.runLater(() -> {
+            if (gLabel.getTooltip() == null) {
+                Tooltip tooltip = new Tooltip();
+                tooltip.setText(r.toString());
+                tooltip.setShowDelay(Duration.ZERO);
+                tooltip.setShowDuration(Duration.INDEFINITE);
+                gLabel.setTooltip(tooltip);
+                gLabel.setUnderline(true);
+                return;
+            }
+
+            String newText = gLabel.getTooltip().getText() + "\n" + r;
+            String[] lines = newText.split("\n");
+            final int maxLines = 20;
+            if (lines.length > maxLines) {
+                newText = String.join("\n", Arrays.copyOfRange(lines, lines.length - maxLines, lines.length));
+            }
+
+            gLabel.getTooltip().setText(newText);
+        });
+    }
+
+    private void setLoadedReleasesText(Integer integer, Label glabelP, Label glabel) {
+        if (glabel.getText().equals("0") && integer > 0) {
+            glabelP.setOpacity(1);
+            glabel.setOpacity(1);
+        }
+        glabel.setText(integer + "");
+    }
+
+    @FXML
+    private void onActionGButtonAbort(ActionEvent actionEvent) {
+        task.cancel();
+    }
+
 
     private void initializeGLabelNewReleasesHour() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Pacific/Tongatapu"));
@@ -148,173 +349,6 @@ public class ControllerFollowed {
         GButtonCheckReleases.setOnMouseEntered(event -> GButtonCheckReleases.setStyle(highlightedStyle));
         GButtonCheckReleases.setOnMouseExited(event -> GButtonCheckReleases.setStyle(defaultStyle));
     }
-
-    private void explore() {
-        LoadingDialog dialog = new LoadingDialog();
-        int iterations = TempData.getInstance().getFileData().getExploreIterations();
-        dialog.setTitle("Explore, " + (iterations == 1 ? "1 iteration" : iterations + " iterations"));
-        dialog.setHeaderText("Loading similar artists to explore...");
-        dialog.setProgressText("Loaded artists: 0");
-
-        ExploreProcessor processor = new ExploreProcessor()
-                .setIterations(iterations)
-                .setArtistCountConsumer(count -> dialog.setProgressText("Loaded artists: " + count))
-                .setProgressConsumer(dialog::setProgress);
-
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() {
-                processor.process();
-                return null;
-            }
-        };
-        task.setOnSucceeded((e) -> {
-            dialog.close();
-            startLoadingAlbums(processor.getOutputArtists().stream()
-                    .map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList()), false);
-        });
-        dialog.setCancelListener(task::cancel);
-
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
-
-        dialog.showAndWait();
-    }
-
-    private void startRefreshingTimer() {
-        Timer timer = new Timer(true);
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() -> {
-                    refreshGLabelLastChecked();
-                    refreshGListFollowedArtists();
-
-                });
-            }
-        }, 0, 1000);
-    }
-
-    @FXML
-    private void onKeyTypedSearchFollowed(KeyEvent keyEvent) {
-        refreshGListFollowedArtists();
-    }
-
-    @FXML
-    private void onActionTextFieldSearchSpotify(ActionEvent actionEvent) {
-        searchSpotify();
-    }
-
-    @FXML
-    private void onActionCheckReleases(ActionEvent actionEvent) {
-        List<FollowedArtist> artists = new ArrayList<>(TempData.getInstance().getFileData().getFollowedArtists().stream()
-                .sorted(Comparator.comparing(FollowedArtist::getName)).toList());
-
-        startLoadingAlbums(artists, true);
-    }
-
-    private void startLoadingAlbums(List<FollowedArtist> list, boolean updateLastChecked) {
-        processing = true;
-        resetInfoBoard();
-        GButtonCheckReleases.setDisable(true);
-        GVboxInfo.setVisible(true);
-
-        ReleasesProcessor processor = new ReleasesProcessor(list);
-        processor.progressConsumer((var) -> {
-                    GLabelPercentage.setText((int) (var * 100) + "%");
-                    GProgressBar.setProgress(var);
-                })
-                .currentArtistConsumer(GLabelCurrentArtist::setText)
-                .processedArtistsNumberConsumer(art -> GLabelProcessedArtists.setText(art + " / " + list.size()))
-                .loadedReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelLoadedReleasesP, GLabelLoadedReleases))
-                .newReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelNewReleasesP, GLabelNewReleases))
-                .todayReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelTodayP, GLabelToday))
-                .tomorrowReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelTomorrowP, GLabelTomorrow))
-                .newReleaseConsumer(r -> addReleaseToLabel(r, GLabelNewReleasesP))
-                .todayReleaseConsumer(r -> addReleaseToLabel(r, GLabelTodayP))
-                .tomorrowReleaseConsumer(r -> addReleaseToLabel(r, GLabelTomorrowP));
-
-
-        final long startMs = System.currentTimeMillis();
-        elapsed = new Timer(true);
-        elapsed.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                Platform.runLater(() ->
-                        GLabelTimeElapsed.setText(Utilities.convertMsToDuration((int) (System.currentTimeMillis() - startMs)))
-                );
-            }
-        }, 0, 1000);
-
-
-        task = new Task<>() {
-            @Override
-            public Void call() {
-                processor.process();
-                processing = false;
-                return null;
-            }
-        };
-
-        task.setOnSucceeded(e -> {
-            GButtonCheckReleases.setDisable(false);
-            if (updateLastChecked) {
-                FileData fileData = TempData.getInstance().getFileData();
-                fileData.setLastChecked(Utilities.now());
-                FileManager.saveFileData(fileData);
-            }
-            showReleases("Releases", processor);
-
-            resetInfoBoard();
-            GVboxInfo.setVisible(false);
-            refreshGLabelLastChecked();
-        });
-        task.setOnCancelled(e -> {
-            GVboxInfo.setVisible(false);
-            GButtonCheckReleases.setDisable(false);
-            resetInfoBoard();
-        });
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
-    }
-
-    private void addReleaseToLabel(ReleasedAlbum r, Label gLabel) {
-        Platform.runLater(() -> {
-            if (gLabel.getTooltip() == null) {
-                Tooltip tooltip = new Tooltip();
-                tooltip.setText(r.toString());
-                tooltip.setShowDelay(Duration.ZERO);
-                gLabel.setTooltip(tooltip);
-                gLabel.setUnderline(true);
-                return;
-            }
-
-            String newText = gLabel.getTooltip().getText() + "\n" + r;
-            String[] lines = newText.split("\n");
-            final int maxLines = 20;
-            if (lines.length > maxLines) {
-                newText = String.join("\n", Arrays.copyOfRange(lines, lines.length - maxLines, lines.length));
-            }
-
-            gLabel.getTooltip().setText(newText);
-        });
-    }
-
-    private void setLoadedReleasesText(Integer integer, Label glabelP, Label glabel) {
-        if (glabel.getText().equals("0") && integer > 0) {
-            glabelP.setOpacity(1);
-            glabel.setOpacity(1);
-        }
-        glabel.setText(integer + "");
-    }
-
-    @FXML
-    private void onActionGButtonAbort(ActionEvent actionEvent) {
-        task.cancel();
-    }
-
 
     private Label initializePlaceholderLabelGListFollowedArtists() {
         final Label label;
