@@ -1240,7 +1240,7 @@ public class ControllerAlbums {
         Task<Boolean> task = new Task<>() {
             @Override
             public Boolean call() {
-                processor.setCurrentArtistConsumer(GTextLoadingArtist::setText);
+                processor.currentArtistConsumer(GTextLoadingArtist::setText);
                 processor.process();
                 return true;
             }

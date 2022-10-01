@@ -72,7 +72,7 @@ public class ReleasedAlbum {
 
     @Override
     public String toString() {
-        return new String((albumType + "  |  " + releaseDate + "  |       " + getArtistString() + "  —  " + albumName).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
+        return new String((getArtistString() + "  —  " + albumName).getBytes(StandardCharsets.UTF_8), StandardCharsets.UTF_8);
     }
 
     public LocalDate getLocalDate() {

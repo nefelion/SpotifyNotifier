@@ -22,10 +22,11 @@ public class ReleasesProcessor {
     private final CountryCode countryCode;
     private final boolean ignoreVarious, showOnlyAvailable, ignoreNotWorldwide;
 
-    private DoubleConsumer progressConsumer;
-    private Consumer<String> currentArtistConsumer;
-    private Consumer<Integer> loadedReleasesConsumer, processedArtistsConsumer, newReleasesConsumer,
-            todayReleasesConsumer, tomorrowReleasesConsumer;
+    private DoubleConsumer progressC;
+    private Consumer<String> currentArtistC;
+    private Consumer<ReleasedAlbum> newReleaseC, todayReleaseC, tomorrowReleaseC;
+    private Consumer<Integer> numberOfLoadedReleasesC, numberOfProcessedArtistsC, numberOfNewReleasesC,
+            numberOfTodayReleasesC, numberOfTomorrowReleases;
     private int today = 0, tomorrow = 0;
 
     public ReleasesProcessor(List<FollowedArtist> artists) {
@@ -57,14 +58,14 @@ public class ReleasesProcessor {
 
 
     public void process() {
-        if (processedArtistsConsumer != null)
-            Platform.runLater(() -> processedArtistsConsumer.accept(0));
+        if (numberOfProcessedArtistsC != null)
+            Platform.runLater(() -> numberOfProcessedArtistsC.accept(0));
 
         AtomicInteger i = new AtomicInteger();
 
         for (FollowedArtist artist : artists) {
-            if (currentArtistConsumer != null)
-                Platform.runLater(() -> currentArtistConsumer.accept(artist.getName()));
+            if (currentArtistC != null)
+                Platform.runLater(() -> currentArtistC.accept(artist.getName()));
 
             List<AlbumSimplified> albums;
 
@@ -88,10 +89,10 @@ public class ReleasesProcessor {
                 markAsLoaded(a);
             }
 
-            if (progressConsumer != null)
-                Platform.runLater(() -> progressConsumer.accept((double) (i.incrementAndGet()) / artists.size()));
-            if (processedArtistsConsumer != null)
-                Platform.runLater(() -> processedArtistsConsumer.accept(i.intValue()));
+            if (progressC != null)
+                Platform.runLater(() -> progressC.accept((double) (i.incrementAndGet()) / artists.size()));
+            if (numberOfProcessedArtistsC != null)
+                Platform.runLater(() -> numberOfProcessedArtistsC.accept(i.intValue()));
         }
         loadUniqueFeaturing();
         FileManager.saveHashSet(FileManager.ALBUM_DATA, fileHashSet);
@@ -108,23 +109,36 @@ public class ReleasesProcessor {
     }
 
     private void addToNewOrAllOnly(ReleasedAlbum album) {
-        if (isNewAndFollowed(album) || album.isReminded()) addToNewAlbums(album);
         addToAllAlbums(album);
+        if (isNewAndFollowed(album) || album.isReminded()) addToNewAlbums(album);
     }
 
     private void addToAllAlbums(ReleasedAlbum releasedAlbum) {
         allAlbums.add(releasedAlbum);
-        if (loadedReleasesConsumer != null) Platform.runLater(() -> loadedReleasesConsumer.accept(allAlbums.size()));
-        if (todayReleasesConsumer != null && releasedAlbum.isToday())
-            Platform.runLater(() -> todayReleasesConsumer.accept(++today));
-        if (tomorrowReleasesConsumer != null && releasedAlbum.isTomorrow())
-            Platform.runLater(() -> tomorrowReleasesConsumer.accept(++tomorrow));
+        if (numberOfLoadedReleasesC != null) Platform.runLater(() -> numberOfLoadedReleasesC.accept(allAlbums.size()));
+        if (numberOfTodayReleasesC != null && releasedAlbum.isToday()) {
+            Platform.runLater(() -> {
+                numberOfTodayReleasesC.accept(++today);
+                todayReleaseC.accept(releasedAlbum);
+            });
+        }
+        if (numberOfTomorrowReleases != null && releasedAlbum.isTomorrow()) {
+            Platform.runLater(() -> {
+                numberOfTomorrowReleases.accept(++tomorrow);
+                tomorrowReleaseC.accept(releasedAlbum);
+            });
+        }
     }
 
     private void addToNewAlbums(ReleasedAlbum releasedAlbum) {
         fileHashSet.add(releasedAlbum.getId());
         newAlbums.add(releasedAlbum);
-        if (newReleasesConsumer != null) Platform.runLater(() -> newReleasesConsumer.accept(newAlbums.size()));
+        if (numberOfNewReleasesC != null) {
+            Platform.runLater(() -> {
+                numberOfNewReleasesC.accept(newAlbums.size());
+                newReleaseC.accept(releasedAlbum);
+            });
+        }
     }
 
     private void addToFeaturing(FollowedArtist artist, AlbumSimplified album) {
@@ -142,38 +156,53 @@ public class ReleasesProcessor {
     }
 
 
-    public ReleasesProcessor setProcessedArtistsConsumer(Consumer<Integer> processedArtistsConsumer) {
-        this.processedArtistsConsumer = processedArtistsConsumer;
+    public ReleasesProcessor processedArtistsNumberConsumer(Consumer<Integer> numberOfProcessedArtistsC) {
+        this.numberOfProcessedArtistsC = numberOfProcessedArtistsC;
         return this;
     }
 
-    public ReleasesProcessor setLoadedReleasesConsumer(Consumer<Integer> loadedReleasesConsumer) {
-        this.loadedReleasesConsumer = loadedReleasesConsumer;
+    public ReleasesProcessor loadedReleasesNumberConsumer(Consumer<Integer> numberOfLoadedReleasesC) {
+        this.numberOfLoadedReleasesC = numberOfLoadedReleasesC;
         return this;
     }
 
-    public ReleasesProcessor setNewReleasesConsumer(Consumer<Integer> newReleasesConsumer) {
-        this.newReleasesConsumer = newReleasesConsumer;
+    public ReleasesProcessor newReleasesNumberConsumer(Consumer<Integer> numberOfNewReleasesC) {
+        this.numberOfNewReleasesC = numberOfNewReleasesC;
         return this;
     }
 
-    public ReleasesProcessor setProgressConsumer(DoubleConsumer progressConsumer) {
-        this.progressConsumer = progressConsumer;
+    public ReleasesProcessor progressConsumer(DoubleConsumer progressC) {
+        this.progressC = progressC;
         return this;
     }
 
-    public ReleasesProcessor setCurrentArtistConsumer(Consumer<String> currentArtistConsumer) {
-        this.currentArtistConsumer = currentArtistConsumer;
+    public ReleasesProcessor currentArtistConsumer(Consumer<String> currentArtistC) {
+        this.currentArtistC = currentArtistC;
         return this;
     }
 
-    public ReleasesProcessor setTodayReleasesConsumer(Consumer<Integer> todayReleasesConsumer) {
-        this.todayReleasesConsumer = todayReleasesConsumer;
+    public ReleasesProcessor todayReleasesNumberConsumer(Consumer<Integer> numberOfTodayReleasesC) {
+        this.numberOfTodayReleasesC = numberOfTodayReleasesC;
         return this;
     }
 
-    public ReleasesProcessor setTomorrowReleasesConsumer(Consumer<Integer> tomorrowReleasesConsumer) {
-        this.tomorrowReleasesConsumer = tomorrowReleasesConsumer;
+    public ReleasesProcessor tomorrowReleasesNumberConsumer(Consumer<Integer> numberOfTomorrowReleases) {
+        this.numberOfTomorrowReleases = numberOfTomorrowReleases;
+        return this;
+    }
+
+    public ReleasesProcessor todayReleaseConsumer(Consumer<ReleasedAlbum> todayReleaseConsumer) {
+        this.todayReleaseC = todayReleaseConsumer;
+        return this;
+    }
+
+    public ReleasesProcessor tomorrowReleaseConsumer(Consumer<ReleasedAlbum> tomorrowReleaseConsumer) {
+        this.tomorrowReleaseC = tomorrowReleaseConsumer;
+        return this;
+    }
+
+    public ReleasesProcessor newReleaseConsumer(Consumer<ReleasedAlbum> newReleaseConsumer) {
+        this.newReleaseC = newReleaseConsumer;
         return this;
     }
 

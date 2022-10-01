@@ -221,16 +221,19 @@ public class ControllerFollowed {
         GVboxInfo.setVisible(true);
 
         ReleasesProcessor processor = new ReleasesProcessor(list);
-        processor.setProgressConsumer((var) -> {
+        processor.progressConsumer((var) -> {
                     GLabelPercentage.setText((int) (var * 100) + "%");
                     GProgressBar.setProgress(var);
                 })
-                .setCurrentArtistConsumer(GLabelCurrentArtist::setText)
-                .setProcessedArtistsConsumer(art -> GLabelProcessedArtists.setText(art + " / " + list.size()))
-                .setLoadedReleasesConsumer(n -> setLoadedReleasesText(n, GLabelLoadedReleasesP, GLabelLoadedReleases))
-                .setNewReleasesConsumer(n -> setLoadedReleasesText(n, GLabelNewReleasesP, GLabelNewReleases))
-                .setTodayReleasesConsumer(n -> setLoadedReleasesText(n, GLabelTodayP, GLabelToday))
-                .setTomorrowReleasesConsumer(n -> setLoadedReleasesText(n, GLabelTomorrowP, GLabelTomorrow));
+                .currentArtistConsumer(GLabelCurrentArtist::setText)
+                .processedArtistsNumberConsumer(art -> GLabelProcessedArtists.setText(art + " / " + list.size()))
+                .loadedReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelLoadedReleasesP, GLabelLoadedReleases))
+                .newReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelNewReleasesP, GLabelNewReleases))
+                .todayReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelTodayP, GLabelToday))
+                .tomorrowReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelTomorrowP, GLabelTomorrow))
+                .newReleaseConsumer(r -> addReleaseToLabel(r, GLabelNewReleasesP))
+                .todayReleaseConsumer(r -> addReleaseToLabel(r, GLabelTodayP))
+                .tomorrowReleaseConsumer(r -> addReleaseToLabel(r, GLabelTomorrowP));
 
 
         final long startMs = System.currentTimeMillis();
@@ -275,6 +278,28 @@ public class ControllerFollowed {
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
+    }
+
+    private void addReleaseToLabel(ReleasedAlbum r, Label gLabel) {
+        Platform.runLater(() -> {
+            if (gLabel.getTooltip() == null) {
+                Tooltip tooltip = new Tooltip();
+                tooltip.setText(r.toString());
+                tooltip.setShowDelay(Duration.ZERO);
+                gLabel.setTooltip(tooltip);
+                gLabel.setUnderline(true);
+                return;
+            }
+
+            String newText = gLabel.getTooltip().getText() + "\n" + r;
+            String[] lines = newText.split("\n");
+            final int maxLines = 20;
+            if (lines.length > maxLines) {
+                newText = String.join("\n", Arrays.copyOfRange(lines, lines.length - maxLines, lines.length));
+            }
+
+            gLabel.getTooltip().setText(newText);
+        });
     }
 
     private void setLoadedReleasesText(Integer integer, Label glabelP, Label glabel) {
@@ -617,6 +642,15 @@ public class ControllerFollowed {
                 GLabelTomorrow, GLabelTomorrowP,
                 GLabelNewReleases, GLabelNewReleasesP,
                 GLabelLoadedReleases, GLabelLoadedReleasesP);
+
+        removeTooltipsAndUnderline(GLabelTodayP, GLabelTomorrowP, GLabelNewReleasesP);
+    }
+
+    private void removeTooltipsAndUnderline(Label... gLabel) {
+        for (Label label : gLabel) {
+            label.setTooltip(null);
+            label.setUnderline(false);
+        }
     }
 
     private void setOpacity(Double opacity, Node... node) {

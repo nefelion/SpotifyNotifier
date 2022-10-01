@@ -49,8 +49,8 @@ public class UtilAlbums {
         Task<Boolean> task = new Task<>() {
             @Override
             public Boolean call() {
-                processor.setCurrentArtistConsumer(progressController::setInfo);
-                processor.setProgressConsumer(progressController::setProgress);
+                processor.currentArtistConsumer(progressController::setInfo);
+                processor.progressConsumer(progressController::setProgress);
                 processor.process();
                 return true;
             }
