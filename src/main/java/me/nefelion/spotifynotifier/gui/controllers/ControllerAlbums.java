@@ -58,7 +58,7 @@ public class ControllerAlbums {
     private List<ReleasedAlbum> newAlbums, allAlbums, filteredNewAlbums, filteredAllAlbums;
     private ReleasedAlbum currentSelectedAlbum;
     private TrackSimplified currentSelectedTrack;
-    private boolean oneArtist, autoPlayback;
+    private boolean oneArtist, autoPlayback, hideCovers = false;
     private final Tooltip GTooltipTracklist = new Tooltip();
     private final ContextMenu GContextMenuTracklist = new ContextMenu();
     private int hoveredIndexTracklist = -1, todayReleases, tomorrowReleases;
@@ -738,14 +738,19 @@ public class ControllerAlbums {
 
     private ContextMenu getCopyCoverToClipboardContextMenu(TempAlbumInfo info) {
         ContextMenu contextMenu = new ContextMenu();
-        MenuItem menuItem = new MenuItem("Copy Cover to clipboard (300x300)");
-        menuItem.setOnAction(event1 -> {
+        MenuItem copyMI = new MenuItem("Copy Cover to clipboard (300x300)");
+        MenuItem hideMI = new MenuItem("Hide Covers");
+        copyMI.setOnAction(event1 -> {
             Clipboard clipboard = Clipboard.getSystemClipboard();
             ClipboardContent content = new ClipboardContent();
             content.putImage(info.cover());
             clipboard.setContent(content);
         });
-        contextMenu.getItems().add(menuItem);
+        hideMI.setOnAction(event1 -> {
+            hideCovers = !hideCovers;
+            GCoverImageView.setOpacity(hideCovers ? 0 : 1);
+        });
+        contextMenu.getItems().addAll(copyMI, hideMI);
         contextMenu.setAutoHide(true);
         return contextMenu;
     }
