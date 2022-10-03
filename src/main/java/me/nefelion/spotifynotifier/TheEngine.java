@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.concurrent.CancellationException;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 public class TheEngine {
@@ -112,19 +113,26 @@ public class TheEngine {
 
     }
 
+    public List<AlbumSimplified> getAlbums(String artistID) {
+        return getAlbums(artistID, null, null);
+    }
 
-    public List<AlbumSimplified> getAlbums(String artistID) throws CancellationException {
+    public List<AlbumSimplified> getAlbums(String artistID, Consumer<Integer> page, Consumer<Integer> all) throws CancellationException {
 
         List<AlbumSimplified> allAlbums = new ArrayList<>();
 
         try {
             Paging<AlbumSimplified> paging;
-
             int offset = 0;
             int n = 50;
 
             do {
                 paging = spotifyAPI.getArtistsAlbums(artistID).offset(offset).limit(n).build().execute();
+
+                if (page != null) page.accept(offset / 50);
+                if (all != null) all.accept((paging.getTotal() / 50) + 1);
+
+
                 allAlbums.addAll(List.of(paging.getItems()));
                 offset += n;
             } while (paging.getNext() != null);

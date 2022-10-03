@@ -33,11 +33,12 @@ public class ControllerFollowed {
     private static final String HIGHLIGHTED_CONTROL_INNER_BACKGROUND = "derive(palegreen, 50%)";
     private final Label placeholderLabelGListFollowed, placeholderLabelGListSpotify;
     private ControllerOutline controllerOutline;
-    private String lastSearch = "", newCoverUrl = "", todayCoverUrl = "", tomorrowCoverUrl = "";
+    private String lastSearch = "", newCoverUrl = "", todayCoverUrl = "", tomorrowCoverUrl = "", currentArtistName = "";
     private double maxGListSpotifyPopularity = Double.MAX_VALUE;
     private Task<Void> task;
     private Timer elapsed;
     private boolean processing = false;
+    private int pageNumber;
 
     @FXML
     private VBox GMainVBOX, GVboxInfo;
@@ -165,7 +166,7 @@ public class ControllerFollowed {
                     GLabelPercentage.setText((int) (var * 100) + "%");
                     GProgressBar.setProgress(var);
                 })
-                .currentArtistConsumer(GLabelCurrentArtist::setText)
+                .currentArtistConsumer(this::setCurrentArtistName)
                 .processedArtistsNumberConsumer(art -> GLabelProcessedArtists.setText(art + " / " + list.size()))
                 .loadedReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelLoadedReleasesP, GLabelLoadedReleases))
                 .newReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelNewReleasesP, GLabelNewReleases))
@@ -191,7 +192,9 @@ public class ControllerFollowed {
                         tomorrowCoverUrl = r.getAlbum().getImages()[1].getUrl();
                     } catch (Exception ignored) {
                     }
-                });
+                })
+                .pageNumberConsumer(n -> pageNumber = n)
+                .numberOfPagesConsumer(this::setNumberOfPages);
 
 
         final long startMs = System.currentTimeMillis();
@@ -236,6 +239,19 @@ public class ControllerFollowed {
         Thread thread = new Thread(task);
         thread.setDaemon(true);
         thread.start();
+    }
+
+    private void setNumberOfPages(Integer integer) {
+        if (pageNumber == 0) return;
+        if (integer < 4) return;
+        int percentage = (pageNumber + 1) * 100 / integer;
+
+        Platform.runLater(() -> GLabelCurrentArtist.setText(percentage + "% " + currentArtistName));
+    }
+
+    private void setCurrentArtistName(String s) {
+        currentArtistName = s;
+        GLabelCurrentArtist.setText(currentArtistName);
     }
 
 

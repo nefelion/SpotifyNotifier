@@ -26,7 +26,7 @@ public class ReleasesProcessor {
     private Consumer<String> currentArtistC;
     private Consumer<ReleasedAlbum> newReleaseC, todayReleaseC, tomorrowReleaseC;
     private Consumer<Integer> numberOfLoadedReleasesC, numberOfProcessedArtistsC, numberOfNewReleasesC,
-            numberOfTodayReleasesC, numberOfTomorrowReleases;
+            numberOfTodayReleasesC, numberOfTomorrowReleases, pageNumberC, numberOfPagesC;
     private int today = 0, tomorrow = 0;
 
     public ReleasesProcessor(List<FollowedArtist> artists) {
@@ -70,7 +70,7 @@ public class ReleasesProcessor {
             List<AlbumSimplified> albums;
 
             try {
-                albums = theEngine.getAlbums(artist.getID());
+                albums = theEngine.getAlbums(artist.getID(), pageNumberC, numberOfPagesC);
             } catch (CancellationException e) {
                 return;
             }
@@ -203,6 +203,16 @@ public class ReleasesProcessor {
 
     public ReleasesProcessor newReleaseConsumer(Consumer<ReleasedAlbum> newReleaseConsumer) {
         this.newReleaseC = newReleaseConsumer;
+        return this;
+    }
+
+    public ReleasesProcessor pageNumberConsumer(Consumer<Integer> pageNumberConsumer) {
+        this.pageNumberC = pageNumberConsumer;
+        return this;
+    }
+
+    public ReleasesProcessor numberOfPagesConsumer(Consumer<Integer> numberOfPagesConsumer) {
+        this.numberOfPagesC = numberOfPagesConsumer;
         return this;
     }
 
