@@ -125,8 +125,10 @@ public class ControllerFollowed {
         };
         task.setOnSucceeded((e) -> {
             dialog.close();
-            startLoadingAlbums(processor.getOutputArtists().stream()
-                    .map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList()), false);
+            List<FollowedArtist> artists = processor.getOutputArtists().stream()
+                    .map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList());
+
+            startLoadingAlbums(artists, false, 5);
         });
         dialog.setCancelListener(task::cancel);
 
@@ -152,10 +154,10 @@ public class ControllerFollowed {
         List<FollowedArtist> artists = new ArrayList<>(TempData.getInstance().getFileData().getFollowedArtists().stream()
                 .sorted(Comparator.comparing(FollowedArtist::getName)).toList());
 
-        startLoadingAlbums(artists, true);
+        startLoadingAlbums(artists, true, -1);
     }
 
-    private void startLoadingAlbums(List<FollowedArtist> list, boolean updateLastChecked) {
+    private void startLoadingAlbums(List<FollowedArtist> list, boolean updateLastChecked, int maxPages) {
         processing = true;
         resetInfoBoard();
         GButtonCheckReleases.setDisable(true);
@@ -195,6 +197,8 @@ public class ControllerFollowed {
                 })
                 .pageNumberConsumer(n -> pageNumber = n)
                 .numberOfPagesConsumer(this::setNumberOfPages);
+
+        if (maxPages != -1) processor.setMaximumPages(maxPages);
 
 
         final long startMs = System.currentTimeMillis();

@@ -114,10 +114,10 @@ public class TheEngine {
     }
 
     public List<AlbumSimplified> getAlbums(String artistID) {
-        return getAlbums(artistID, null, null);
+        return getAlbums(artistID, null, null, -1);
     }
 
-    public List<AlbumSimplified> getAlbums(String artistID, Consumer<Integer> page, Consumer<Integer> all) throws CancellationException {
+    public List<AlbumSimplified> getAlbums(String artistID, Consumer<Integer> page, Consumer<Integer> all, int maxPages) throws CancellationException {
 
         List<AlbumSimplified> allAlbums = new ArrayList<>();
 
@@ -129,8 +129,10 @@ public class TheEngine {
             do {
                 paging = spotifyAPI.getArtistsAlbums(artistID).offset(offset).limit(n).build().execute();
 
+                int allPages = (paging.getTotal() / 50) + 1;
+                if (allPages > maxPages && maxPages != -1) return allAlbums;
                 if (page != null) page.accept(offset / 50);
-                if (all != null) all.accept((paging.getTotal() / 50) + 1);
+                if (all != null) all.accept((allPages));
 
 
                 allAlbums.addAll(List.of(paging.getItems()));

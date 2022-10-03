@@ -28,6 +28,7 @@ public class ReleasesProcessor {
     private Consumer<Integer> numberOfLoadedReleasesC, numberOfProcessedArtistsC, numberOfNewReleasesC,
             numberOfTodayReleasesC, numberOfTomorrowReleases, pageNumberC, numberOfPagesC;
     private int today = 0, tomorrow = 0;
+    private int maximumPages = -1;
 
     public ReleasesProcessor(List<FollowedArtist> artists) {
         this.artists = artists;
@@ -70,7 +71,7 @@ public class ReleasesProcessor {
             List<AlbumSimplified> albums;
 
             try {
-                albums = theEngine.getAlbums(artist.getID(), pageNumberC, numberOfPagesC);
+                albums = theEngine.getAlbums(artist.getID(), pageNumberC, numberOfPagesC, maximumPages);
             } catch (CancellationException e) {
                 return;
             }
@@ -248,6 +249,10 @@ public class ReleasesProcessor {
 
     private boolean isOnRemindList(AlbumSimplified album) {
         return remindIDhashSet.contains(album.getId());
+    }
+
+    public void setMaximumPages(int maximumPages) {
+        this.maximumPages = maximumPages;
     }
 
 }
