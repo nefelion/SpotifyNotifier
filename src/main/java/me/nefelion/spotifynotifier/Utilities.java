@@ -1,11 +1,17 @@
 package me.nefelion.spotifynotifier;
 
+import api.deezer.DeezerApi;
+import api.deezer.exceptions.DeezerException;
+import api.deezer.objects.Album;
+import api.deezer.objects.data.AlbumData;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
+import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 
 import javax.swing.*;
 import java.text.ParseException;
@@ -207,6 +213,21 @@ public class Utilities {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.DATE, 1);
         return sdf.format(c.getTime());
+    }
+
+    public static Album findDeezerRelease(AlbumSimplified album) {
+        DeezerApi deezerApi = new DeezerApi();
+        try {
+            for (ArtistSimplified artist : album.getArtists()) {
+                AlbumData albumData = deezerApi.search().searchAlbum()
+                        .album(album.getName())
+                        .artist(artist.getName())
+                        .execute();
+                if (!albumData.getData().isEmpty()) return albumData.getData().get(0);
+            }
+        } catch (DeezerException ignored) {
+        }
+        return null;
     }
 
 
