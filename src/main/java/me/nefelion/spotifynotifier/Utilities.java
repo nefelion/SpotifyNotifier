@@ -3,6 +3,7 @@ package me.nefelion.spotifynotifier;
 import api.deezer.DeezerApi;
 import api.deezer.exceptions.DeezerException;
 import api.deezer.objects.Album;
+import api.deezer.objects.Artist;
 import api.deezer.objects.data.AlbumData;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -10,9 +11,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import se.michaelthelin.spotify.enums.AlbumGroup;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 
+import javax.swing.Timer;
 import javax.swing.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,10 +24,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
@@ -227,6 +227,70 @@ public class Utilities {
             }
         } catch (DeezerException ignored) {
         }
+        return findDeezerReleaseAlternate(album);
+    }
+
+    private static Album findDeezerReleaseAlternate(AlbumSimplified albumS) {
+        DeezerApi deezerApi = new DeezerApi();
+
+        for (ArtistSimplified artist : albumS.getArtists()) {
+            AlbumSimplified oldAlbum = getOldAlbum(artist.getId());
+            if (oldAlbum == null) continue;
+
+            Artist newArtist = findDeezerArtist(artist.getName(), oldAlbum.getName());
+            if (newArtist == null) continue;
+
+            Album album = findTheAlbum(albumS.getName(), newArtist.getId());
+            if (album == null) continue;
+
+            album.setArtist(newArtist);
+            return album;
+        }
+        return null;
+    }
+
+    private static Album findTheAlbum(String albumName, long newArtistID) {
+        DeezerApi deezerApi = new DeezerApi();
+        try {
+            AlbumData albumData = deezerApi.artist().getAlbums(newArtistID).execute();
+            if (albumData.getData().isEmpty()) return null;
+
+            for (Album album : albumData.getData())
+                if (album.getTitle().equals(albumName)) return album;
+        } catch (DeezerException ignored) {
+        }
+        return null;
+    }
+
+    private static Artist findDeezerArtist(String artistName, String oldAlbumName) {
+        DeezerApi deezerApi = new DeezerApi();
+
+        try {
+            AlbumData albumData = deezerApi.search().searchAlbum()
+                    .album(oldAlbumName)
+                    .artist(artistName)
+                    .execute();
+            if (albumData.getData().isEmpty()) return null;
+
+            Artist newArtist = albumData.getData().get(0).getArtist();
+            if (!newArtist.getName().equals(artistName)) return null;
+
+            return newArtist;
+        } catch (DeezerException ignored) {
+        }
+
+        return null;
+    }
+
+    private static AlbumSimplified getOldAlbum(String artistID) {
+        List<AlbumSimplified> albums = TheEngine.getInstance().getAlbums(artistID);
+        if (albums == null) return null;
+
+        for (AlbumSimplified album : albums) {
+            if (album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON)) continue;
+            if (convertDateToDaysAgo(album.getReleaseDate()) >= 1) return album;
+        }
+
         return null;
     }
 

@@ -2,6 +2,8 @@ package me.nefelion.spotifynotifier.gui;
 
 import api.deezer.objects.Album;
 import com.neovisionaries.i18n.CountryCode;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -21,11 +23,9 @@ import java.util.Objects;
 public class AlbumInfoDialog extends Dialog<String> {
 
     private final AlbumSimplified album;
-    private final Album deezerAlbum;
 
     public AlbumInfoDialog(AlbumSimplified album) {
         this.album = album;
-        deezerAlbum = Utilities.findDeezerRelease(album);
         setIcon();
         setTitle("Info");
         setHeaderText(album.getName());
@@ -42,16 +42,33 @@ public class AlbumInfoDialog extends Dialog<String> {
         albumNameLabel.setStyle("-fx-font-weight: bold;");
 
         vbox.getChildren().addAll(albumNameLabel, getAvailableMarketsScrollPane());
-        if (deezerAlbum != null) vbox.getChildren().addAll(getSeparator(), getDeezerInfoVBox());
+
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                Album deezerAlbum = Utilities.findDeezerRelease(album);
+                if (deezerAlbum == null) return null;
+                Platform.runLater(() -> {
+                    vbox.getChildren().addAll(getSeparator(), getDeezerInfoVBox(deezerAlbum));
+                    getDialogPane().getScene().getWindow().sizeToScene();
+                });
+                return null;
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+
         return vbox;
     }
 
-    private VBox getDeezerInfoVBox() {
+    private VBox getDeezerInfoVBox(Album deezerAlbum) {
         HBox hbox = new HBox();
 
         Label albumName = new Label(deezerAlbum.getTitle());
         Label albumArtist = new Label(deezerAlbum.getArtist().getName());
-        Label albumTracks = new Label(deezerAlbum.getNbTracks() + " tracks");
+        Label albumInfo = new Label(deezerAlbum.getNbTracks() == null ? "New Album!" : deezerAlbum.getNbTracks() + " tracks");
         Button copyLinkButton = new Button("Copy link");
         copyLinkButton.setOnAction(event -> {
             Clipboard clipboard = Clipboard.getSystemClipboard();
@@ -65,7 +82,7 @@ public class AlbumInfoDialog extends Dialog<String> {
         ImageView albumImage = new ImageView(new Image(deezerAlbum.getCoverMedium()));
         hbox.getChildren().addAll(
                 albumImage,
-                new VBox(albumName, albumArtist, albumTracks, copyLinkButton)
+                new VBox(albumName, albumArtist, albumInfo, copyLinkButton)
         );
 
 
