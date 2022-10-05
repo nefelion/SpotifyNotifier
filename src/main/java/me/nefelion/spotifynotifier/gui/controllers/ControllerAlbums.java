@@ -821,6 +821,7 @@ public class ControllerAlbums {
             if (selected.getPreviewUrl() == null) {
                 Platform.runLater(() -> {
                     GLabelCurrentPlaying.setText("Spotify blocks this track from being played here.");
+                    GLabelCurrentPlaying.setStyle("-fx-text-fill: red");
                     GLabelCurrentPlaying.setVisible(true);
                     Tooltip tooltip = new Tooltip("Spotify blocks this track from being played here.");
                     tooltip.setShowDelay(Duration.ZERO);
@@ -851,6 +852,7 @@ public class ControllerAlbums {
         String artists = Arrays.stream(t.getArtists()).map(ArtistSimplified::getName).collect(Collectors.joining(", "));
 
         GLabelCurrentPlaying.setText(t.getName());
+        GLabelCurrentPlaying.setStyle("");
         Tooltip tooltip = new Tooltip(artists + " \n" + a.getName() + " (" + a.getReleaseDate() + ")" + " \n" + t.getName());
         tooltip.setShowDelay(Duration.seconds(0));
         GLabelCurrentPlaying.setTooltip(tooltip);
