@@ -10,6 +10,10 @@ import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -24,8 +28,10 @@ import me.nefelion.spotifynotifier.data.TempData;
 import me.nefelion.spotifynotifier.gui.LoadingDialog;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ControllerFollowed {
@@ -248,7 +254,14 @@ public class ControllerFollowed {
                 .currentArtistConsumer(this::setCurrentArtistName)
                 .processedArtistsNumberConsumer(art -> GLabelProcessedArtists.setText(art + " / " + list.size()))
                 .loadedReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelLoadedReleasesP, GLabelLoadedReleases))
-                .newReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelNewReleasesP, GLabelNewReleases))
+                .newReleasesNumberConsumer(n -> {
+                    if (GLabelNewReleases.getText().equals("0") && n > 0) {
+                        GVboxInfo.setStyle("-fx-background-color: " + HIGHLIGHTED_CONTROL_INNER_BACKGROUND + ";");
+                        Toolkit.getDefaultToolkit().beep();
+                    }
+
+                    setLoadedReleasesText(n, GLabelNewReleasesP, GLabelNewReleases);
+                })
                 .todayReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelTodayP, GLabelToday))
                 .tomorrowReleasesNumberConsumer(n -> setLoadedReleasesText(n, GLabelTomorrowP, GLabelTomorrow))
                 .newReleaseConsumer(r -> {
