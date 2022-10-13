@@ -617,8 +617,7 @@ public class ControllerAlbums {
             return;
         }
 
-        newAlbums.sort(Comparator.comparing(ReleasedAlbum::isReminded, Comparator.reverseOrder())
-                .thenComparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
+        sortReleases(newAlbums);
         this.newAlbums = newAlbums;
         this.filteredNewAlbums = new ArrayList<>(newAlbums);
 
@@ -646,8 +645,7 @@ public class ControllerAlbums {
             return;
         }
 
-        allAlbums.sort(Comparator.comparing(ReleasedAlbum::isReminded, Comparator.reverseOrder())
-                .thenComparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder()));
+        sortReleases(allAlbums);
         this.allAlbums = allAlbums;
         this.filteredAllAlbums = new ArrayList<>(allAlbums);
         this.oneArtist = allAlbums.stream().filter(p -> !p.getFollowedArtist().getID().equals(allAlbums.get(0).getFollowedArtist().getID())).findAny().isEmpty();
@@ -661,6 +659,21 @@ public class ControllerAlbums {
             GAccordionTracklist.setExpandedPane(GTitledPaneTracklist);
             Platform.runLater(() -> GTableAllReleases.getSelectionModel().select(0));
         }
+    }
+
+    private static void sortReleases(List<ReleasedAlbum> albums) {
+        Comparator<ReleasedAlbum> reminded = Comparator.comparing(ReleasedAlbum::isReminded, Comparator.reverseOrder());
+        Comparator<ReleasedAlbum> date = Comparator.comparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder());
+        Comparator<ReleasedAlbum> featuring = Comparator.comparing(ReleasedAlbum::isFeaturing);
+        Comparator<ReleasedAlbum> album = Comparator.comparing(ReleasedAlbum::isAlbum, Comparator.reverseOrder());
+        Comparator<ReleasedAlbum> albumName = Comparator.comparing(ReleasedAlbum::getAlbumName);
+
+        albums.sort(reminded
+                .thenComparing(date)
+                .thenComparing(featuring)
+                .thenComparing(album)
+                .thenComparing(albumName)
+        );
     }
 
     private void initializeCheckboxesFor(List<ReleasedAlbum> albums) {

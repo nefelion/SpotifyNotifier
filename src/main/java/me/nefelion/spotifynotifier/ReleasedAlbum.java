@@ -114,4 +114,8 @@ public class ReleasedAlbum {
     public boolean isToday() {
         return releaseDate.equals(Utilities.getTodayDate());
     }
+
+    public boolean isAlbum() {
+        return albumType.equals("ALBUM");
+    }
 }
