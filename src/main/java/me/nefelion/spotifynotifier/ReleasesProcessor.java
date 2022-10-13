@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import me.nefelion.spotifynotifier.data.FileManager;
 import se.michaelthelin.spotify.enums.AlbumGroup;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
+import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 
 import java.util.*;
 import java.util.concurrent.CancellationException;
@@ -29,6 +30,7 @@ public class ReleasesProcessor {
             numberOfTodayReleasesC, numberOfTomorrowReleases, pageNumberC, numberOfPagesC;
     private int today = 0, tomorrow = 0;
     private int maximumPages = -1;
+    private boolean dischardFollowedArtists = false;
 
     public ReleasesProcessor(List<FollowedArtist> artists) {
         this.artists = artists;
@@ -80,6 +82,8 @@ public class ReleasesProcessor {
                 if (isAlreadyLoaded(a)) continue;
                 if (showOnlyAvailable && !isAvailable(a)) continue;
                 if (ignoreNotWorldwide && !isWorldwide(a)) continue;
+                if (dischardFollowedArtists && hasFollowedArtist(a)) continue;
+
                 if (isFeaturing(a)) {
                     if (ignoreVarious && isVariousArtists(a)) continue;
                     addToFeaturing(artist, a);
@@ -98,6 +102,12 @@ public class ReleasesProcessor {
         loadUniqueFeaturing();
         FileManager.saveHashSet(FileManager.ALBUM_DATA, fileHashSet);
         FileManager.saveHashSet(FileManager.REMIND_DATA, remindIDhashSet);
+    }
+
+    private boolean hasFollowedArtist(AlbumSimplified a) {
+        List<String> ids = new ArrayList<>(Arrays.stream(a.getArtists()).map(ArtistSimplified::getId).toList());
+
+        return ids.stream().anyMatch(TheEngine::isFollowed);
     }
 
     private void loadUniqueFeaturing() {
@@ -214,6 +224,11 @@ public class ReleasesProcessor {
 
     public ReleasesProcessor numberOfPagesConsumer(Consumer<Integer> numberOfPagesConsumer) {
         this.numberOfPagesC = numberOfPagesConsumer;
+        return this;
+    }
+
+    public ReleasesProcessor dischardFollowedArtists(boolean dischardFollowedArtists) {
+        this.dischardFollowedArtists = dischardFollowedArtists;
         return this;
     }
 

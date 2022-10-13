@@ -128,7 +128,7 @@ public class ControllerFollowed {
             List<FollowedArtist> artists = processor.getOutputArtists().stream()
                     .map(p -> new FollowedArtist(p.getName(), p.getId())).collect(Collectors.toList());
 
-            startLoadingAlbums(artists, false, 5);
+            explore(artists);
         });
         dialog.setCancelListener(task::cancel);
 
@@ -154,15 +154,92 @@ public class ControllerFollowed {
         List<FollowedArtist> artists = new ArrayList<>(TempData.getInstance().getFileData().getFollowedArtists().stream()
                 .sorted(Comparator.comparing(FollowedArtist::getName)).toList());
 
-        startLoadingAlbums(artists, true, -1);
+        checkReleases(artists);
     }
 
-    private void startLoadingAlbums(List<FollowedArtist> list, boolean updateLastChecked, int maxPages) {
+    private void checkReleases(List<FollowedArtist> list) {
         processing = true;
         resetInfoBoard();
         GButtonCheckReleases.setDisable(true);
         GVboxInfo.setVisible(true);
 
+        ReleasesProcessor processor = getDefaultReleasesProcessor(list);
+        startCountingProcessorTime();
+
+
+        task = new Task<>() {
+            @Override
+            public Void call() {
+                processor.process();
+                processing = false;
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            GButtonCheckReleases.setDisable(false);
+            FileData fileData = TempData.getInstance().getFileData();
+            fileData.setLastChecked(Utilities.now());
+            FileManager.saveFileData(fileData);
+
+            showReleases("Releases", processor);
+
+            resetInfoBoard();
+            GVboxInfo.setVisible(false);
+            refreshGLabelLastChecked();
+        });
+        task.setOnCancelled(e -> {
+            GVboxInfo.setVisible(false);
+            GButtonCheckReleases.setDisable(false);
+            resetInfoBoard();
+        });
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private void explore(List<FollowedArtist> list) {
+        processing = true;
+        resetInfoBoard();
+        GButtonCheckReleases.setDisable(true);
+        GVboxInfo.setVisible(true);
+        GLabelNewReleases.setText("N/A");
+
+        ReleasesProcessor processor = getDefaultReleasesProcessor(list);
+        processor.setMaximumPages(5);
+        processor.dischardFollowedArtists(true);
+
+        startCountingProcessorTime();
+
+
+        task = new Task<>() {
+            @Override
+            public Void call() {
+                processor.process();
+                processing = false;
+                return null;
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            GButtonCheckReleases.setDisable(false);
+            showReleases("Explore releases", processor);
+
+            resetInfoBoard();
+            GVboxInfo.setVisible(false);
+            refreshGLabelLastChecked();
+        });
+        task.setOnCancelled(e -> {
+            GVboxInfo.setVisible(false);
+            GButtonCheckReleases.setDisable(false);
+            resetInfoBoard();
+        });
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private ReleasesProcessor getDefaultReleasesProcessor(List<FollowedArtist> list) {
         ReleasesProcessor processor = new ReleasesProcessor(list);
         processor.progressConsumer((var) -> {
                     GLabelPercentage.setText((int) (var * 100) + "%");
@@ -197,10 +274,10 @@ public class ControllerFollowed {
                 })
                 .pageNumberConsumer(n -> pageNumber = n)
                 .numberOfPagesConsumer(this::setNumberOfPages);
+        return processor;
+    }
 
-        if (maxPages != -1) processor.setMaximumPages(maxPages);
-
-
+    private void startCountingProcessorTime() {
         final long startMs = System.currentTimeMillis();
         elapsed = new Timer(true);
         elapsed.scheduleAtFixedRate(new TimerTask() {
@@ -211,39 +288,8 @@ public class ControllerFollowed {
                 );
             }
         }, 0, 1000);
-
-
-        task = new Task<>() {
-            @Override
-            public Void call() {
-                processor.process();
-                processing = false;
-                return null;
-            }
-        };
-
-        task.setOnSucceeded(e -> {
-            GButtonCheckReleases.setDisable(false);
-            if (updateLastChecked) {
-                FileData fileData = TempData.getInstance().getFileData();
-                fileData.setLastChecked(Utilities.now());
-                FileManager.saveFileData(fileData);
-            }
-            showReleases("Releases", processor);
-
-            resetInfoBoard();
-            GVboxInfo.setVisible(false);
-            refreshGLabelLastChecked();
-        });
-        task.setOnCancelled(e -> {
-            GVboxInfo.setVisible(false);
-            GButtonCheckReleases.setDisable(false);
-            resetInfoBoard();
-        });
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
     }
+
 
     private void setNumberOfPages(Integer integer) {
         if (pageNumber == 0) return;
