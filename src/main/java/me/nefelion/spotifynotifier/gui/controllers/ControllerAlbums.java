@@ -327,11 +327,12 @@ public class ControllerAlbums {
                     Clipboard.getSystemClipboard().setContent(content);
                 } else Utilities.okMSGBOX("No preview available for this track");
             });
-            MenuItem menuItemOpenLink = new MenuItem("Show on Spotify");
+            MenuItem menuItemOpenLink = new MenuItem("Show in Spotify");
             menuItemOpenLink.setOnAction(event -> {
-                String link = "https://open.spotify.com/track/" + getHoveredTrack().getId();
+                boolean browser = TempData.getInstance().getFileData().isUseBrowserInsteadOfApp();
+                String url = (browser ? "https://open.spotify.com/track/" : "spotify://track/") + getHoveredTrack().getId();
                 try {
-                    Desktop.getDesktop().browse(new URI(link));
+                    Desktop.getDesktop().browse(new URI(url));
                 } catch (IOException | URISyntaxException e1) {
                     e1.printStackTrace();
                 }
@@ -925,7 +926,7 @@ public class ControllerAlbums {
             };
 
             final ContextMenu contextMenu = new ContextMenu();
-            final MenuItem showOnSpotifyMenuItem = new MenuItem("Show on Spotify");
+            final MenuItem showOnSpotifyMenuItem = new MenuItem("Show in Spotify");
             final MenuItem copySpotifyLinkMenuItem = new MenuItem("Copy Spotify link");
             final MenuItem showReleasesMenuItem = new MenuItem("Show releases by...");
             final MenuItem showSimilarMenuItem = new MenuItem("Show similar artists");
@@ -936,7 +937,8 @@ public class ControllerAlbums {
             showOnSpotifyMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
                 Runtime rt = Runtime.getRuntime();
-                String url = "https://open.spotify.com/album/" + album.getId();
+                boolean browser = TempData.getInstance().getFileData().isUseBrowserInsteadOfApp();
+                String url = (browser ? "https://open.spotify.com/album/" : "spotify://album/") + album.getId();
                 try {
                     rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
                 } catch (IOException ex) {

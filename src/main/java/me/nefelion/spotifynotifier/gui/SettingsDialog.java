@@ -3,6 +3,7 @@ package me.nefelion.spotifynotifier.gui;
 import com.neovisionaries.i18n.CountryCode;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
@@ -21,6 +22,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
     private TextField textFieldCountryCode;
     private CheckBox checkBoxIgnoreVarious, checkBoxOnlyAvailable, checkBoxIgnoreNotWorldwide;
     private Slider sliderExploreIterations;
+    private RadioButton radioButtonBrowser, radioButtonApp;
 
     public SettingsDialog() {
         setIcon();
@@ -46,7 +48,35 @@ public class SettingsDialog extends Dialog<ButtonType> {
                 getSeparator(),
                 getExploreIterationsVBOX(),
                 getSeparator(),
+                getBrowserAppVBOX(),
+                getSeparator(),
                 getButtonResetCredentials());
+        return vbox;
+    }
+
+    private Node getBrowserAppVBOX() {
+        VBox vbox = new VBox();
+        Tooltip tooltip = new Tooltip("How to open Spotify links when you click \"Show on Spotify\"?");
+        tooltip.setShowDelay(javafx.util.Duration.ZERO);
+        tooltip.setStyle("-fx-font-size: 14px;");
+
+
+        Label label = new Label("Prefer:");
+        label.setTooltip(tooltip);
+        radioButtonApp = new RadioButton("Spotify App");
+        radioButtonApp.setSelected(!TempData.getInstance().getFileData().isUseBrowserInsteadOfApp());
+        radioButtonBrowser = new RadioButton("Browser");
+        radioButtonBrowser.setSelected(TempData.getInstance().getFileData().isUseBrowserInsteadOfApp());
+
+        radioButtonApp.setTooltip(tooltip);
+        radioButtonBrowser.setTooltip(tooltip);
+
+        ToggleGroup toggleGroup = new ToggleGroup();
+        toggleGroup.getToggles().addAll(radioButtonApp, radioButtonBrowser);
+
+
+        vbox.setSpacing(5);
+        vbox.getChildren().addAll(label, radioButtonApp, radioButtonBrowser);
         return vbox;
     }
 
@@ -166,6 +196,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
         fd.setShowOnlyAvailable(checkBoxOnlyAvailable.isSelected());
         fd.setIgnoreNotWorldwide(checkBoxIgnoreNotWorldwide.isSelected());
         fd.setExploreIterations((int) sliderExploreIterations.getValue());
+        fd.setUseBrowserInsteadOfApp(radioButtonBrowser.isSelected());
 
         FileManager.saveFileData(fd);
     }

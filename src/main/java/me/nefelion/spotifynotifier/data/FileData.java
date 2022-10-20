@@ -10,7 +10,7 @@ public class FileData {
     private final List<FollowedArtist> followedArtists;
     private String lastChecked, clientId, clientSecret;
     private int countryCodeNumeric, exploreIterations;
-    private boolean ignoreVariousArtists, showOnlyAvailable, ignoreNotWorldwide;
+    private boolean ignoreVariousArtists, showOnlyAvailable, ignoreNotWorldwide, useBrowserInsteadOfApp;
 
     public FileData() {
         this.followedArtists = new LinkedList<>();
@@ -22,6 +22,7 @@ public class FileData {
         this.showOnlyAvailable = false;
         this.ignoreNotWorldwide = false;
         this.exploreIterations = 1;
+        this.useBrowserInsteadOfApp = false;
     }
 
     public List<FollowedArtist> getFollowedArtists() {
@@ -94,5 +95,13 @@ public class FileData {
 
     public void setExploreIterations(int exploreIterations) {
         this.exploreIterations = exploreIterations;
+    }
+
+    public boolean isUseBrowserInsteadOfApp() {
+        return useBrowserInsteadOfApp;
+    }
+
+    public void setUseBrowserInsteadOfApp(boolean useBrowserInsteadOfApp) {
+        this.useBrowserInsteadOfApp = useBrowserInsteadOfApp;
     }
 }
