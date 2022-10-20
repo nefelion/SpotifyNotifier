@@ -22,7 +22,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
     private TextField textFieldCountryCode;
     private CheckBox checkBoxIgnoreVarious, checkBoxOnlyAvailable, checkBoxIgnoreNotWorldwide;
     private Slider sliderExploreIterations;
-    private RadioButton radioButtonBrowser, radioButtonApp;
+    private RadioButton radioButtonBrowser;
 
     public SettingsDialog() {
         setIcon();
@@ -46,8 +46,6 @@ public class SettingsDialog extends Dialog<ButtonType> {
         vbox.getChildren().addAll(
                 getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious, checkBoxIgnoreNotWorldwide,
                 getSeparator(),
-                getExploreIterationsVBOX(),
-                getSeparator(),
                 getBrowserAppVBOX(),
                 getSeparator(),
                 getButtonResetCredentials());
@@ -63,7 +61,7 @@ public class SettingsDialog extends Dialog<ButtonType> {
 
         Label label = new Label("Prefer:");
         label.setTooltip(tooltip);
-        radioButtonApp = new RadioButton("Spotify App");
+        RadioButton radioButtonApp = new RadioButton("Spotify App");
         radioButtonApp.setSelected(!TempData.getInstance().getFileData().isUseBrowserInsteadOfApp());
         radioButtonBrowser = new RadioButton("Browser");
         radioButtonBrowser.setSelected(TempData.getInstance().getFileData().isUseBrowserInsteadOfApp());
@@ -77,35 +75,6 @@ public class SettingsDialog extends Dialog<ButtonType> {
 
         vbox.setSpacing(5);
         vbox.getChildren().addAll(label, radioButtonApp, radioButtonBrowser);
-        return vbox;
-    }
-
-    private VBox getExploreIterationsVBOX() {
-        VBox vbox = new VBox();
-        vbox.setSpacing(5);
-
-        Tooltip tooltip = new Tooltip("""
-                How deep should the explore algorithm go?
-                1 = only artists similar to followed artists
-                2 = also artists similar to artists similar to followed artists
-                """);
-        tooltip.setShowDelay(javafx.util.Duration.ZERO);
-        tooltip.setStyle("-fx-font-size: 14px;");
-
-        Label label = new Label("Explore depth:");
-        label.setTooltip(tooltip);
-        label.setWrapText(true);
-
-        sliderExploreIterations = new Slider(1, 2, TempData.getInstance().getFileData().getExploreIterations());
-        sliderExploreIterations.setShowTickLabels(true);
-        sliderExploreIterations.setShowTickMarks(true);
-        sliderExploreIterations.setMajorTickUnit(1);
-        sliderExploreIterations.setMinorTickCount(0);
-        sliderExploreIterations.setBlockIncrement(1);
-        sliderExploreIterations.setSnapToTicks(true);
-        sliderExploreIterations.setTooltip(tooltip);
-
-        vbox.getChildren().addAll(label, sliderExploreIterations);
         return vbox;
     }
 
@@ -195,7 +164,6 @@ public class SettingsDialog extends Dialog<ButtonType> {
         fd.setIgnoreVariousArtists(checkBoxIgnoreVarious.isSelected());
         fd.setShowOnlyAvailable(checkBoxOnlyAvailable.isSelected());
         fd.setIgnoreNotWorldwide(checkBoxIgnoreNotWorldwide.isSelected());
-        fd.setExploreIterations((int) sliderExploreIterations.getValue());
         fd.setUseBrowserInsteadOfApp(radioButtonBrowser.isSelected());
 
         FileManager.saveFileData(fd);

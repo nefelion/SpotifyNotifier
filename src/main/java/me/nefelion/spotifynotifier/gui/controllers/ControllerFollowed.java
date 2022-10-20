@@ -9,17 +9,19 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import me.nefelion.spotifynotifier.*;
 import me.nefelion.spotifynotifier.data.FileData;
@@ -30,8 +32,8 @@ import se.michaelthelin.spotify.model_objects.specification.Artist;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ControllerFollowed {
@@ -110,9 +112,8 @@ public class ControllerFollowed {
         }, 0, 1000);
     }
 
-    private void explore() {
+    private void explore(int iterations) {
         LoadingDialog dialog = new LoadingDialog();
-        int iterations = TempData.getInstance().getFileData().getExploreIterations();
         dialog.setTitle("Explore, " + (iterations == 1 ? "1 iteration" : iterations + " iterations"));
         dialog.setHeaderText("Loading similar artists to explore...");
         dialog.setProgressText("Loaded artists: 0");
@@ -142,6 +143,37 @@ public class ControllerFollowed {
         thread.setDaemon(true);
         thread.start();
 
+        dialog.showAndWait();
+    }
+
+    private void doTheDialogStuff() {
+        Dialog<String> dialog = new Dialog<>();
+        dialog.setTitle("Explore");
+        dialog.setHeaderText("Explore depth");
+        ((Stage) (dialog.getDialogPane().getScene().getWindow())).getIcons()
+                .add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
+
+        // set the button types
+        ButtonType exploreButtonType = new ButtonType("Explore", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(exploreButtonType, ButtonType.CANCEL);
+
+        // create the explore button and disable it by default
+        Node exploreButton = dialog.getDialogPane().lookupButton(exploreButtonType);
+        exploreButton.setDisable(true);
+
+        // create the radio buttons
+        RadioButton rb1 = new RadioButton("1");
+        RadioButton rb2 = new RadioButton("2");
+        ToggleGroup group = new ToggleGroup();
+        group.getToggles().addAll(rb1, rb2);
+        rb1.setOnAction(e -> exploreButton.setDisable(false));
+        rb2.setOnAction(e -> exploreButton.setDisable(false));
+        dialog.getDialogPane().setContent(new VBox(rb1, rb2));
+
+        dialog.getDialogPane().lookupButton(exploreButtonType).addEventFilter(ActionEvent.ACTION, event -> {
+            dialog.close();
+            Platform.runLater(() -> explore(rb1.isSelected() ? 1 : 2));
+        });
         dialog.showAndWait();
     }
 
@@ -388,7 +420,7 @@ public class ControllerFollowed {
         GButtonCheckReleases.setOnMousePressed(event -> {
             if (event.isSecondaryButtonDown()) {
                 CustomMenuItem explore1 = new CustomMenuItem(new Label("Explore"));
-                explore1.setOnAction(event1 -> explore());
+                explore1.setOnAction(event1 -> doTheDialogStuff());
                 Tooltip tooltip = new Tooltip("The Explore functionality shows all the albums of all the artists who are similar to the artists you follow.");
                 tooltip.setShowDelay(Duration.ZERO);
                 tooltip.setStyle("-fx-font-size: 14px;");

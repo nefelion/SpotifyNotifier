@@ -9,7 +9,7 @@ import java.util.List;
 public class FileData {
     private final List<FollowedArtist> followedArtists;
     private String lastChecked, clientId, clientSecret;
-    private int countryCodeNumeric, exploreIterations;
+    private int countryCodeNumeric;
     private boolean ignoreVariousArtists, showOnlyAvailable, ignoreNotWorldwide, useBrowserInsteadOfApp;
 
     public FileData() {
@@ -21,7 +21,6 @@ public class FileData {
         this.ignoreVariousArtists = false;
         this.showOnlyAvailable = false;
         this.ignoreNotWorldwide = false;
-        this.exploreIterations = 1;
         this.useBrowserInsteadOfApp = false;
     }
 
@@ -87,14 +86,6 @@ public class FileData {
 
     public void setIgnoreNotWorldwide(boolean ignoreNotWorldwide) {
         this.ignoreNotWorldwide = ignoreNotWorldwide;
-    }
-
-    public int getExploreIterations() {
-        return exploreIterations;
-    }
-
-    public void setExploreIterations(int exploreIterations) {
-        this.exploreIterations = exploreIterations;
     }
 
     public boolean isUseBrowserInsteadOfApp() {
