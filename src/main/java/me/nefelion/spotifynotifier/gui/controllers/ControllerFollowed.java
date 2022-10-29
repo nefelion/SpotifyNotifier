@@ -499,10 +499,10 @@ public class ControllerFollowed {
             });
             showOnSpotifyMenuItem.setOnAction(event -> {
                 FollowedArtist artist = cell.getItem();
-                Runtime rt = Runtime.getRuntime();
-                String url = "https://open.spotify.com/artist/" + artist.getID();
+                boolean browser = TempData.getInstance().getFileData().isUseBrowserInsteadOfApp();
+                String url = (browser ? "https://open.spotify.com/artist/" : "spotify://artist/") + artist.getID();
                 try {
-                    rt.exec("rundll32 url.dll,FileProtocolHandler " + url);
+                    Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
