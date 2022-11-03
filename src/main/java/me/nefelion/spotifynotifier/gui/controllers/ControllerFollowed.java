@@ -384,7 +384,7 @@ public class ControllerFollowed {
     }
 
     private void setLoadedReleasesText(Integer integer, Label glabelP, Label glabel) {
-        if (glabel.getText().equals("0") && integer > 0) {
+        if ((int) glabel.getOpacity() != 1 && integer > 0) {
             glabelP.setOpacity(1);
             glabel.setOpacity(1);
         }
