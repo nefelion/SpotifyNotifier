@@ -10,7 +10,7 @@ public class FileData {
     private final List<FollowedArtist> followedArtists;
     private String lastChecked, clientId, clientSecret;
     private int countryCodeNumeric;
-    private boolean ignoreVariousArtists, showOnlyAvailable, ignoreNotWorldwide, useBrowserInsteadOfApp;
+    private boolean showOnlyAvailable, ignoreVariousArtists, ignoreNotWorldwide, ignoreCompilations, useBrowserInsteadOfApp;
 
     public FileData() {
         this.followedArtists = new LinkedList<>();
@@ -18,8 +18,9 @@ public class FileData {
         this.clientId = "-";
         this.clientSecret = "-";
         this.countryCodeNumeric = 840;
-        this.ignoreVariousArtists = false;
         this.showOnlyAvailable = false;
+        this.ignoreVariousArtists = false;
+        this.ignoreCompilations = false;
         this.ignoreNotWorldwide = false;
         this.useBrowserInsteadOfApp = false;
     }
@@ -56,6 +57,22 @@ public class FileData {
         this.ignoreVariousArtists = ignoreVariousArtists;
     }
 
+    public boolean isIgnoreNotWorldwide() {
+        return ignoreNotWorldwide;
+    }
+
+    public void setIgnoreNotWorldwide(boolean ignoreNotWorldwide) {
+        this.ignoreNotWorldwide = ignoreNotWorldwide;
+    }
+
+    public boolean isIgnoreCompilations() {
+        return ignoreCompilations;
+    }
+
+    public void setIgnoreCompilations(boolean ignoreCompilations) {
+        this.ignoreCompilations = ignoreCompilations;
+    }
+
     public boolean isShowOnlyAvailable() {
         return showOnlyAvailable;
     }
@@ -80,14 +97,6 @@ public class FileData {
         this.clientSecret = clientSecret;
     }
 
-    public boolean isIgnoreNotWorldwide() {
-        return ignoreNotWorldwide;
-    }
-
-    public void setIgnoreNotWorldwide(boolean ignoreNotWorldwide) {
-        this.ignoreNotWorldwide = ignoreNotWorldwide;
-    }
-
     public boolean isUseBrowserInsteadOfApp() {
         return useBrowserInsteadOfApp;
     }
@@ -95,4 +104,5 @@ public class FileData {
     public void setUseBrowserInsteadOfApp(boolean useBrowserInsteadOfApp) {
         this.useBrowserInsteadOfApp = useBrowserInsteadOfApp;
     }
+
 }

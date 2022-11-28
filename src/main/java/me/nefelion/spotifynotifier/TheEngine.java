@@ -6,7 +6,6 @@ import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
-import se.michaelthelin.spotify.enums.AlbumType;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.*;
 
@@ -147,7 +146,6 @@ public class TheEngine {
         }
 
         tried = 0;
-        allAlbums.removeIf(p -> p.getAlbumType().equals(AlbumType.COMPILATION));
         return allAlbums;
     }
 

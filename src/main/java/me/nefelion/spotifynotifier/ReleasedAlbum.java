@@ -1,6 +1,7 @@
 package me.nefelion.spotifynotifier;
 
 import se.michaelthelin.spotify.enums.AlbumGroup;
+import se.michaelthelin.spotify.enums.AlbumType;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 
 import java.nio.charset.StandardCharsets;
@@ -17,7 +18,6 @@ public class ReleasedAlbum {
     private final String releaseDate;
     private final boolean featuring;
     private boolean reminded = false;
-    private boolean availableEverywhere = false;
 
 
     public ReleasedAlbum(AlbumSimplified album, FollowedArtist artist) {
@@ -27,7 +27,7 @@ public class ReleasedAlbum {
         this.followedArtist = artist;
         this.albumType = album.getAlbumType().toString();
         this.releaseDate = album.getReleaseDate();
-        this.featuring = album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON);
+        this.featuring = album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON) && !isCompilation();
     }
 
     public String getId() {
@@ -44,6 +44,7 @@ public class ReleasedAlbum {
                 : followedArtist.getName() + (album.getArtists().length == 1 ? "" : " ..."));
     }
 
+    // DO NOT remove this method, it is used in the GUI
     public String getAlbumType() {
         return albumType;
     }
@@ -99,14 +100,6 @@ public class ReleasedAlbum {
         this.reminded = reminded;
     }
 
-    public boolean isAvailableEverywhere() {
-        return availableEverywhere;
-    }
-
-    public void setAvailableEverywhere(boolean availableEverywhere) {
-        this.availableEverywhere = availableEverywhere;
-    }
-
     public boolean isTomorrow() {
         return releaseDate.equals(Utilities.getTomorrowDate());
     }
@@ -116,6 +109,15 @@ public class ReleasedAlbum {
     }
 
     public boolean isAlbum() {
-        return albumType.equals("ALBUM");
+        return album.getAlbumType().equals(AlbumType.ALBUM);
     }
+
+    public boolean isCompilation() {
+        return album.getAlbumType().equals(AlbumType.COMPILATION);
+    }
+
+    public boolean isSingle() {
+        return album.getAlbumType().equals(AlbumType.SINGLE);
+    }
+
 }

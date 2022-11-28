@@ -20,7 +20,8 @@ public class SettingsDialog extends Dialog<ButtonType> {
 
     private ButtonType buttonTypeSave;
     private TextField textFieldCountryCode;
-    private CheckBox checkBoxIgnoreVarious, checkBoxOnlyAvailable, checkBoxIgnoreNotWorldwide;
+    private CheckBox checkBoxOnlyAvailable,
+            checkBoxIgnoreVarious, checkBoxIgnoreNotWorldwide, checkBoxIgnoreCompilations;
     private Slider sliderExploreIterations;
     private RadioButton radioButtonBrowser;
 
@@ -43,8 +44,12 @@ public class SettingsDialog extends Dialog<ButtonType> {
         checkBoxIgnoreNotWorldwide = new CheckBox("Ignore not worldwide releases");
         checkBoxIgnoreNotWorldwide.setSelected(TempData.getInstance().getFileData().isIgnoreNotWorldwide());
 
+        checkBoxIgnoreCompilations = new CheckBox("Ignore compilations");
+        checkBoxIgnoreCompilations.setSelected(TempData.getInstance().getFileData().isIgnoreCompilations());
+
+
         vbox.getChildren().addAll(
-                getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious, checkBoxIgnoreNotWorldwide,
+                getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious, checkBoxIgnoreNotWorldwide, checkBoxIgnoreCompilations,
                 getSeparator(),
                 getBrowserAppVBOX(),
                 getSeparator(),
@@ -162,8 +167,9 @@ public class SettingsDialog extends Dialog<ButtonType> {
             fd.setCountryCodeNumeric(CountryCode.findByName(textFieldCountryCode.getText()).get(0).getNumeric());
 
         fd.setIgnoreVariousArtists(checkBoxIgnoreVarious.isSelected());
-        fd.setShowOnlyAvailable(checkBoxOnlyAvailable.isSelected());
         fd.setIgnoreNotWorldwide(checkBoxIgnoreNotWorldwide.isSelected());
+        fd.setIgnoreCompilations(checkBoxIgnoreCompilations.isSelected());
+        fd.setShowOnlyAvailable(checkBoxOnlyAvailable.isSelected());
         fd.setUseBrowserInsteadOfApp(radioButtonBrowser.isSelected());
 
         FileManager.saveFileData(fd);

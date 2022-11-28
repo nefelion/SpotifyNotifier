@@ -86,7 +86,7 @@ public class ControllerAlbums {
     @FXML
     private Slider GSliderVolume;
     @FXML
-    private CheckBox GCheckboxAlbums, GCheckboxSingles, GCheckboxFeaturing, GCheckboxNotWorldwide;
+    private CheckBox GCheckboxAlbums, GCheckboxSingles, GCheckboxFeaturing, GCheckboxCompilations;
     @FXML
     private ProgressBar GProgressBar;
     @FXML
@@ -153,12 +153,12 @@ public class ControllerAlbums {
     private void recalculateFilteredAlbums(List<ReleasedAlbum> filteredAlbums, List<ReleasedAlbum> albums) {
         filteredAlbums.clear();
         for (ReleasedAlbum album : albums) {
-            if (!GCheckboxNotWorldwide.isSelected() && !album.isAvailableEverywhere()) continue;
             if (album.isFeaturing()) {
                 if (!GCheckboxFeaturing.isSelected()) continue;
             } else {
-                if (!GCheckboxAlbums.isSelected() && album.getAlbumType().equalsIgnoreCase("ALBUM")) continue;
-                if (!GCheckboxSingles.isSelected() && album.getAlbumType().equalsIgnoreCase("SINGLE")) continue;
+                if (!GCheckboxAlbums.isSelected() && album.isAlbum()) continue;
+                if (!GCheckboxCompilations.isSelected() && album.isCompilation()) continue;
+                if (!GCheckboxSingles.isSelected() && album.isSingle()) continue;
             }
             filteredAlbums.add(album);
         }
@@ -667,31 +667,33 @@ public class ControllerAlbums {
         Comparator<ReleasedAlbum> date = Comparator.comparing(ReleasedAlbum::getLocalDate, Comparator.reverseOrder());
         Comparator<ReleasedAlbum> featuring = Comparator.comparing(ReleasedAlbum::isFeaturing);
         Comparator<ReleasedAlbum> album = Comparator.comparing(ReleasedAlbum::isAlbum, Comparator.reverseOrder());
+        Comparator<ReleasedAlbum> compilation = Comparator.comparing(ReleasedAlbum::isCompilation, Comparator.reverseOrder());
         Comparator<ReleasedAlbum> albumName = Comparator.comparing(ReleasedAlbum::getAlbumName);
 
         albums.sort(reminded
                 .thenComparing(date)
                 .thenComparing(featuring)
                 .thenComparing(album)
+                .thenComparing(compilation)
                 .thenComparing(albumName)
         );
     }
 
     private void initializeCheckboxesFor(List<ReleasedAlbum> albums) {
-        long numberOfAlbums = albums.stream().filter(p -> p.getAlbumType().equalsIgnoreCase("ALBUM") && !p.isFeaturing()).count();
-        long numberOfSingles = albums.stream().filter(p -> p.getAlbumType().equalsIgnoreCase("SINGLE") && !p.isFeaturing()).count();
+        long numberOfAlbums = albums.stream().filter(p -> p.isAlbum() && !p.isFeaturing()).count();
+        long numberOfCompilations = albums.stream().filter(ReleasedAlbum::isCompilation).count();
+        long numberOfSingles = albums.stream().filter(p -> p.isSingle() && !p.isFeaturing()).count();
         long numberOfFeaturing = albums.stream().filter(ReleasedAlbum::isFeaturing).count();
-        long numberOfNotWorldwide = albums.stream().filter(p -> !p.isAvailableEverywhere()).count();
 
         GCheckboxAlbums.setText("Albums (" + numberOfAlbums + ")");
         GCheckboxSingles.setText("Singles (" + numberOfSingles + ")");
         GCheckboxFeaturing.setText("Featuring (" + numberOfFeaturing + ")");
-        GCheckboxNotWorldwide.setText("Not worldwide (" + numberOfNotWorldwide + ")");
+        GCheckboxCompilations.setText("Compilations (" + numberOfCompilations + ")");
 
         configCheckboxBasedOnNumbers(GCheckboxAlbums, numberOfAlbums);
         configCheckboxBasedOnNumbers(GCheckboxSingles, numberOfSingles);
         configCheckboxBasedOnNumbers(GCheckboxFeaturing, numberOfFeaturing);
-        configCheckboxBasedOnNumbers(GCheckboxNotWorldwide, numberOfNotWorldwide);
+        configCheckboxBasedOnNumbers(GCheckboxCompilations, numberOfCompilations);
     }
 
     private void configCheckboxBasedOnNumbers(CheckBox checkbox, long number) {
@@ -1047,7 +1049,7 @@ public class ControllerAlbums {
     private static void copyDiscordMessage(ReleasedAlbum album) {
         ClipboardContent content = new ClipboardContent();
 
-        String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
+        String qsingle = album.isSingle() ? " _(Single)_" : "";
         content.putString("> **" + album.getAlbumName() + "**" + qsingle + "\n" +
                 "> by " + getFormattedArtists(album) + "\n" +
                 "> " + album.getExtendedReleaseDate() + "\n> " +
@@ -1061,7 +1063,7 @@ public class ControllerAlbums {
         StringBuilder sb = new StringBuilder();
 
         for (ReleasedAlbum album : GTableNewReleases.getItems()) {
-            String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
+            String qsingle = album.isSingle() ? " _(Single)_" : "";
             sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle)
                     .append("\n> by ").append(getFormattedArtists(album))
                     .append("\n> Release date: ").append(album.getExtendedReleaseDate())
@@ -1077,7 +1079,7 @@ public class ControllerAlbums {
         StringBuilder sb = new StringBuilder(todaytomorrow + " (" + date + ") new releases:\n\n");
 
         for (ReleasedAlbum album : GTableAllReleases.getItems().stream().filter(p -> p.getReleaseDate().equals(date)).toList()) {
-            String qsingle = album.getAlbumType().equalsIgnoreCase("single") ? " _(Single)_" : "";
+            String qsingle = album.isSingle() ? " _(Single)_" : "";
             sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle)
                     .append("\n> by ").append(getFormattedArtists(album))
                     .append("\n> ").append(album.getLink()).append("\n\n");

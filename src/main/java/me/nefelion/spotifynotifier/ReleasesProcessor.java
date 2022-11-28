@@ -4,6 +4,7 @@ import com.neovisionaries.i18n.CountryCode;
 import javafx.application.Platform;
 import me.nefelion.spotifynotifier.data.FileManager;
 import se.michaelthelin.spotify.enums.AlbumGroup;
+import se.michaelthelin.spotify.enums.AlbumType;
 import se.michaelthelin.spotify.model_objects.specification.AlbumSimplified;
 import se.michaelthelin.spotify.model_objects.specification.ArtistSimplified;
 
@@ -21,7 +22,7 @@ public class ReleasesProcessor {
     private final HashMap<String, ReleasedAlbum> featuringHashMap;
     private final List<ReleasedAlbum> newAlbums, allAlbums;
     private final CountryCode countryCode;
-    private final boolean ignoreVarious, showOnlyAvailable, ignoreNotWorldwide;
+    private final boolean ignoreVarious, ignoreNotWorldwide, ignoreCompilations, showOnlyAvailable;
 
     private DoubleConsumer progressC;
     private Consumer<String> currentArtistC;
@@ -43,8 +44,9 @@ public class ReleasesProcessor {
         loadedIDhashSet = new HashSet<>();
         countryCode = FileManager.getFileData().getCountryCode();
         ignoreVarious = FileManager.getFileData().isIgnoreVariousArtists();
-        showOnlyAvailable = FileManager.getFileData().isShowOnlyAvailable();
         ignoreNotWorldwide = FileManager.getFileData().isIgnoreNotWorldwide();
+        ignoreCompilations = FileManager.getFileData().isIgnoreCompilations();
+        showOnlyAvailable = FileManager.getFileData().isShowOnlyAvailable();
     }
 
     public ReleasesProcessor(FollowedArtist... artists) {
@@ -82,6 +84,7 @@ public class ReleasesProcessor {
                 if (isAlreadyLoaded(a)) continue;
                 if (showOnlyAvailable && !isAvailable(a)) continue;
                 if (ignoreNotWorldwide && !isWorldwide(a)) continue;
+                if (ignoreCompilations && isCompilation(a)) continue;
                 if (dischardFollowedArtists && hasFollowedArtist(a)) continue;
 
                 if (isFeaturing(a)) {
@@ -162,7 +165,6 @@ public class ReleasesProcessor {
         boolean isRemind = isOnRemindList(a) && isAvailable(a);
         if (isRemind) remindIDhashSet.remove(a.getId());
         album.setReminded(isRemind);
-        album.setAvailableEverywhere(isWorldwide(a));
         return album;
     }
 
@@ -247,6 +249,10 @@ public class ReleasesProcessor {
 
     private static boolean isFeaturing(AlbumSimplified album) {
         return album.getAlbumGroup().equals(AlbumGroup.APPEARS_ON);
+    }
+
+    private boolean isCompilation(AlbumSimplified a) {
+        return a.getAlbumType().equals(AlbumType.COMPILATION);
     }
 
     private boolean isAlreadyLoaded(AlbumSimplified album) {
