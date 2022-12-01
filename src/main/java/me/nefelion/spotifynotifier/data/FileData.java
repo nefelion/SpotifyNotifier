@@ -22,7 +22,7 @@ public class FileData {
         this.ignoreVariousArtists = false;
         this.ignoreCompilations = false;
         this.ignoreNotWorldwide = false;
-        this.useBrowserInsteadOfApp = false;
+        this.useBrowserInsteadOfApp = true;
     }
 
     public List<FollowedArtist> getFollowedArtists() {
