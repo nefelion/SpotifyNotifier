@@ -966,12 +966,17 @@ public class ControllerAlbums {
                 copyDiscordMessage(album);
             });
             remindMenuItem.setOnAction(event -> {
-                FileManager.addToRemind(row.getItem().getId());
+                ReleasedAlbum album = row.getItem();
+                if (Arrays.stream(album.getAlbum().getArtists()).noneMatch(p -> TheEngine.isFollowed(p.getId()))) {
+                    Utilities.okMSGBOX("You can't set a reminder for an album if you don't follow the artist!");
+                    return;
+                }
 
+                FileManager.addToRemind(album.getId());
                 String countryName = TempData.getInstance().getFileData().getCountryCode().getName();
                 if (Utilities.okUndoMSGBOX("Reminder added. The album will appear in the 'New Releases' tab when it is released in " + countryName + "."
                         + "\n\nTo change the country, go to the 'Settings' (3 dots in the top right corner)."))
-                    if (FileManager.removeFromRemind(row.getItem().getId())) Utilities.okMSGBOX("Reminder removed.");
+                    if (FileManager.removeFromRemind(album.getId())) Utilities.okMSGBOX("Reminder removed.");
             });
             moreInfoMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
