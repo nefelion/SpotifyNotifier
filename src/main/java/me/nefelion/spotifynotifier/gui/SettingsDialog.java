@@ -13,6 +13,7 @@ import me.nefelion.spotifynotifier.Main;
 import me.nefelion.spotifynotifier.data.FileData;
 import me.nefelion.spotifynotifier.data.FileManager;
 import me.nefelion.spotifynotifier.data.TempData;
+import me.nefelion.spotifynotifier.settings.DiscordMessageSettings;
 
 import java.util.Objects;
 
@@ -22,14 +23,13 @@ public class SettingsDialog extends Dialog<ButtonType> {
     private TextField textFieldCountryCode;
     private CheckBox checkBoxOnlyAvailable,
             checkBoxIgnoreVarious, checkBoxIgnoreNotWorldwide, checkBoxIgnoreCompilations;
-    private Slider sliderExploreIterations;
     private RadioButton radioButtonBrowser;
+    private final DiscordMessageSettings discordMessagesSettings = new DiscordMessageSettings();
 
     public SettingsDialog() {
         setIcon();
         setTitle("Settings");
         setHeaderText("Settings");
-        setContentText("Please choose your settings:");
         setButtons();
         getDialogPane().setContent(getMainVBOX());
     }
@@ -53,8 +53,20 @@ public class SettingsDialog extends Dialog<ButtonType> {
                 getSeparator(),
                 getBrowserAppVBOX(),
                 getSeparator(),
+                getButtonDiscordMessageConfig(),
+                getSeparator(),
                 getButtonResetCredentials());
         return vbox;
+    }
+
+    private Node getButtonDiscordMessageConfig() {
+        Button button = new Button("Discord Messages Config");
+        button.setOnAction((event) -> {
+            DiscordMessageConfigDialog dialog = new DiscordMessageConfigDialog(discordMessagesSettings);
+            dialog.showAndWait();
+        });
+
+        return button;
     }
 
     private Node getBrowserAppVBOX() {
@@ -171,6 +183,8 @@ public class SettingsDialog extends Dialog<ButtonType> {
         fd.setIgnoreCompilations(checkBoxIgnoreCompilations.isSelected());
         fd.setShowOnlyAvailable(checkBoxOnlyAvailable.isSelected());
         fd.setUseBrowserInsteadOfApp(radioButtonBrowser.isSelected());
+
+        discordMessagesSettings.saveSettings(fd);
 
         FileManager.saveFileData(fd);
     }

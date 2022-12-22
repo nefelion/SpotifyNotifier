@@ -9,6 +9,8 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import se.michaelthelin.spotify.enums.AlbumGroup;
@@ -298,5 +300,35 @@ public class Utilities {
         return null;
     }
 
+    public static String getFormattedArtists(ReleasedAlbum album) {
+        StringBuilder sb = new StringBuilder();
+        int artists = 0;
+        int allArtists = album.getAlbum().getArtists().length;
 
+        ArtistSimplified[] followed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> TheEngine.isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
+        ArtistSimplified[] notFollowed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> !TheEngine.isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
+        for (ArtistSimplified artist : followed) {
+            artists++;
+            sb.append("**").append(artist.getName()).append("**").append(artists == allArtists - 1 ? " and " : ", ");
+        }
+
+        for (ArtistSimplified artist : notFollowed) {
+            if (artists >= 5) break;
+            artists++;
+            sb.append(artist.getName()).append((artists == allArtists - 1 && artists < 5) ? " and " : ", ");
+        }
+
+        sb.delete(sb.length() - 2, sb.length());
+
+        if (artists < album.getAlbum().getArtists().length)
+            sb.append("... (and ").append(album.getAlbum().getArtists().length - artists).append(" more)");
+
+        return sb.toString();
+    }
+
+    public static void copyToClipboard(String s) {
+        ClipboardContent content = new ClipboardContent();
+        content.putString(s);
+        Clipboard.getSystemClipboard().setContent(content);
+    }
 }

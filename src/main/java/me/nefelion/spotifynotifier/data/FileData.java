@@ -2,6 +2,7 @@ package me.nefelion.spotifynotifier.data;
 
 import com.neovisionaries.i18n.CountryCode;
 import me.nefelion.spotifynotifier.FollowedArtist;
+import me.nefelion.spotifynotifier.settings.DiscordMessageSettings;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ public class FileData {
     private String lastChecked, clientId, clientSecret;
     private int countryCodeNumeric;
     private boolean showOnlyAvailable, ignoreVariousArtists, ignoreNotWorldwide, ignoreCompilations, useBrowserInsteadOfApp;
+    private String discordTemplateAlbum, discordTemplateAlbumSpecificDay, discordPrefixLineToday, discordPrefixLineTomorrow;
 
     public FileData() {
         this.followedArtists = new LinkedList<>();
@@ -23,6 +25,11 @@ public class FileData {
         this.ignoreCompilations = false;
         this.ignoreNotWorldwide = false;
         this.useBrowserInsteadOfApp = true;
+
+        this.discordTemplateAlbum = DiscordMessageSettings.DEFAULT_TEMPLATE_ALBUM;
+        this.discordTemplateAlbumSpecificDay = DiscordMessageSettings.DEFAULT_TEMPLATE_ALBUM_SPECIFIC_DAY;
+        this.discordPrefixLineToday = DiscordMessageSettings.DEFAULT_PREFIX_LINE_TODAY;
+        this.discordPrefixLineTomorrow = DiscordMessageSettings.DEFAULT_PREFIX_LINE_TOMORROW;
     }
 
     public List<FollowedArtist> getFollowedArtists() {
@@ -105,4 +112,35 @@ public class FileData {
         this.useBrowserInsteadOfApp = useBrowserInsteadOfApp;
     }
 
+    public String getDiscordTemplateAlbum() {
+        return discordTemplateAlbum;
+    }
+
+    public void setDiscordTemplateAlbum(String discordTemplateAlbum) {
+        this.discordTemplateAlbum = discordTemplateAlbum;
+    }
+
+    public String getDiscordTemplateAlbumSpecificDay() {
+        return discordTemplateAlbumSpecificDay;
+    }
+
+    public void setDiscordTemplateAlbumSpecificDay(String discordTemplateAlbumSpecificDay) {
+        this.discordTemplateAlbumSpecificDay = discordTemplateAlbumSpecificDay;
+    }
+
+    public String getDiscordPrefixLineToday() {
+        return discordPrefixLineToday;
+    }
+
+    public void setDiscordPrefixLineToday(String discordPrefixLineToday) {
+        this.discordPrefixLineToday = discordPrefixLineToday;
+    }
+
+    public String getDiscordPrefixLineTomorrow() {
+        return discordPrefixLineTomorrow;
+    }
+
+    public void setDiscordPrefixLineTomorrow(String discordPrefixLineTomorrow) {
+        this.discordPrefixLineTomorrow = discordPrefixLineTomorrow;
+    }
 }

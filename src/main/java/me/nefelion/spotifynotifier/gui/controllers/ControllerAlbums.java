@@ -249,7 +249,7 @@ public class ControllerAlbums {
                     Clipboard.getSystemClipboard().setContent(content);
                 } else if (event.getCode() == KeyCode.D) {
                     ReleasedAlbum album = GTableAllReleases.getSelectionModel().getSelectedItem();
-                    copyDiscordMessage(album);
+                    DiscordMessage.copy(album);
                 }
             }
         });
@@ -404,9 +404,9 @@ public class ControllerAlbums {
         MenuItem menuCreateDiscordTodayMessage = new MenuItem("Create discord message for today's releases only (" + todayReleases + ")");
         MenuItem menuCreateDiscordTomorrowMessage = new MenuItem("Create discord message for tomorrow's releases only (" + tomorrowReleases + ")");
 
-        menuCreateDiscordMessage.setOnAction(event -> copyDiscordMessageForAllNewReleases());
-        menuCreateDiscordTodayMessage.setOnAction(event -> copyDiscordMessageForReleases("Today's", Utilities.getTodayDate()));
-        menuCreateDiscordTomorrowMessage.setOnAction(event -> copyDiscordMessageForReleases("Tomorrow's", Utilities.getTomorrowDate()));
+        menuCreateDiscordMessage.setOnAction(event -> DiscordMessage.copy(newAlbums));
+        menuCreateDiscordTodayMessage.setOnAction(event -> DiscordMessage.copyTodays(allAlbums));
+        menuCreateDiscordTomorrowMessage.setOnAction(event -> DiscordMessage.copyTomorrows(allAlbums));
 
         GContextMenuNewReleases.getItems().clear();
         GContextMenuNewReleases.getItems().addAll(menuCreateDiscordMessage);
@@ -427,8 +427,8 @@ public class ControllerAlbums {
         MenuItem menuCreateDiscordTodayMessage = new MenuItem("Create discord message for today's releases only (" + todayReleases + ")");
         MenuItem menuCreateDiscordTomorrowMessage = new MenuItem("Create discord message for tomorrow's releases only (" + tomorrowReleases + ")");
 
-        menuCreateDiscordTodayMessage.setOnAction(event -> copyDiscordMessageForReleases("Today's", Utilities.getTodayDate()));
-        menuCreateDiscordTomorrowMessage.setOnAction(event -> copyDiscordMessageForReleases("Tomorrow's", Utilities.getTomorrowDate()));
+        menuCreateDiscordTodayMessage.setOnAction(event -> DiscordMessage.copyTodays(allAlbums));
+        menuCreateDiscordTomorrowMessage.setOnAction(event -> DiscordMessage.copyTomorrows(allAlbums));
 
         GContextMenuAllReleases.getItems().clear();
         if (todayReleases > 0) GContextMenuAllReleases.getItems().add(menuCreateDiscordTodayMessage);
@@ -963,7 +963,7 @@ public class ControllerAlbums {
             showSimilarMenuItem.setOnAction(event -> requestSimilarArtistsView(row.getItem().getFollowedArtist().getID(), row.getItem().getFollowedArtist().getName()));
             discordMessageMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
-                copyDiscordMessage(album);
+                DiscordMessage.copy(album);
             });
             remindMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
@@ -1051,49 +1051,6 @@ public class ControllerAlbums {
         });
     }
 
-    private static void copyDiscordMessage(ReleasedAlbum album) {
-        ClipboardContent content = new ClipboardContent();
-
-        String qsingle = album.isSingle() ? " _(Single)_" : "";
-        content.putString("> **" + album.getAlbumName() + "**" + qsingle + "\n" +
-                "> by " + getFormattedArtists(album) + "\n" +
-                "> " + album.getExtendedReleaseDate() + "\n> " +
-                album.getLink() + "\n");
-
-        Clipboard.getSystemClipboard().setContent(content);
-    }
-
-    private void copyDiscordMessageForAllNewReleases() {
-        ClipboardContent content = new ClipboardContent();
-        StringBuilder sb = new StringBuilder();
-
-        for (ReleasedAlbum album : GTableNewReleases.getItems()) {
-            String qsingle = album.isSingle() ? " _(Single)_" : "";
-            sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle)
-                    .append("\n> by ").append(getFormattedArtists(album))
-                    .append("\n> Release date: ").append(album.getExtendedReleaseDate())
-                    .append("\n> ").append(album.getLink()).append("\n\n");
-        }
-
-        content.putString(sb.toString());
-        Clipboard.getSystemClipboard().setContent(content);
-    }
-
-    private void copyDiscordMessageForReleases(String todaytomorrow, String date) {
-        ClipboardContent content = new ClipboardContent();
-        StringBuilder sb = new StringBuilder(":star2: " + todaytomorrow + " (_" + date + "_) new releases:\n\n");
-
-        for (ReleasedAlbum album : GTableAllReleases.getItems().stream().filter(p -> p.getReleaseDate().equals(date)).toList()) {
-            String qsingle = album.isSingle() ? " _(Single)_" : "";
-            sb.append("> **").append(album.getAlbumName()).append("**").append(qsingle)
-                    .append("\n> by ").append(getFormattedArtists(album))
-                    .append("\n> ").append(album.getLink()).append("\n\n");
-        }
-
-        content.putString(sb.toString());
-        Clipboard.getSystemClipboard().setContent(content);
-    }
-
     private void copyTracklist(TempAlbumInfo info) {
         ClipboardContent content = new ClipboardContent();
         StringBuilder sb = new StringBuilder();
@@ -1134,33 +1091,6 @@ public class ControllerAlbums {
 
         content.putString(sb.toString());
         Clipboard.getSystemClipboard().setContent(content);
-    }
-
-
-    private static String getFormattedArtists(ReleasedAlbum album) {
-        StringBuilder sb = new StringBuilder();
-        int artists = 0;
-        int allArtists = album.getAlbum().getArtists().length;
-
-        ArtistSimplified[] followed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> TheEngine.isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
-        ArtistSimplified[] notFollowed = Arrays.stream(album.getAlbum().getArtists()).filter(p -> !TheEngine.isFollowed(p.getId())).toArray(ArtistSimplified[]::new);
-        for (ArtistSimplified artist : followed) {
-            artists++;
-            sb.append("**").append(artist.getName()).append("**").append(artists == allArtists - 1 ? " and " : ", ");
-        }
-
-        for (ArtistSimplified artist : notFollowed) {
-            if (artists >= 5) break;
-            artists++;
-            sb.append(artist.getName()).append((artists == allArtists - 1 && artists < 5) ? " and " : ", ");
-        }
-
-        sb.delete(sb.length() - 2, sb.length());
-
-        if (artists < album.getAlbum().getArtists().length)
-            sb.append("... (and ").append(album.getAlbum().getArtists().length - artists).append(" more)");
-
-        return sb.toString();
     }
 
     private void requestSimilarArtistsView(String id, String name) {
