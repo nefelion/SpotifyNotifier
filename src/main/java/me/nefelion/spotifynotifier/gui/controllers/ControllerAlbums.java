@@ -968,7 +968,7 @@ public class ControllerAlbums {
             remindMenuItem.setOnAction(event -> {
                 ReleasedAlbum album = row.getItem();
                 if (Arrays.stream(album.getAlbum().getArtists()).noneMatch(p -> TheEngine.isFollowed(p.getId()))) {
-                    Utilities.okMSGBOX("You can't set a reminder for an album if you don't follow the artist!");
+                    Utilities.okMSGBOX("You can't set a reminder for an album if you don't follow the artist!", Alert.AlertType.ERROR);
                     return;
                 }
 

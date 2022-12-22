@@ -136,10 +136,14 @@ public class Utilities {
         return alert.getResult() == undo;
     }
 
-    public static void okMSGBOX(String message) {
+    public static void okMSGBOX(String message, Alert.AlertType type) {
         ButtonType ok = new ButtonType("Ok");
-        Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ok);
+        Alert alert = new Alert(type, message, ok);
         showAlert(alert);
+    }
+
+    public static void okMSGBOX(String message) {
+        okMSGBOX(message, Alert.AlertType.INFORMATION);
     }
 
     public static void showAlert(Alert alert) {
