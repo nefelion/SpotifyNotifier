@@ -1081,7 +1081,7 @@ public class ControllerAlbums {
 
     private void copyDiscordMessageForReleases(String todaytomorrow, String date) {
         ClipboardContent content = new ClipboardContent();
-        StringBuilder sb = new StringBuilder(todaytomorrow + " (" + date + ") new releases:\n\n");
+        StringBuilder sb = new StringBuilder(":star2: " + todaytomorrow + " (_" + date + "_) new releases:\n\n");
 
         for (ReleasedAlbum album : GTableAllReleases.getItems().stream().filter(p -> p.getReleaseDate().equals(date)).toList()) {
             String qsingle = album.isSingle() ? " _(Single)_" : "";
