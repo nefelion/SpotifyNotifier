@@ -1,6 +1,7 @@
 package me.nefelion.spotifynotifier.gui;
 
 import com.neovisionaries.i18n.CountryCode;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
@@ -26,18 +27,46 @@ public class SettingsDialog extends Dialog<ButtonType> {
     private RadioButton radioButtonBrowser;
     private final DiscordMessageSettings discordMessagesSettings = new DiscordMessageSettings();
 
-    public SettingsDialog() {
+    public SettingsDialog(boolean expanded) {
         setIcon();
         setTitle("Settings");
         setHeaderText("Settings");
         setButtons();
-        getDialogPane().setContent(getMainVBOX());
+        initializeIgnoringCheckboxes();
+        getDialogPane().setContent(expanded ? getExpandedMainVBOX() : getBasicMainVBOX());
     }
 
-    private VBox getMainVBOX() {
+    private VBox getExpandedMainVBOX() {
         VBox vbox = new VBox();
         vbox.setSpacing(15);
 
+        vbox.getChildren().addAll(
+                getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious, checkBoxIgnoreNotWorldwide, checkBoxIgnoreCompilations,
+                getSeparator(),
+                getBrowserAppVBOX(),
+                getSeparator(),
+                new Label("Customisation"),
+                getButtonDiscordMessageConfig(),
+                getSeparator(),
+                getButtonResetCredentials());
+        return vbox;
+    }
+
+    private VBox getBasicMainVBOX() {
+        VBox vbox = new VBox();
+        vbox.setSpacing(15);
+
+        vbox.getChildren().addAll(
+                getCountryVBOX(),
+                getSeparator(),
+                getBrowserAppVBOX(),
+                getSeparator(),
+                getButtonShowExpandedSettings()
+        );
+        return vbox;
+    }
+
+    private void initializeIgnoringCheckboxes() {
         checkBoxIgnoreVarious = new CheckBox("Ignore 'Various Artists' releases");
         checkBoxIgnoreVarious.setSelected(TempData.getInstance().getFileData().isIgnoreVariousArtists());
 
@@ -46,21 +75,25 @@ public class SettingsDialog extends Dialog<ButtonType> {
 
         checkBoxIgnoreCompilations = new CheckBox("Ignore compilations");
         checkBoxIgnoreCompilations.setSelected(TempData.getInstance().getFileData().isIgnoreCompilations());
-
-
-        vbox.getChildren().addAll(
-                getCountryVBOX(), getSeparator(), checkBoxIgnoreVarious, checkBoxIgnoreNotWorldwide, checkBoxIgnoreCompilations,
-                getSeparator(),
-                getBrowserAppVBOX(),
-                getSeparator(),
-                getButtonDiscordMessageConfig(),
-                getSeparator(),
-                getButtonResetCredentials());
-        return vbox;
     }
 
-    private Node getButtonDiscordMessageConfig() {
-        Button button = new Button("Discord Messages Config");
+    private Button getButtonShowExpandedSettings() {
+        Button button = new Button("Show all settings");
+        button.setOnAction((event) -> {
+            Platform.runLater(this::close);
+            SettingsDialog dialog = new SettingsDialog(true);
+            dialog.showAndWait();
+        });
+
+        Tooltip tooltip = new Tooltip("Show all settings, including less important ones");
+        tooltip.setShowDelay(new javafx.util.Duration(0));
+        button.setTooltip(tooltip);
+
+        return button;
+    }
+
+    private Button getButtonDiscordMessageConfig() {
+        Button button = new Button("Customise Discord messages");
         button.setOnAction((event) -> {
             DiscordMessageConfigDialog dialog = new DiscordMessageConfigDialog(discordMessagesSettings);
             dialog.showAndWait();

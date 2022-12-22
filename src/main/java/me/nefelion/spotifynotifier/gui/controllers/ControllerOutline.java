@@ -63,7 +63,7 @@ public class ControllerOutline {
 
     private void setGButtonSettings() {
         GButtonSettings.setOnAction(e -> {
-            Dialog<ButtonType> dialog = new SettingsDialog();
+            Dialog<ButtonType> dialog = new SettingsDialog(false);
             dialog.showAndWait();
         });
         Tooltip settings = new Tooltip("Settings");

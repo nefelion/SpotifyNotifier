@@ -22,7 +22,7 @@ public class DiscordMessageConfigDialog extends Dialog<ButtonType> {
         this.discordMessagesSettings = settings;
         setIcon();
         setTitle("Discord Message Config");
-        setHeaderText("Here you can customize your Discord messages:");
+        setHeaderText("Here you can customise your Discord messages:");
         setButtons();
         getDialogPane().setContent(getMainVBOX());
     }
