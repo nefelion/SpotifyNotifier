@@ -96,7 +96,7 @@ public class AlbumInfoDialog extends Dialog<String> {
     private ScrollPane getAvailableMarketsScrollPane() {
         ScrollPane scrollPane = new ScrollPane();
         Label albumNameTextField = new Label();
-        String[] markets = Arrays.stream(album.getAvailableMarkets()).map(CountryCode::getName).sorted().toArray(String[]::new);
+        String[] markets = Arrays.stream(album.getAvailableMarkets()).filter(Objects::nonNull).map(CountryCode::getName).sorted().toArray(String[]::new);
         albumNameTextField.setText(String.join("\n", markets));
         scrollPane.setContent(albumNameTextField);
         scrollPane.setPrefViewportHeight(100);

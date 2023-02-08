@@ -104,7 +104,7 @@
         <dependency>
             <groupId>se.michaelthelin.spotify</groupId>
             <artifactId>spotify-web-api-java</artifactId>
-            <version>7.2.2</version>
+            <version>7.3.0</version>
         </dependency>
 
 
@@ -132,7 +132,6 @@
             <version>19</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-media -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
@@ -143,6 +142,12 @@
             <groupId>com.github.yvasyliev</groupId>
             <artifactId>deezer-api</artifactId>
             <version>1.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.dustinredmond.fxtrayicon</groupId>
+            <artifactId>FXTrayIcon</artifactId>
+            <version>4.0.1</version>
         </dependency>
 
 
